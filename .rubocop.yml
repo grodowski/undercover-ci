@@ -1,0 +1,20 @@
+AllCops:
+  TargetRubyVersion: 2.4.4
+  Exclude:
+    - spec/fixtures/**/*
+
+Style/RegexpLiteral:
+  EnforcedStyle: slashes
+  AllowInnerSlashes: true
+
+Style/Documentation:
+  Enabled: false
+
+Layout/SpaceInsideHashLiteralBraces:
+  Enabled: true
+  EnforcedStyle: no_space
+
+Metrics/BlockLength:
+  Enabled: true
+  Exclude:
+    - spec/**/*
