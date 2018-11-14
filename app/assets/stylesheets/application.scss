@@ -10,6 +10,33 @@
  * files in this directory. Styles in this file should be added after the last require_* statement.
  * It is generally better to create a new file per style scope.
  *
- *= require_tree .
- *= require_self
  */
+@import "bootstrap";
+
+// index
+body {
+  padding-top: 5rem;
+}
+
+.starter-template {
+  text-align: center;
+  padding: 3rem 1.5rem;
+
+  @include media-breakpoint-up(md) {
+    padding: 6rem 1.5rem;
+  }
+
+  @include media-breakpoint-up(lg) {
+    padding: 10rem 1.5rem;
+  }
+}
+
+// pricing
+.pricing
+.pricing-header {
+  max-width: 700px;
+}
+
+.card-deck .card {
+  min-width: 220px;
+}

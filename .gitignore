@@ -7,6 +7,9 @@
 # Ignore bundler config.
 /.bundle
 
+# Ignore secrets
+*.pem
+
 # Ignore all logfiles and tempfiles.
 /log/*
 /tmp/*

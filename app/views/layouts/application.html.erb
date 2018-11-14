@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>UndercoverCi</title>
+    <title>Undercover CI - Quality Code Ships With Tests</title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -10,6 +10,10 @@
   </head>
 
   <body>
-    <%= yield %>
+    <%= render 'partials/navbar' %>
+    <main role="main" class="container">
+      <%= yield %>
+    </main>
+    <%= render 'partials/footer' %>
   </body>
 </html>
