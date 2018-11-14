@@ -1,24 +1,7 @@
-# README
+# Undercover CI
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Undercover code coverage warnings as a Github App.
 
-Things you may want to cover:
+While this project is under construction, check out the [undercover gem](https://github.com/grodowski/undercover).
 
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+![wip](https://media1.giphy.com/media/oDXVyGCO7f4A0/giphy.gif?cid=3640f6095bec729162584275360b6922)
