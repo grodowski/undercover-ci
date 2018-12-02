@@ -10,6 +10,7 @@
 # Ignore secrets
 *.pem
 *.env
+*.envrc
 
 # Ignore all logfiles and tempfiles.
 /log/*
