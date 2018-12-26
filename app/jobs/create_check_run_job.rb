@@ -15,6 +15,7 @@ class CreateCheckRunJob < ApplicationJob
 
   # end
 
+  # rubocop:disable Metrics/MethodLength
   def perform(webhook_payload)
     @app_client = setup_app_client
     @webhook_payload = webhook_payload
@@ -37,20 +38,21 @@ class CreateCheckRunJob < ApplicationJob
         text: "**some sample mardown**\n\n```\ndef hello\n  $$$\nend\n```\n~~hello~~",
         annotations: [
           {
-            path: 'lib/undercover.rb',
+            path: "lib/undercover.rb",
             start_line: 38,
             end_line: 39,
-            annotation_level: 'warning',
-            title: 'Insufficient Test Coverage',
-            message: 'Instance method `test_method` is missing coverage for line 39 (method coverage: 0.0%)'
+            annotation_level: "warning",
+            title: "Insufficient Test Coverage",
+            message: "Instance method `test_method` is missing coverage for line 39 (method coverage: 0.0%)"
           }
-        ],
+        ]
       },
       headers: {"Accept": "application/vnd.github.antiope-preview+json"}
     )
 
     Rails.logger.debug(res.to_h)
   end
+  # rubocop:enable Metrics/MethodLength
 
   private
 
