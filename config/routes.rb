@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  namespace :v1 do
+  namespace :v1, constraints: ->(req) { req.format == :json } do
     post "/hooks", to: "github_webhooks#create"
   end
 
