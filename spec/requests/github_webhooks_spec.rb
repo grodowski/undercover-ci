@@ -35,7 +35,6 @@ describe "GitHub Webhooks" do
   it "logs unhandled actions and returns ok" do
     payload = {action: :start}.to_json
     valid_headers = {
-      "CONTENT_TYPE": "application/json",
       "ACCEPT": "application/json",
       "HTTP_X_HUB_SIGNATURE": sign_hook(payload),
       "HTTP_X_GITHUB_EVENT": "partyhard"
@@ -63,7 +62,6 @@ describe "GitHub Webhooks" do
       "check_suite" => {"id" => 43_009_808}
     }
     valid_headers = {
-      "CONTENT_TYPE": "application/json",
       "ACCEPT": "application/json",
       "HTTP_X_HUB_SIGNATURE": sign_hook(payload.to_json),
       "HTTP_X_GITHUB_EVENT": "check_suite"
