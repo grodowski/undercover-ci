@@ -2,6 +2,6 @@
 
 require "rails_helper"
 
-RSpec.describe RunnerJob, type: :job do
+describe RunnerJob do
   pending "add some examples to (or delete) #{__FILE__}"
 end

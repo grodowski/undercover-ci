@@ -2,6 +2,6 @@
 
 require "rails_helper"
 
-describe CreateCheckRunJob do
+describe V1::GithubWebhooksController do
   pending "add some examples to (or delete) #{__FILE__}"
 end

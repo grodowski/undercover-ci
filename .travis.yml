@@ -1,0 +1,13 @@
+language: ruby
+rvm:
+  - 2.5.3
+  - 2.4.5
+  - 2.3.8
+before_install:
+  - gem install bundler undercover
+  - gem update --system
+script:
+  - bundle exec rubocop
+  - bundle exec rake
+  - git pull origin master:master
+  - bundle exec undercover --compare master
