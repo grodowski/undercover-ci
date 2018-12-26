@@ -2,9 +2,7 @@
 
 require "spec_helper"
 
-require "timecop"
 require "pry"
-
 require "simplecov"
 require "simplecov-lcov"
 SimpleCov::Formatter::LcovFormatter.config.report_with_single_file = true
@@ -14,6 +12,8 @@ SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new(
 SimpleCov.start do
   add_filter(/^\/spec\//)
 end
+
+system("source .envrc.example")
 
 ENV["RAILS_ENV"] ||= "test"
 require File.expand_path("../config/environment", __dir__)

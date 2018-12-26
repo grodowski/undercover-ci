@@ -3,11 +3,17 @@ rvm:
   - 2.5.3
   - 2.4.5
   - 2.3.8
+env:
+  global:
+    - GITHUB_PRIVATE_KEY=bacon_key
+    - GITHUB_APP_IDENTIFIER=bacon_app_id
+    - GITHUB_WEBHOOK_SECRET=sekrit
 before_install:
   - gem install bundler undercover
   - gem update --system
 script:
   - bundle exec rubocop
+  - RAILS_ENV=test bundle exec rails db:setup
   - bundle exec rake
   - git pull origin master:master
   - bundle exec undercover --compare master

@@ -30,15 +30,19 @@ module V1
         case @payload["action"].strip
         when /^(re)?requested$/
           File.write("check_suite.json", @payload.to_json)
+          # TODO: Start a check run (in_progress)
           # CreateCheckRunJob.perform_later(@payload)
+          # TODO: RunnerJob sleeps and auto-completes for now (done)
           # RunnerJob.perform_later(Time.now.to_i.to_s)
         end
       when EVENT_TYPE_INSTALLATION
+        # TODO: create an installation record
         File.write("installation.json", @payload.to_json)
       when EVENT_TYPE_INSTALLATION_REPOSITORIES
+        # TODO: create/soft-delete a repository
         File.write("installation_repositories.json", @payload.to_json)
       else
-        logger.debug "---- unhandled #{@payload['action']}/#{@event_type}"
+        logger.debug "Webhook Unhandled: #{@payload['action']}/#{@event_type}"
       end
     end
     # rubocop:enable Metrics/MethodLength
