@@ -2,6 +2,7 @@ AllCops:
   TargetRubyVersion: 2.4.4
   Exclude:
     - spec/fixtures/**/*
+    - db/schema.rb
 
 Style/RegexpLiteral:
   EnforcedStyle: slashes
