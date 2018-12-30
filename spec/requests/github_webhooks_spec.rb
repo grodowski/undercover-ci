@@ -59,7 +59,9 @@ describe "GitHub Webhooks" do
   it "handles check_suite and creates a new check_run" do
     payload = {
       "action" => "requested",
-      "check_suite" => {"id" => 43_009_808}
+      "check_suite" => {"head_sha" => "0fb234"},
+      "installation" => {"id" => 43_009_808},
+      "repository" => {"full_name" => "grodowski/undercover-ci"}
     }
     valid_headers = {
       "ACCEPT": "application/json",
@@ -67,7 +69,8 @@ describe "GitHub Webhooks" do
       "HTTP_X_GITHUB_EVENT": "check_suite"
     }
 
-    expect(CreateCheckRunJob).to receive(:perform_later).with(payload)
+    expect(CreateCheckRunJob).to receive(:perform_later)
+      .with(hash_including(payload.symbolize_keys))
 
     post path, params: payload.to_json, headers: valid_headers
     expect(response).to be_ok
