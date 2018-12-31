@@ -3,7 +3,7 @@ AllCops:
   Exclude:
     - spec/fixtures/**/*
     - db/schema.rb
-    - vendor/
+    - vendor/**/*
 
 Style/RegexpLiteral:
   EnforcedStyle: slashes
