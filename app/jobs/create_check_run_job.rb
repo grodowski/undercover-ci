@@ -8,7 +8,8 @@ class CreateCheckRunJob < ApplicationJob
   queue_as :default
 
   # FIXME: mock implementation
-  def perform(webhook_payload)
-    CheckRuns::Create.from_check_suite(webhook_payload)
+  def perform(run)
+    run = Hooks::CheckRunInfo.new(run)
+    CheckRuns::Create.new(run).post
   end
 end

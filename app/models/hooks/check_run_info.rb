@@ -4,7 +4,7 @@ require "ostruct"
 
 module Hooks
   class CheckRunInfo
-    include ActiveModel::Model
+    attr_reader :installation_id, :full_name, :sha
 
     def initialize(payload)
       @payload = OpenStruct.new(payload)

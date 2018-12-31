@@ -17,6 +17,7 @@ class RunnerJob < ApplicationJob
 
     sleep 15 if SLEEP
     # FIXME: needs more states to retry if GitHub api fails
+    # FIXME: improve logging `run`
     Rails.logger.info "Starting analysis... #{run}"
     CheckRuns::Run.new run.to_h
 
