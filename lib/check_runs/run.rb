@@ -3,8 +3,8 @@
 module CheckRuns
   class Run < Base
     def post
-      installation_api_client(run.installation_id).post(
-        "/repos/#{run.repo_name}/check-runs",
+      res = installation_api_client(run.installation_id).post(
+        "/repos/#{run.full_name}/check-runs",
         head_sha: run.sha,
         name: "Coverage Check",
         status: "in_progress",
@@ -16,7 +16,6 @@ module CheckRuns
         },
         headers: {"Accept": "application/vnd.github.antiope-preview+json"}
       )
-      # TODO: check response
     end
   end
 end

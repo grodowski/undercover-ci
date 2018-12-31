@@ -5,7 +5,7 @@ module CheckRuns
     # TODO: fix 422
     def post
       installation_api_client(run.installation_id).post(
-        "/repos/#{run.repo_name}/check-runs",
+        "/repos/#{run.full_name}/check-runs",
         head_sha: run.sha,
         name: "Coverage Check",
         status: "completed",

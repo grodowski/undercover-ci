@@ -33,7 +33,7 @@ module V1
         when /^(re)?requested$/
           File.write("check_suite.json", @payload.to_json) unless Rails.env.test?
           # TODO: Start a check run (in_progress)
-          run_info = Hooks::CheckRunInfo.new(@payload)
+          run_info = Hooks::CheckRunInfo.from_webhook(@payload)
           CreateCheckRunJob.perform_later(run_info.to_h)
 
           # FIXME: remove mock, triggers RunnerJob with sleeps inside :o

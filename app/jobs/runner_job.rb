@@ -11,7 +11,7 @@ class RunnerJob < ApplicationJob
 
   # FIXME: mock implementation
   def perform(run)
-    run = Hooks::CheckRunInfo.new(run)
+    run = Hooks::CheckRunInfo.from_webhook(run)
 
     Rails.logger.info "Waiting for webhook... #{run}"
 
@@ -19,11 +19,11 @@ class RunnerJob < ApplicationJob
     # FIXME: needs more states to retry if GitHub api fails
     # FIXME: improve logging `run`
     Rails.logger.info "Starting analysis... #{run}"
-    CheckRuns::Run.new run.to_h
+    CheckRuns::Run.new run
 
     sleep 15 if SLEEP
     # FIXME: needs more states to retry if GitHub api fails
     Rails.logger.info "Completing analysis... #{run}"
-    CheckRuns::Complete.new run.to_h
+    CheckRuns::Complete.new run
   end
 end
