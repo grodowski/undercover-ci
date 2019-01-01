@@ -10,7 +10,7 @@ module GitHubRequests
     app_api_client unless @github_app_client
     i_token = @github_app_client.create_installation_access_token(
       installation_id,
-      headers: {"Accept": "application/vnd.github.antiope-preview+json"}
+      accept: "application/vnd.github.machine-man-preview+json"
     )
     Octokit::Client.new(access_token: i_token.token)
   end

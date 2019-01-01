@@ -77,6 +77,14 @@ describe "GitHub Webhooks" do
           sha: "0fb234"
         )
       )
+    expect(RunnerJob).to receive(:perform_later)
+      .with(
+        hash_including(
+          installation_id: 43_009_808,
+          full_name: "grodowski/undercover-ci",
+          sha: "0fb234"
+        )
+      )
 
     post path, params: payload.to_json, headers: valid_headers
     expect(response).to be_ok

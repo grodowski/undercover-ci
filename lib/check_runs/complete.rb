@@ -2,7 +2,6 @@
 
 module CheckRuns
   class Complete < Base
-    # TODO: fix 422
     def post
       client = installation_api_client(run.installation_id)
       client.post(
@@ -10,6 +9,7 @@ module CheckRuns
         head_sha: run.sha,
         name: "Coverage Check",
         status: "completed",
+        # TODO: send started_at
         completed_at: Time.now.iso8601,
         conclusion: "failure",
         details_url: "https://google.com",
@@ -29,9 +29,9 @@ module CheckRuns
             message: "Instance method `test_method` is missing coverage for line 39 (method coverage: 0.0%)"
           }
         ],
-        headers: {"Accept": "application/vnd.github.antiope-preview+json"}
+        accept: "application/vnd.github.antiope-preview+json"
       )
-      Rails.logger.debug(client.last_response)
+      Rails.logger.debug("CheckRuns::Complete response: #{client.last_response.status}")
     end
   end
 end

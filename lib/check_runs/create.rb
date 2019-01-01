@@ -15,9 +15,9 @@ module CheckRuns
           summary: "Undercover CI is awaiting a coverage report...",
           text: "**TODO: LCOV coverage setup instructions**\n\n```\ndef hello\n  $$$\nend\n```\n~~hello~~"
         },
-        headers: {"Accept": "application/vnd.github.antiope-preview+json"}
+        accept: "application/vnd.github.antiope-preview+json"
       )
-      Rails.logger.debug(client.last_response)
+      Rails.logger.debug("CheckRuns::Create response: #{client.last_response.status}")
     end
   end
 end
