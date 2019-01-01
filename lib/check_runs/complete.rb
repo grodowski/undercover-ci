@@ -4,7 +4,8 @@ module CheckRuns
   class Complete < Base
     # TODO: fix 422
     def post
-      installation_api_client(run.installation_id).post(
+      client = installation_api_client(run.installation_id)
+      client.post(
         "/repos/#{run.full_name}/check-runs",
         head_sha: run.sha,
         name: "Coverage Check",
@@ -30,7 +31,7 @@ module CheckRuns
         ],
         headers: {"Accept": "application/vnd.github.antiope-preview+json"}
       )
-      # TODO: check response
+      Rails.logger.debug(client.last_response)
     end
   end
 end
