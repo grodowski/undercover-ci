@@ -9,7 +9,7 @@ class CreateCheckRunJob < ApplicationJob
 
   # FIXME: mock implementation
   def perform(run)
-    run = Hooks::CheckRunInfo.from_webhook(run)
+    run = Hooks::CheckRunInfo.build_from_hash(run)
     CheckRuns::Create.new(run).post
   end
 end

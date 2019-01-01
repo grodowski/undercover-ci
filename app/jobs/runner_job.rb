@@ -11,7 +11,7 @@ class RunnerJob < ApplicationJob
 
   # FIXME: mock implementation
   def perform(run)
-    run = Hooks::CheckRunInfo.from_webhook(run)
+    run = Hooks::CheckRunInfo.build_from_hash(run)
 
     Rails.logger.info "Waiting for webhook... #{run}"
 
