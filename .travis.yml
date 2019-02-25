@@ -9,7 +9,7 @@ env:
     - GITHUB_APP_IDENTIFIER=bacon_app_id
     - GITHUB_WEBHOOK_SECRET=sekrit
 addons:
-  postgresql: "10"
+  postgresql: "9.6"
 before_install:
   - gem install bundler undercover
   - gem update --system
