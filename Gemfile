@@ -11,6 +11,8 @@ gem "jbuilder", "~> 2.5"
 gem "pg", ">= 0.18", "< 2.0"
 gem "puma", "~> 3.11"
 
+gem "undercover"
+
 # UI Gems
 gem "bootstrap", "~> 4.1.3"
 gem "coffee-rails", "~> 4.2"
@@ -27,7 +29,6 @@ group :development, :test do
   gem "byebug", platforms: %i[mri mingw x64_mingw]
   gem "pry-rails"
   gem "rubocop"
-  gem "undercover"
 end
 
 group :development do

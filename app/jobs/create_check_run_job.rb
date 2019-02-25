@@ -7,9 +7,10 @@ require "check_runs"
 class CreateCheckRunJob < ApplicationJob
   queue_as :default
 
-  # FIXME: mock implementation
-  def perform(run)
-    run = Hooks::CheckRunInfo.build_from_hash(run)
+  def perform(coverage_report_job_id)
+    run = Hooks::CheckRunInfo.from_coverage_report_job(
+      CoverageReportJob.find(coverage_report_job_id)
+    )
     CheckRuns::Create.new(run).post
   end
 end

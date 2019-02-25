@@ -7,23 +7,8 @@ require "check_runs"
 class RunnerJob < ApplicationJob
   queue_as :default
 
-  SLEEP = !Rails.env.test?
-
-  # FIXME: mock implementation
-  def perform(run)
-    run = Hooks::CheckRunInfo.build_from_hash(run)
-
-    Rails.logger.info "Waiting for webhook... #{run}"
-
-    sleep 15 if SLEEP
-    # FIXME: needs more states to retry if GitHub api fails
-    # FIXME: improve logging `run`
-    Rails.logger.info "Starting analysis... #{run}"
-    CheckRuns::Run.new(run).post
-
-    sleep 15 if SLEEP
-    # FIXME: needs more states to retry if GitHub api fails
-    Rails.logger.info "Completing analysis... #{run}"
-    CheckRuns::Complete.new(run).post
+  def perform(coverage_report_job_id)
+    coverage_report_job = CoverageReportJob.find(coverage_report_job_id)
+    Logic::RunUndercover.call(coverage_report_job)
   end
 end

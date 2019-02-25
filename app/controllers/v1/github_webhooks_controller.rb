@@ -31,13 +31,12 @@ module V1
 
         case @payload["action"].strip
         when /^(re)?requested$/
-          File.write("check_suite.json", @payload.to_json) unless Rails.env.test?
-          # TODO: Start a check run (in_progress)
-          run_info = Hooks::CheckRunInfo.from_webhook(@payload)
-          CreateCheckRunJob.perform_later(run_info.to_h)
+          File.write("check_suite.json", @payload.to_json) if Rails.env.development?
 
-          # FIXME: remove mock, triggers RunnerJob with sleeps inside :o
-          RunnerJob.perform_later(run_info.to_h)
+          # TODO: Queue a check run instance (queued)
+          # What if already running?
+          run_info = Hooks::CheckRunInfo.from_webhook(@payload)
+          Logic::StartCheckRun.call(run_info)
         else
           logger.debug "Webhook Unhandled: #{@payload['action']}/#{@event_type}"
         end
@@ -48,20 +47,20 @@ module V1
         case @payload["action"].strip
         when /^(re)?requested$/
           # FIXME: handle check_run re-requests!
-          File.write("check_run.json", @payload.to_json) unless Rails.env.test?
+          File.write("check_run.json", @payload.to_json) if Rails.env.development?
         end
 
       when EVENT_TYPE_INSTALLATION
 
         # TODO: create an installation record
         logger.debug "Webhook Unhandled: #{@payload['action']}/#{@event_type}"
-        File.write("installation.json", @payload.to_json) unless Rails.env.test?
+        File.write("installation.json", @payload.to_json) if Rails.env.development?
 
       when EVENT_TYPE_INSTALLATION_REPOSITORIES
 
         # TODO: create or soft-delete a repositories
         logger.debug "Webhook Unhandled: #{@payload['action']}/#{@event_type}"
-        File.write("installation_repositories.json", @payload.to_json) unless Rails.env.test?
+        File.write("installation_repositories.json", @payload.to_json) if Rails.env.development?
 
       else
         logger.debug "Webhook Unhandled: #{@payload['action']}/#{@event_type}"

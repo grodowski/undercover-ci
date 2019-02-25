@@ -6,13 +6,19 @@ module GitHubRequests
   )
   APP_IDENTIFIER = ENV.fetch("GITHUB_APP_IDENTIFIER")
 
-  def installation_api_client(installation_id)
+  def installation_token(installation_id)
     app_api_client unless @github_app_client
     i_token = @github_app_client.create_installation_access_token(
       installation_id,
       accept: "application/vnd.github.machine-man-preview+json"
     )
-    Octokit::Client.new(access_token: i_token.token)
+    i_token.token
+  end
+
+  def installation_api_client(installation_id)
+    Octokit::Client.new(
+      access_token: installation_token(installation_id)
+    )
   end
 
   def app_api_client
