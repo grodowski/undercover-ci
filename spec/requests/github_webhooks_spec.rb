@@ -68,25 +68,19 @@ describe "GitHub Webhooks" do
       "HTTP_X_HUB_SIGNATURE": sign_hook(payload.to_json),
       "HTTP_X_GITHUB_EVENT": "check_suite"
     }
-
-    expect(CreateCheckRunJob).to receive(:perform_later)
-      .with(
-        hash_including(
-          installation_id: 43_009_808,
-          full_name: "grodowski/undercover-ci",
-          sha: "0fb234"
-        )
-      )
-    expect(RunnerJob).to receive(:perform_later)
-      .with(
-        hash_including(
-          installation_id: 43_009_808,
-          full_name: "grodowski/undercover-ci",
-          sha: "0fb234"
-        )
-      )
+    allow(CreateCheckRunJob).to receive(:perform_later)
 
     post path, params: payload.to_json, headers: valid_headers
+
+    coverage_job = CoverageReportJob.last
+    expect(coverage_job.attributes).to include(
+      "installation_id" => "43009808",
+      "repo" => {"full_name" => "grodowski/undercover-ci"},
+      "commit_sha" => "0fb234"
+    )
+
+    expect(CreateCheckRunJob).to have_received(:perform_later)
+      .with(coverage_job.id)
     expect(response).to be_ok
   end
 end
