@@ -1,8 +1,10 @@
 AllCops:
   TargetRubyVersion: 2.4.4
   Exclude:
-    - spec/fixtures/**/*
+    - db/migrate/*
     - db/schema.rb
+    - spec/fixtures/**/*
+    - tmp/**/*
     - vendor/**/*
 
 Style/RegexpLiteral:
