@@ -6,17 +6,17 @@ module Logic
       new(coverage_report_job).run_undercover
     end
 
-    attr_reader :coverage_report_job, :run
+    attr_reader :coverage_report_job_id, :run
 
     def initialize(coverage_report_job)
-      @coverage_report_job = coverage_report_job
+      @coverage_report_job_id = coverage_report_job.id
       @run = Hooks::CheckRunInfo.from_coverage_report_job(coverage_report_job)
     end
 
     def run_undercover
       validate_run
 
-      Rails.logger.info "CheckRuns::Run post #{run} job_id: #{coverage_report_job.id}"
+      Rails.logger.info "CheckRuns::Run post #{run} job_id: #{coverage_report_job_id}"
       CheckRuns::Run.new(run).post
 
       clone_repo
@@ -26,11 +26,10 @@ module Logic
       # Rails.logger.info "Undercover validate #{report.validate()}"
       Rails.logger.info "Undercover warnigns #{report.build_warnings}"
 
-      Rails.logger.info "Completing analysis... #{run} job_id: #{coverage_report_job.id}"
+      Rails.logger.info "Completing analysis... #{run} job_id: #{coverage_report_job_id}"
       CheckRuns::Complete.new(run).post
 
-      # Cleanup
-      # - remove /tmp clone and lcov
+      teardown
     end
 
     private
@@ -53,13 +52,17 @@ module Logic
       )
     end
 
+    def teardown
+      # pass
+    end
+
     def repo_path
-      "tmp/job/#{coverage_report_job.id}"
+      "tmp/job/#{coverage_report_job_id}"
     end
 
     def lcov_path
-      # TODO: fixup lcov storage!
-      "tmp/lcov/#{coverage_report_job.id}/project.lcov"
+      # TODO: fixup lcov storage (set correct filename)
+      "tmp/lcov/#{coverage_report_job_id}/project.lcov"
     end
 
     def run_cmd
