@@ -5,6 +5,7 @@ require "github_requests"
 module CheckRuns
   class Base
     include GitHubRequests
+    include ClassLoggable
 
     attr_reader :run
 

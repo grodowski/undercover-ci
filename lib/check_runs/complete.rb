@@ -31,7 +31,7 @@ module CheckRuns
         ],
         accept: "application/vnd.github.antiope-preview+json"
       )
-      Rails.logger.debug("CheckRuns::Complete response: #{client.last_response.status}")
+      log "#{run} response: #{client.last_response.status}"
     end
   end
 end

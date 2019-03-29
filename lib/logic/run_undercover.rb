@@ -2,6 +2,8 @@
 
 module Logic
   class RunUndercover
+    include ClassLoggable
+
     def self.call(coverage_report_job)
       new(coverage_report_job).run_undercover
     end
@@ -10,40 +12,47 @@ module Logic
 
     def initialize(coverage_report_job)
       @coverage_report_job_id = coverage_report_job.id
+      raise ArgumentError, "coverage_reports can't be blank" if coverage_report_job.coverage_reports.empty?
+
+      # In Rails 6 this will become `coverage_report_jov.coverage_reports.last.open`
+      @lcov_tmpfile = Tempfile.new
+      @lcov_tmpfile.write(coverage_report_job.coverage_reports.last.download)
+
       @run = Hooks::CheckRunInfo.from_coverage_report_job(coverage_report_job)
     end
 
+    # TODO: validation and error handling
     def run_undercover
-      validate_run
-
-      Rails.logger.info "CheckRuns::Run post #{run} job_id: #{coverage_report_job_id}"
+      log "starting run #{run} job_id: #{coverage_report_job_id}"
       CheckRuns::Run.new(run).post
 
       clone_repo
-      report = run_cmd
+      report = run_undercover_cmd
 
-      # TODO: needs lcov path as argument
-      # Rails.logger.info "Undercover validate #{report.validate()}"
-      Rails.logger.info "Undercover warnigns #{report.build_warnings}"
+      log "undercover warnings: #{report.build_warnings.size}"
+      # TODO: format undercover results and send with Complete
 
-      Rails.logger.info "Completing analysis... #{run} job_id: #{coverage_report_job_id}"
+      log "completing analysis... #{run} job_id: #{coverage_report_job_id}"
       CheckRuns::Complete.new(run).post
 
       teardown
+      log "teardown complete #{run} job_id: #{coverage_report_job_id}"
     end
 
     private
 
-    def validate_run
-      # TODO: validate if run can be ran:
-      # - was it queued?
-      # - lcov present?
-      # - repo reachable (ls-remote)?
-      true
-    end
+    # def validate_run
+    #   # TODO: validate if run can be ran:
+    #   # - was it queued?
+    #   # - lcov present?
+    #   # - repo reachable (ls-remote)?
+    #   true
+    # end
 
     # https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#http-based-git-access-by-an-installation
     def clone_repo
+      FileUtils.mkdir_p(repo_path)
+
       i_token = CheckRuns::InstallationAccessToken.new(run).get
       FileUtils.remove_entry(repo_path)
       Imagen::Clone.perform(
@@ -53,21 +62,16 @@ module Logic
     end
 
     def teardown
-      # pass
+      @lcov_tmpfile.close
     end
 
     def repo_path
       "tmp/job/#{coverage_report_job_id}"
     end
 
-    def lcov_path
-      # TODO: fixup lcov storage (set correct filename)
-      "tmp/lcov/#{coverage_report_job_id}/project.lcov"
-    end
-
-    def run_cmd
+    def run_undercover_cmd
       opts = Undercover::Options.new.tap do |opt|
-        opt.lcov = lcov_path
+        opt.lcov = @lcov_tmpfile.path
         opt.path = repo_path
       end
       changeset = Undercover::Changeset.new("#{repo_path}/.git", "origin/master")

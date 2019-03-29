@@ -6,10 +6,10 @@ module V1
 
     WEBHOOK_SECRET = ENV.fetch("GITHUB_WEBHOOK_SECRET")
     EVENT_TYPES = [
-      EVENT_TYPE_CHECK_SUITE = "check_suite",
-      EVENT_TYPE_CHECK_RUN = "check_run",
-      EVENT_TYPE_INSTALLATION = "installation",
-      EVENT_TYPE_INSTALLATION_REPOSITORIES = "installation_repositories"
+      EVENT_TYPE_CHECK_SUITE = "check_suite", # DONE
+      EVENT_TYPE_CHECK_RUN = "check_run", # TODO
+      EVENT_TYPE_INSTALLATION = "installation", # TODO
+      EVENT_TYPE_INSTALLATION_REPOSITORIES = "installation_repositories" # TODO
     ].freeze
 
     before_action do
