@@ -20,7 +20,7 @@ describe "Coverage Upload" do
     fake_run = class_spy(Logic::RunUndercover)
     stub_const("Logic::RunUndercover", fake_run)
 
-    post path, params: {repo: crj.repo, sha: crj.commit_sha, lcov_base64: Base64.encode64(contents)}
+    post path, params: {repo: crj.repo_full_name, sha: crj.commit_sha, lcov_base64: Base64.encode64(contents)}
 
     crj.reload
     expect(crj.coverage_reports).not_to be_empty
@@ -33,7 +33,7 @@ describe "Coverage Upload" do
     crj = make_coverage_report_job
     contents = File.read("public/404.html") # text/html, should fail
 
-    post path, params: {repo: crj.repo, sha: crj.commit_sha, lcov_base64: Base64.encode64(contents)}
+    post path, params: {repo: crj.repo_full_name, sha: crj.commit_sha, lcov_base64: Base64.encode64(contents)}
 
     expect(response.status).to eq(422)
     expect(JSON.parse(response.body)).to eq(
@@ -49,12 +49,12 @@ describe "Coverage Upload" do
     fake_run = class_spy(Logic::RunUndercover)
     stub_const("Logic::RunUndercover", fake_run)
 
-    post path, params: {repo: crj.repo, sha: crj.commit_sha, lcov_base64: Base64.encode64(contents)}
+    post path, params: {repo: crj.repo_full_name, sha: crj.commit_sha, lcov_base64: Base64.encode64(contents)}
 
     expect(fake_run).to have_received(:call)
   end
 
   def make_coverage_report_job
-    CoverageReportJob.create!(repo: "user/repository", commit_sha: "b4c0n")
+    CoverageReportJob.create!(repo: {id: 1, full_name: "user/repository"}, commit_sha: "b4c0n")
   end
 end
