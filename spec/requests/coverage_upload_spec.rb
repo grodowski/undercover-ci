@@ -4,24 +4,23 @@ require "base64"
 require "rails_helper"
 
 describe "Coverage Upload" do
-  # FIXME: repo + sha params
   # FIXME: authenticate
-  def path(id)
-    "/v1/runs/#{id}/coverage.json"
+  def path
+    "/v1/coverage.json"
   end
 
   it "renders 404 when CoverageReportJob does not exist" do
-    expect { post path(7) }.to raise_error(ActiveRecord::RecordNotFound)
+    expect { post path, params: {repo: "foo", sha: "bar"} }.to raise_error(ActiveRecord::RecordNotFound)
   end
 
   it "stores the LCOV in active storage" do
-    crj = CoverageReportJob.create
+    crj = make_coverage_report_job
     contents = File.read("spec/fixtures/coverage.lcov")
 
     fake_run = class_spy(Logic::RunUndercover)
     stub_const("Logic::RunUndercover", fake_run)
 
-    post path(crj.id), params: {lcov_base64: Base64.encode64(contents)}
+    post path, params: {repo: crj.repo, sha: crj.commit_sha, lcov_base64: Base64.encode64(contents)}
 
     crj.reload
     expect(crj.coverage_reports).not_to be_empty
@@ -31,10 +30,10 @@ describe "Coverage Upload" do
   end
 
   it "validates uploads" do
-    crj = CoverageReportJob.create
+    crj = make_coverage_report_job
     contents = File.read("public/404.html") # text/html, should fail
 
-    post path(crj.id), params: {lcov_base64: Base64.encode64(contents)}
+    post path, params: {repo: crj.repo, sha: crj.commit_sha, lcov_base64: Base64.encode64(contents)}
 
     expect(response.status).to eq(422)
     expect(JSON.parse(response.body)).to eq(
@@ -44,14 +43,18 @@ describe "Coverage Upload" do
   end
 
   it "kicks off RunUndercover" do
-    crj = CoverageReportJob.create
+    crj = make_coverage_report_job
     contents = File.read("spec/fixtures/coverage.lcov")
 
     fake_run = class_spy(Logic::RunUndercover)
     stub_const("Logic::RunUndercover", fake_run)
 
-    post path(crj.id), params: {lcov_base64: Base64.encode64(contents)}
+    post path, params: {repo: crj.repo, sha: crj.commit_sha, lcov_base64: Base64.encode64(contents)}
 
     expect(fake_run).to have_received(:call)
+  end
+
+  def make_coverage_report_job
+    CoverageReportJob.create!(repo: "user/repository", commit_sha: "b4c0n")
   end
 end

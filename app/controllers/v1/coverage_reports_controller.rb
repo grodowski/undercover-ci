@@ -52,7 +52,11 @@ module V1
     end
 
     def find_coverage_report_job
-      @coverage_report_job = CoverageReportJob.find(params[:id])
+      crj_params = params.require(%i[repo sha])
+      @coverage_report_job = CoverageReportJob.find_by!(
+        repo: crj_params[0],
+        commit_sha: crj_params[1]
+      )
     end
   end
 end
