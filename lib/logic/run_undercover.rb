@@ -17,6 +17,7 @@ module Logic
       # In Rails 6 this will become `coverage_report_jov.coverage_reports.last.open`
       @lcov_tmpfile = Tempfile.new
       @lcov_tmpfile.write(coverage_report_job.coverage_reports.last.download)
+      @lcov_tmpfile.flush
 
       @run = Hooks::CheckRunInfo.from_coverage_report_job(coverage_report_job)
     end
@@ -27,13 +28,19 @@ module Logic
       CheckRuns::Run.new(run).post
 
       clone_repo
+      # LOL
+      # TODO: checkout correct branch!
+      Rugged::Repository.new(repo_path).checkout("origin/test-pr")
+
       report = run_undercover_cmd
 
-      log "undercover warnings: #{report.build_warnings.size}"
+      # TODO: fix reporter to store warnings in state
+      warnings = report.build_warnings
+      log "undercover warnings: #{warnings.size}"
       # TODO: format undercover results and send with Complete
 
       log "completing analysis... #{run} job_id: #{coverage_report_job_id}"
-      CheckRuns::Complete.new(run).post
+      CheckRuns::Complete.new(run).post(warnings)
 
       teardown
       log "teardown complete #{run} job_id: #{coverage_report_job_id}"
