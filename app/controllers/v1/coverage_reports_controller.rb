@@ -54,7 +54,7 @@ module V1
     def find_coverage_check
       check_params = params.require(%i[repo sha])
       @coverage_check = CoverageCheck.where("repo @> ?", {full_name: check_params[0]}.to_json)
-                                     .where(commit_sha: check_params[1]).first!
+                                     .where(head_sha: check_params[1]).first!
     end
   end
 end

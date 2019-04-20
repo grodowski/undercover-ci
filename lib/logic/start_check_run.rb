@@ -14,7 +14,7 @@ module Logic
 
     def create_and_queue_check_run
       report = CoverageCheck.find_or_initialize_by(
-        commit_sha: check_run_info.sha,
+        head_sha: check_run_info.sha,
         installation_id: check_run_info.installation_id
       )
       report.repo = check_run_info.payload&.repository

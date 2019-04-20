@@ -76,7 +76,7 @@ describe "GitHub Webhooks" do
     expect(coverage_job.attributes).to include(
       "installation_id" => "43009808",
       "repo" => {"full_name" => "grodowski/undercover-ci"},
-      "commit_sha" => "0fb234"
+      "head_sha" => "0fb234"
     )
 
     expect(CreateCheckRunJob).to have_received(:perform_later)

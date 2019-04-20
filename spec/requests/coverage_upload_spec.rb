@@ -20,7 +20,7 @@ describe "Coverage Upload" do
     fake_run = class_spy(Logic::RunUndercover)
     stub_const("Logic::RunUndercover", fake_run)
 
-    post path, params: {repo: check.repo_full_name, sha: check.commit_sha, lcov_base64: Base64.encode64(contents)}
+    post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
 
     check.reload
     expect(check.coverage_reports).not_to be_empty
@@ -33,7 +33,7 @@ describe "Coverage Upload" do
     check = make_coverage_check
     contents = File.read("public/404.html") # text/html, should fail
 
-    post path, params: {repo: check.repo_full_name, sha: check.commit_sha, lcov_base64: Base64.encode64(contents)}
+    post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
 
     expect(response.status).to eq(422)
     expect(JSON.parse(response.body)).to eq(
@@ -49,12 +49,12 @@ describe "Coverage Upload" do
     fake_run = class_spy(Logic::RunUndercover)
     stub_const("Logic::RunUndercover", fake_run)
 
-    post path, params: {repo: check.repo_full_name, sha: check.commit_sha, lcov_base64: Base64.encode64(contents)}
+    post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
 
     expect(fake_run).to have_received(:call)
   end
 
   def make_coverage_check
-    CoverageCheck.create!(repo: {id: 1, full_name: "user/repository"}, commit_sha: "b4c0n")
+    CoverageCheck.create!(repo: {id: 1, full_name: "user/repository"}, head_sha: "b4c0n")
   end
 end

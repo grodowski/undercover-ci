@@ -15,7 +15,7 @@ module Hooks
     def self.from_coverage_check(job)
       new(
         job.repo.fetch("full_name"),
-        job.commit_sha,
+        job.head_sha,
         job.installation_id
       )
     end
