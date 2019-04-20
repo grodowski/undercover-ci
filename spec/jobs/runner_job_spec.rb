@@ -10,6 +10,8 @@ describe RunnerJob do
     )
   end
 
+  before { ActiveJob::Base.queue_adapter = :test }
+
   it "retries if coverage_reports are still empty" do
     expect do
       described_class.perform_now(check.id)
