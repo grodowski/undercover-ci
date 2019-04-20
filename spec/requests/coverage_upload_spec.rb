@@ -14,42 +14,42 @@ describe "Coverage Upload" do
   end
 
   it "stores the LCOV in active storage" do
-    crj = make_coverage_check
+    check = make_coverage_check
     contents = File.read("spec/fixtures/coverage.lcov")
 
     fake_run = class_spy(Logic::RunUndercover)
     stub_const("Logic::RunUndercover", fake_run)
 
-    post path, params: {repo: crj.repo_full_name, sha: crj.commit_sha, lcov_base64: Base64.encode64(contents)}
+    post path, params: {repo: check.repo_full_name, sha: check.commit_sha, lcov_base64: Base64.encode64(contents)}
 
-    crj.reload
-    expect(crj.coverage_reports).not_to be_empty
+    check.reload
+    expect(check.coverage_reports).not_to be_empty
 
-    expect(crj.coverage_reports.attachments.first.download).to eq(contents)
+    expect(check.coverage_reports.attachments.first.download).to eq(contents)
     expect(response.status).to eq(201)
   end
 
   it "validates uploads" do
-    crj = make_coverage_check
+    check = make_coverage_check
     contents = File.read("public/404.html") # text/html, should fail
 
-    post path, params: {repo: crj.repo_full_name, sha: crj.commit_sha, lcov_base64: Base64.encode64(contents)}
+    post path, params: {repo: check.repo_full_name, sha: check.commit_sha, lcov_base64: Base64.encode64(contents)}
 
     expect(response.status).to eq(422)
     expect(JSON.parse(response.body)).to eq(
       "error" => "could not recognise '<!DOCTYPE html>\n' as valid LCOV"
     )
-    expect(crj.reload.coverage_reports.attached?).to eq(false)
+    expect(check.reload.coverage_reports.attached?).to eq(false)
   end
 
   it "kicks off RunUndercover" do
-    crj = make_coverage_check
+    check = make_coverage_check
     contents = File.read("spec/fixtures/coverage.lcov")
 
     fake_run = class_spy(Logic::RunUndercover)
     stub_const("Logic::RunUndercover", fake_run)
 
-    post path, params: {repo: crj.repo_full_name, sha: crj.commit_sha, lcov_base64: Base64.encode64(contents)}
+    post path, params: {repo: check.repo_full_name, sha: check.commit_sha, lcov_base64: Base64.encode64(contents)}
 
     expect(fake_run).to have_received(:call)
   end

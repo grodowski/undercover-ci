@@ -52,9 +52,9 @@ module V1
     end
 
     def find_coverage_check
-      crj_params = params.require(%i[repo sha])
-      @coverage_check = CoverageCheck.where("repo @> ?", {full_name: crj_params[0]}.to_json)
-                                              .where(commit_sha: crj_params[1]).first!
+      check_params = params.require(%i[repo sha])
+      @coverage_check = CoverageCheck.where("repo @> ?", {full_name: check_params[0]}.to_json)
+                                              .where(commit_sha: check_params[1]).first!
     end
   end
 end
