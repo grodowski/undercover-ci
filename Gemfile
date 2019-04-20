@@ -42,12 +42,12 @@ end
 
 group :test do
   gem "capybara", ">= 2.15"
-  gem "webdrivers"
   gem "rspec-rails"
   gem "selenium-webdriver"
   gem "simplecov"
   gem "simplecov-html"
   gem "simplecov-lcov"
+  gem "webdrivers"
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

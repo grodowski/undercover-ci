@@ -33,8 +33,8 @@ module V1
     def validate_input(input_io)
       Undercover::LcovParser.new(input_io).parse
       true
-    rescue Undercover::LcovParseError => err
-      @error_message = err.message
+    rescue Undercover::LcovParseError => e
+      @error_message = e.message
       false
     end
 
@@ -54,7 +54,7 @@ module V1
     def find_coverage_check
       check_params = params.require(%i[repo sha])
       @coverage_check = CoverageCheck.where("repo @> ?", {full_name: check_params[0]}.to_json)
-                                              .where(commit_sha: check_params[1]).first!
+                                     .where(commit_sha: check_params[1]).first!
     end
   end
 end
