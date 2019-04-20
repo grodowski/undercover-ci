@@ -7,9 +7,9 @@ require "check_runs"
 class CreateCheckRunJob < ApplicationJob
   queue_as :default
 
-  def perform(coverage_report_job_id)
-    run = Hooks::CheckRunInfo.from_coverage_report_job(
-      CoverageCheck.find(coverage_report_job_id)
+  def perform(coverage_check_id)
+    run = Hooks::CheckRunInfo.from_coverage_check(
+      CoverageCheck.find(coverage_check_id)
     )
     CheckRuns::Create.new(run).post
   end

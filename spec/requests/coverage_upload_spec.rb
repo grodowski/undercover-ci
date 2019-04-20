@@ -14,7 +14,7 @@ describe "Coverage Upload" do
   end
 
   it "stores the LCOV in active storage" do
-    crj = make_coverage_report_job
+    crj = make_coverage_check
     contents = File.read("spec/fixtures/coverage.lcov")
 
     fake_run = class_spy(Logic::RunUndercover)
@@ -30,7 +30,7 @@ describe "Coverage Upload" do
   end
 
   it "validates uploads" do
-    crj = make_coverage_report_job
+    crj = make_coverage_check
     contents = File.read("public/404.html") # text/html, should fail
 
     post path, params: {repo: crj.repo_full_name, sha: crj.commit_sha, lcov_base64: Base64.encode64(contents)}
@@ -43,7 +43,7 @@ describe "Coverage Upload" do
   end
 
   it "kicks off RunUndercover" do
-    crj = make_coverage_report_job
+    crj = make_coverage_check
     contents = File.read("spec/fixtures/coverage.lcov")
 
     fake_run = class_spy(Logic::RunUndercover)
@@ -54,7 +54,7 @@ describe "Coverage Upload" do
     expect(fake_run).to have_received(:call)
   end
 
-  def make_coverage_report_job
+  def make_coverage_check
     CoverageCheck.create!(repo: {id: 1, full_name: "user/repository"}, commit_sha: "b4c0n")
   end
 end

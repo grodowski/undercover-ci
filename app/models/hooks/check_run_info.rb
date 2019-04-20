@@ -12,7 +12,7 @@ module Hooks
       new(full_name, sha, installation_id, payload)
     end
 
-    def self.from_coverage_report_job(job)
+    def self.from_coverage_check(job)
       new(
         job.repo.fetch("full_name"),
         job.commit_sha,

@@ -86,7 +86,7 @@ SF:./app/models/application_record.rb
 DA:3,1
 DA:4,1
 end_of_record
-SF:./app/models/coverage_report_job.rb
+SF:./app/models/coverage_check.rb
 DA:3,1
 DA:4,1
 DA:6,1

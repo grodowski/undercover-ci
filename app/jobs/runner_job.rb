@@ -7,11 +7,11 @@ require "check_runs"
 class RunnerJob < ApplicationJob
   queue_as :default
 
-  def perform(coverage_report_job_id)
+  def perform(coverage_check_id)
     # TODO: return if already running
     # TODO: store running state
 
-    coverage_report_job = CoverageCheck.find(coverage_report_job_id)
-    Logic::RunUndercover.call(coverage_report_job)
+    coverage_check = CoverageCheck.find(coverage_check_id)
+    Logic::RunUndercover.call(coverage_check)
   end
 end

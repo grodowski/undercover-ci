@@ -4,27 +4,27 @@ module Logic
   class RunUndercover
     include ClassLoggable
 
-    def self.call(coverage_report_job)
-      new(coverage_report_job).run_undercover
+    def self.call(coverage_check)
+      new(coverage_check).run_undercover
     end
 
-    attr_reader :coverage_report_job_id, :run
+    attr_reader :coverage_check_id, :run
 
-    def initialize(coverage_report_job)
-      @coverage_report_job_id = coverage_report_job.id
-      raise ArgumentError, "coverage_reports can't be blank" if coverage_report_job.coverage_reports.empty?
+    def initialize(coverage_check)
+      @coverage_check_id = coverage_check.id
+      raise ArgumentError, "coverage_reports can't be blank" if coverage_check.coverage_reports.empty?
 
       # In Rails 6 this will become `coverage_report_jov.coverage_reports.last.open`
       @lcov_tmpfile = Tempfile.new
-      @lcov_tmpfile.write(coverage_report_job.coverage_reports.last.download)
+      @lcov_tmpfile.write(coverage_check.coverage_reports.last.download)
       @lcov_tmpfile.flush
 
-      @run = Hooks::CheckRunInfo.from_coverage_report_job(coverage_report_job)
+      @run = Hooks::CheckRunInfo.from_coverage_check(coverage_check)
     end
 
     # TODO: validation and error handling
     def run_undercover
-      log "starting run #{run} job_id: #{coverage_report_job_id}"
+      log "starting run #{run} job_id: #{coverage_check_id}"
       CheckRuns::Run.new(run).post
 
       clone_repo
@@ -39,11 +39,11 @@ module Logic
       log "undercover warnings: #{warnings.size}"
       # TODO: format undercover results and send with Complete
 
-      log "completing analysis... #{run} job_id: #{coverage_report_job_id}"
+      log "completing analysis... #{run} job_id: #{coverage_check_id}"
       CheckRuns::Complete.new(run).post(warnings)
 
       teardown
-      log "teardown complete #{run} job_id: #{coverage_report_job_id}"
+      log "teardown complete #{run} job_id: #{coverage_check_id}"
     end
 
     private
@@ -73,7 +73,7 @@ module Logic
     end
 
     def repo_path
-      "tmp/job/#{coverage_report_job_id}"
+      "tmp/job/#{coverage_check_id}"
     end
 
     def run_undercover_cmd
