@@ -10,7 +10,11 @@ describe RunnerJob do
     )
   end
 
-  before { ActiveJob::Base.queue_adapter = :test }
+  before do
+    @previous_queue_adapter = ActiveJob::Base.queue_adapter
+    ActiveJob::Base.queue_adapter = :test
+  end
+  after { ActiveJob::Base.queue_adapter = @previous_queue_adapter }
 
   it "retries if coverage_reports are still empty" do
     expect do

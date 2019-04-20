@@ -16,7 +16,6 @@ class RunnerJob < ApplicationJob
 
     coverage_check = CoverageCheck.find(coverage_check_id)
 
-    STDOUT.puts "WOOOT #{attempt}, empty? #{coverage_check.coverage_reports.empty?}"
     if coverage_check.coverage_reports.empty? && attempt < MAX_RETRIES
       self.class.set(wait: 5.seconds).perform_later(coverage_check_id, attempt + 1)
       return
