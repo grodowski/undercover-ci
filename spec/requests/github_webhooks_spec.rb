@@ -72,7 +72,7 @@ describe "GitHub Webhooks" do
 
     post path, params: payload.to_json, headers: valid_headers
 
-    coverage_job = CoverageReportJob.last
+    coverage_job = CoverageCheck.last
     expect(coverage_job.attributes).to include(
       "installation_id" => "43009808",
       "repo" => {"full_name" => "grodowski/undercover-ci"},

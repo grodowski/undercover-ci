@@ -13,7 +13,7 @@ module Logic
     end
 
     def create_and_queue_check_run
-      report = CoverageReportJob.find_or_initialize_by(
+      report = CoverageCheck.find_or_initialize_by(
         commit_sha: check_run_info.sha,
         installation_id: check_run_info.installation_id
       )

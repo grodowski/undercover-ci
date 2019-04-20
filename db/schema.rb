@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_23_205520) do
+ActiveRecord::Schema.define(version: 2019_04_20_094203) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -36,7 +36,7 @@ ActiveRecord::Schema.define(version: 2019_03_23_205520) do
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
-  create_table "coverage_report_jobs", force: :cascade do |t|
+  create_table "coverage_checks", force: :cascade do |t|
     t.string "commit_sha"
     t.jsonb "repo"
     t.text "lcov"

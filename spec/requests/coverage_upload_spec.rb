@@ -9,7 +9,7 @@ describe "Coverage Upload" do
     "/v1/coverage.json"
   end
 
-  it "renders 404 when CoverageReportJob does not exist" do
+  it "renders 404 when CoverageCheck does not exist" do
     expect { post path, params: {repo: "foo", sha: "bar"} }.to raise_error(ActiveRecord::RecordNotFound)
   end
 
@@ -55,6 +55,6 @@ describe "Coverage Upload" do
   end
 
   def make_coverage_report_job
-    CoverageReportJob.create!(repo: {id: 1, full_name: "user/repository"}, commit_sha: "b4c0n")
+    CoverageCheck.create!(repo: {id: 1, full_name: "user/repository"}, commit_sha: "b4c0n")
   end
 end

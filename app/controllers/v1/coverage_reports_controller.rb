@@ -53,7 +53,7 @@ module V1
 
     def find_coverage_report_job
       crj_params = params.require(%i[repo sha])
-      @coverage_report_job = CoverageReportJob.where("repo @> ?", {full_name: crj_params[0]}.to_json)
+      @coverage_report_job = CoverageCheck.where("repo @> ?", {full_name: crj_params[0]}.to_json)
                                               .where(commit_sha: crj_params[1]).first!
     end
   end

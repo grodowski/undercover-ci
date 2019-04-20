@@ -9,7 +9,7 @@ class CreateCheckRunJob < ApplicationJob
 
   def perform(coverage_report_job_id)
     run = Hooks::CheckRunInfo.from_coverage_report_job(
-      CoverageReportJob.find(coverage_report_job_id)
+      CoverageCheck.find(coverage_report_job_id)
     )
     CheckRuns::Create.new(run).post
   end
