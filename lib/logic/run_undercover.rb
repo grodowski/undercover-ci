@@ -2,6 +2,8 @@
 
 module Logic
   class RunUndercover
+    RunError = Class.new(StandardError)
+
     include ClassLoggable
 
     def self.call(coverage_check)
@@ -12,7 +14,7 @@ module Logic
 
     def initialize(coverage_check)
       @coverage_check_id = coverage_check.id
-      raise ArgumentError, "coverage_reports can't be blank" if coverage_check.coverage_reports.empty?
+      raise RunError, "coverage_reports can't be blank" if coverage_check.coverage_reports.empty?
 
       # In Rails 6 this will become `coverage_report_jov.coverage_reports.last.open`
       @lcov_tmpfile = Tempfile.new
