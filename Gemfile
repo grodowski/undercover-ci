@@ -14,7 +14,7 @@ gem "puma", "~> 3.11"
 gem "undercover"
 
 # UI Gems
-gem "bootstrap", "~> 4.1.3"
+gem "bootstrap", "~> 4.3.1"
 gem "coffee-rails", "~> 4.2"
 gem "jquery-rails"
 gem "sass-rails", "~> 5.0"
