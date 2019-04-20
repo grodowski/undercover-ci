@@ -2,7 +2,7 @@
 
 require "ostruct"
 
-module Hooks
+module DataObjects
   CheckRunInfo = Struct.new(:full_name, :sha, :installation_id, :payload) do
     def self.from_webhook(payload)
       payload = OpenStruct.new(payload)

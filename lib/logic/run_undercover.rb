@@ -21,7 +21,7 @@ module Logic
       @lcov_tmpfile.write(coverage_check.coverage_reports.last.download)
       @lcov_tmpfile.flush
 
-      @run = Hooks::CheckRunInfo.from_coverage_check(coverage_check)
+      @run = DataObjects::CheckRunInfo.from_coverage_check(coverage_check)
     end
 
     # TODO: validation and error handling

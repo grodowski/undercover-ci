@@ -35,7 +35,7 @@ module V1
 
           # TODO: Queue a check run instance (queued)
           # What if already running?
-          run_info = Hooks::CheckRunInfo.from_webhook(@payload)
+          run_info = DataObjects::CheckRunInfo.from_webhook(@payload)
           Logic::StartCheckRun.call(run_info)
         else
           logger.debug "Webhook Unhandled: #{@payload['action']}/#{@event_type}"
