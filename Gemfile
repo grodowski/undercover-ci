@@ -13,7 +13,7 @@ gem "puma", "~> 3.11"
 
 # UI Gems
 gem "bootstrap", "~> 4.3.1"
-gem "coffee-rails", "~> 4.2"
+gem "coffee-rails", "~> 5.0"
 gem "jquery-rails"
 gem "sass-rails", "~> 5.0"
 gem "turbolinks", "~> 5"
