@@ -10,4 +10,8 @@ class CoverageCheck < ApplicationRecord
   def repo_full_name
     repo["full_name"]
   end
+
+  def default_branch
+    repo["default_branch"]
+  end
 end

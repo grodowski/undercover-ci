@@ -61,7 +61,8 @@ describe "GitHub Webhooks" do
       "action" => "requested",
       "check_suite" => {"head_sha" => "0fb234"},
       "installation" => {"id" => 43_009_808},
-      "repository" => {"full_name" => "grodowski/undercover-ci"}
+      "repository" => {"full_name" => "grodowski/undercover-ci"},
+      "pull_requests" => []
     }
     valid_headers = {
       "ACCEPT": "application/json",
