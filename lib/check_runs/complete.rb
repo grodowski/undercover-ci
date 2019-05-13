@@ -16,9 +16,9 @@ module CheckRuns
         details_url: "https://google.com",
         external_id: "", # TODO: create an external id
         output: {
-          title: "Analysing coverage report",
-          summary: "Undercover CI run is in progress...",
-          text: "**TODO: add something nice**\n\n```\ndef hello\n  $$$\nend\n```\n~~hello~~",
+          title: "Code coverage report",
+          summary: summary_for_run(undercover_warnings),
+          text: text_for_run(undercover_warnings),
           annotations: warnings_to_annotations(undercover_warnings)
         },
         accept: "application/vnd.github.antiope-preview+json"
@@ -37,7 +37,7 @@ module CheckRuns
         lines = result.coverage.map { |ln, _cov| ln if result.uncovered?(ln) }.compact
         message = "#{result.node.human_name.capitalize} `#{result.node.name}` is missing" \
                   " coverage for line#{'s' if lines.size > 1} #{lines.join(', ')}" \
-                  " (method coverage: #{result.coverage_f})"
+                  " (node coverage: #{result.coverage_f})"
         {
           path: "app/models/application_record.rb",
           start_line: result.first_line,
@@ -47,6 +47,23 @@ module CheckRuns
           message: message
         }
       end
+    end
+
+    # TODO: conditional copy
+    # - if no warnings, tell that it's a clean PR!
+    # - if warnings present, suggest to add test coverage
+    # - show some stats
+    #   - num methods / classes / changed / added / removed
+    #   - avg coverage per method
+    # - show a random tip
+
+    # TODO: failure / aborted check run copy
+    def summary_for_run(_warnings)
+      nil
+    end
+
+    def text_for_run(_warnings)
+      nil
     end
   end
 end
