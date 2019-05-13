@@ -12,13 +12,29 @@ module CheckRuns
         started_at: Time.now.iso8601,
         external_id: "", # TODO: create an external id
         output: {
-          title: "Analysing coverage report",
-          summary: "Undercover CI run is in progress...",
-          text: "**TODO: add something nice**\n\n```\ndef hello\n  $$$\nend\n```\n~~hello~~"
+          title: "Analysing code coverage",
+          summary: summary_for_run,
+          text: text_for_run
         },
         accept: "application/vnd.github.antiope-preview+json"
       )
       log "#{run} response: #{client.last_response.status}"
+    end
+
+    private
+
+    def summary_for_run
+      <<-TEXT
+      Undercover CI scans this PR for untested methods,
+      blocks and classes that have been added or changed in this diff.
+      TEXT
+    end
+
+    def text_for_run
+      # TODO: show random tip
+      # - how to set up undercover locally
+      # - how to test $thing (rake task, concurrent programs etc...)
+      "⏳☕️ Please wait while code coverage report is being generated..."
     end
   end
 end
