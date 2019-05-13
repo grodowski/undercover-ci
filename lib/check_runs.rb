@@ -9,6 +9,7 @@ module CheckRuns
 
     attr_reader :run
 
+    # @param run [DataObjects::CheckRunInfo] check run metadata object
     def initialize(run)
       @run = run
     end
