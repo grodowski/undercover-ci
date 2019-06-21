@@ -7,7 +7,7 @@ module CheckRuns
       client.post(
         "/repos/#{run.full_name}/check-runs",
         head_sha: run.sha,
-        name: "Coverage Check",
+        name: "Code coverage",
         status: "in_progress",
         started_at: Time.now.iso8601,
         external_id: "", # TODO: create an external id

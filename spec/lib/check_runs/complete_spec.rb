@@ -18,18 +18,16 @@ describe CheckRuns::Complete do
     allow(check_run_complete).to receive(:installation_api_client) { dummy_github }
 
     expected_output = hash_including(
-      output: hash_including(
-        annotations: [
-          {
-            path: "app/models/application_record.rb",
-            start_line: 2,
-            end_line: 5,
-            annotation_level: "warning",
-            title: "FOO",
-            message: "Instance method `method` is missing coverage for line 3 (method coverage: 0.5)"
-          }
-        ]
-      )
+      annotations: [
+        {
+          path: "app/models/application_record.rb",
+          start_line: 2,
+          end_line: 5,
+          annotation_level: "warning",
+          title: "Untested instance method",
+          message: "Instance method `method` is missing coverage for line 3 (node coverage: 0.5)"
+        }
+      ]
     )
 
     check_run_complete.post(
@@ -37,11 +35,10 @@ describe CheckRuns::Complete do
     )
 
     expect(dummy_github)
-      .to have_received(:post)
-      .with(
-        "/repos/grodowski/undercover-ci/check-runs",
-        expected_output
-      )
+      .to have_received(:post) do |path, payload|
+        expect(path).to eq("/repos/grodowski/undercover-ci/check-runs")
+        expect(payload[:output]).to match(expected_output)
+      end
   end
 
   def undercover_result_fixture

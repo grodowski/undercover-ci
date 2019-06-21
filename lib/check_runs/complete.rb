@@ -8,11 +8,11 @@ module CheckRuns
       client.post(
         "/repos/#{run.full_name}/check-runs",
         head_sha: run.sha,
-        name: "Coverage Check",
+        name: "Code coverage",
         status: "completed",
         # started_at: "", # TODO: store started at
         completed_at: Time.now.iso8601,
-        conclusion: "failure",
+        conclusion: conclusion_for_run(undercover_warnings),
         details_url: "https://google.com",
         external_id: "", # TODO: create an external id
         output: {
@@ -39,11 +39,11 @@ module CheckRuns
                   " coverage for line#{'s' if lines.size > 1} #{lines.join(', ')}" \
                   " (node coverage: #{result.coverage_f})"
         {
-          path: "app/models/application_record.rb",
+          path: result.file_path,
           start_line: result.first_line,
           end_line: result.last_line,
           annotation_level: "warning",
-          title: "FOO",
+          title: "Untested #{result.node.human_name}",
           message: message
         }
       end
@@ -57,13 +57,17 @@ module CheckRuns
     #   - avg coverage per method
     # - show a random tip
 
+    def conclusion_for_run(warnings)
+      warnings.empty? ? "success" : "failure"
+    end
+
     # TODO: failure / aborted check run copy
     def summary_for_run(_warnings)
-      nil
+      ""
     end
 
     def text_for_run(_warnings)
-      nil
+      ""
     end
   end
 end

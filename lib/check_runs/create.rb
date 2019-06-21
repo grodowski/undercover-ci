@@ -7,7 +7,7 @@ module CheckRuns
       client.post(
         "/repos/#{run.full_name}/check-runs",
         head_sha: run.sha,
-        name: "Undercover CI",
+        name: "Code coverage",
         status: "queued",
         external_id: "", # TODO: create an external id
         output: {
@@ -29,14 +29,14 @@ module CheckRuns
     # - in general, add some fun and randomness
     def queued_text_for_run
       <<-TEXT
-      ⏳ Please hold on tight until coverage data is ready to analyse.
+      ⏳ Please hold tight until coverage data is ready to analyse.
 
-      📚 If this is your first build with Undercover CI, please keep on reading to
-      learn how to set it up.
+      📚 If this is your first build, keep on reading to
+      learn how to set up Undercover CI.
 
       ---
 
-      **Undercover CI setup guide**
+      **Setup Guide**
 
       1. Add `simplecov` and `simplecov-lcov` to your `Gemfile`
       2. Make sure LCOV coverage format is enabled

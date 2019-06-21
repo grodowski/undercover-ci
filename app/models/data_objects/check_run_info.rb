@@ -9,7 +9,7 @@ module DataObjects
       installation_id = payload.installation.fetch("id")
       full_name = payload.repository.fetch("full_name")
       sha = payload.check_suite.fetch("head_sha")
-      compare = payload.pull_requests.first&.dig("base", "ref")
+      compare = payload.check_suite["pull_requests"]&.first&.dig("base", "ref")
       new(full_name, sha, compare, installation_id, payload)
     end
 
