@@ -6,6 +6,6 @@ class ApplicationRecord < ActiveRecord::Base
   def test_method
     puts "untested!"
     puts "a"
-    puts "b"
+    puts "c"
   end
 end
