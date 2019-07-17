@@ -5,7 +5,7 @@ require "check_runs"
 
 describe CheckRuns::Complete do
   it "transforms Undercover::Result into annotations" do
-    run = Hooks::CheckRunInfo.new(
+    run = DataObjects::CheckRunInfo.new(
       "grodowski/undercover-ci",
       "abc123",
       "installation-1",
