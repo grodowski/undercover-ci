@@ -10,10 +10,10 @@ module CheckRuns
         head_sha: run.sha,
         name: "Code coverage",
         status: "completed",
-        # started_at: "", # TODO: store started at
-        completed_at: Time.now.iso8601,
+        started_at: run.created_at, # TODO: replace when we store states
+        completed_at: Time.now.iso8601, # TODO: store this in model
         conclusion: conclusion_for_run(undercover_warnings),
-        details_url: "https://google.com",
+        details_url: "https://undercover-ci.com",
         external_id: "", # TODO: create an external id
         output: {
           title: "Code coverage report",
@@ -56,18 +56,17 @@ module CheckRuns
     #   - num methods / classes / changed / added / removed
     #   - avg coverage per method
     # - show a random tip
-
     def conclusion_for_run(warnings)
       warnings.empty? ? "success" : "failure"
     end
 
     # TODO: failure / aborted check run copy
     def summary_for_run(_warnings)
-      ""
+      "TODO: create summary_for_run"
     end
 
     def text_for_run(_warnings)
-      ""
+      "TODO: create text_for_run"
     end
   end
 end
