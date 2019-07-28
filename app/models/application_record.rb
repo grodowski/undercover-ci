@@ -7,5 +7,6 @@ class ApplicationRecord < ActiveRecord::Base
     puts "untested!"
     puts "a"
     puts "c"
+    puts "more untested"
   end
 end

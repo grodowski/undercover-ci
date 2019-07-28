@@ -11,11 +11,13 @@ env:
 addons:
   postgresql: "9.6"
 before_install:
-  - gem install bundler undercover
+  - gem install bundler
   - gem update --system
 script:
   - bundle exec rubocop
   - RAILS_ENV=test bundle exec rails db:setup
   - bundle exec rake
-  - git pull origin master:master
-  - bundle exec undercover --compare master
+  - | # upload test coverage data to undercover-ci.com
+    curl -X POST -H "Content-Type: application/json" \
+    -d "{\"repo\": \"grodowski/undercover-ci\", \"sha\": \"$TRAVIS_COMMIT\", \"lcov_base64\": \"$(cat coverage/lcov/undercover-ci.lcov | base64)\"}" \
+    https://undercover-ci.com/v1/coverage
