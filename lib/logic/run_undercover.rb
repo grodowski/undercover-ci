@@ -30,9 +30,7 @@ module Logic
       CheckRuns::Run.new(run).post
 
       clone_repo
-      # LOL
-      # TODO: checkout correct branch!
-      Rugged::Repository.new(repo_path).checkout("origin/test-pr")
+      Rugged::Repository.new(repo_path).reset(run.sha, :hard)
 
       report = run_undercover_cmd
 

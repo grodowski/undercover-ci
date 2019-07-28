@@ -8,17 +8,17 @@ module CheckRuns
       client.post(
         "/repos/#{run.full_name}/check-runs",
         head_sha: run.sha,
-        name: "Coverage Check",
+        name: "Code coverage",
         status: "completed",
-        # started_at: "", # TODO: store started at
-        completed_at: Time.now.iso8601,
-        conclusion: "failure",
-        details_url: "https://google.com",
+        started_at: run.created_at, # TODO: replace when we store states
+        completed_at: Time.now.iso8601, # TODO: store this in model
+        conclusion: conclusion_for_run(undercover_warnings),
+        details_url: "https://undercover-ci.com",
         external_id: "", # TODO: create an external id
         output: {
-          title: "Analysing coverage report",
-          summary: "Undercover CI run is in progress...",
-          text: "**TODO: add something nice**\n\n```\ndef hello\n  $$$\nend\n```\n~~hello~~",
+          title: "Code coverage report",
+          summary: summary_for_run(undercover_warnings),
+          text: text_for_run(undercover_warnings),
           annotations: warnings_to_annotations(undercover_warnings)
         },
         accept: "application/vnd.github.antiope-preview+json"
@@ -37,16 +37,36 @@ module CheckRuns
         lines = result.coverage.map { |ln, _cov| ln if result.uncovered?(ln) }.compact
         message = "#{result.node.human_name.capitalize} `#{result.node.name}` is missing" \
                   " coverage for line#{'s' if lines.size > 1} #{lines.join(', ')}" \
-                  " (method coverage: #{result.coverage_f})"
+                  " (node coverage: #{result.coverage_f})"
         {
-          path: "app/models/application_record.rb",
+          path: result.file_path,
           start_line: result.first_line,
           end_line: result.last_line,
           annotation_level: "warning",
-          title: "FOO",
+          title: "Untested #{result.node.human_name}",
           message: message
         }
       end
+    end
+
+    # TODO: conditional copy
+    # - if no warnings, tell that it's a clean PR!
+    # - if warnings present, suggest to add test coverage
+    # - show some stats
+    #   - num methods / classes / changed / added / removed
+    #   - avg coverage per method
+    # - show a random tip
+    def conclusion_for_run(warnings)
+      warnings.empty? ? "success" : "failure"
+    end
+
+    # TODO: failure / aborted check run copy
+    def summary_for_run(_warnings)
+      "TODO: create summary_for_run"
+    end
+
+    def text_for_run(_warnings)
+      "TODO: create text_for_run"
     end
   end
 end
