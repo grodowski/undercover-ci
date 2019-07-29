@@ -13,7 +13,8 @@ The Undercover CI only accepts LCOV-formatted coverage reports. Please use the `
 ⚠️ This method is still a proof of concept and should not be used for real applications. ⚠️
 
 ```
-curl -X POST -H "Content-Type: application/json" \
--d "{\"repo\": \"grodowski/undercover-ci\", \"sha\": \"3eb49a677d75852404c898c4ecaa9b6efd335f8a\", \"lcov_base64\": \"$(cat coverage/lcov/undercover-ci.lcov | base64)\"}" \
-localhost:3000/v1/coverage
+coverage_base64=$(ruby -r base64 -e "print Base64.strict_encode64(File.read(\"coverage/lcov/undercover-ci.lcov\"))")
+curl -iX POST -H "Content-Type: application/json" \
+-d "{\"repo\": \"grodowski/undercover-ci\", \"sha\": \"$TRAVIS_COMMIT\", \"lcov_base64\": \"$coverage_base64\"}" \
+https://undercover-ci.com/v1/coverage
 ```
