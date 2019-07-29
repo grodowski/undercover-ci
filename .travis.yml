@@ -11,9 +11,6 @@ env:
     - GITHUB_WEBHOOK_SECRET=sekrit
 addons:
   postgresql: "9.6"
-before_install:
-  - gem install bundler
-  - gem update --system
 script:
   - bundle exec rubocop
   - RAILS_ENV=test bundle exec rails db:setup
