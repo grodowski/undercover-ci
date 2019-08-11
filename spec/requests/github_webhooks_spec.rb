@@ -32,17 +32,13 @@ describe "GitHub Webhooks" do
     end
   end
 
-  it "logs unhandled actions and returns ok" do
+  it "returns ok for unhandled actions" do
     payload = {action: :start}.to_json
     valid_headers = {
       "ACCEPT": "application/json",
       "HTTP_X_HUB_SIGNATURE": sign_hook(payload),
       "HTTP_X_GITHUB_EVENT": "partyhard"
     }
-
-    expect(Rails.logger)
-      .to receive(:info)
-      .with("Unhandled GitHub webhook: start/partyhard")
 
     post path, params: payload, headers: valid_headers
     expect(response).to be_ok
