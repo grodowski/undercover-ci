@@ -10,25 +10,32 @@ describe Logic::UpdateCoverageCheckState do
     described_class.new(coverage_check)
   end
 
-  it "updates state to queued" do
-    expect { svc.queue }.to change { coverage_check.reload.state }.from(:created).to(:queued)
+  it "updates state to awaiting_coverage" do
+    expect { svc.await_coverage }.to change { coverage_check.reload.state }.from(:created).to(:awaiting_coverage)
   end
 
   it "updates state to in_progress" do
-    expect { svc.start }.to change { coverage_check.reload.state }.from(:created).to(:in_progress)
+    coverage_check.update!(state: :awaiting_coverage)
+    expect { svc.start }.to change { coverage_check.reload.state }.from(:awaiting_coverage).to(:in_progress)
   end
 
   it "updates state to complete" do
-    expect { svc.complete }.to change { coverage_check.reload.state }.from(:created).to(:complete)
+    coverage_check.update!(state: :in_progress)
+    expect { svc.complete }.to change { coverage_check.reload.state }.from(:in_progress).to(:complete)
+  end
+
+  it "raises a StateTransisionError if initial state is invalid" do
+    expect { svc.complete }.to raise_error(Logic::StateTransisionError)
   end
 
   it "restarts" do
+    coverage_check.update!(state: :awaiting_coverage)
     Timecop.freeze do
       expect do
         svc.start
         svc.restart
-      end.to change { coverage_check.reload.state }.from(:created).to(:in_progress)
-      expect_state_log("created", "in_progress", Time.now, nil)
+      end.to change { coverage_check.reload.state }.from(:awaiting_coverage).to(:in_progress)
+      expect_state_log("awaiting_coverage", "in_progress", Time.now, nil)
       expect_state_log("in_progress", "in_progress", Time.now, "restart")
     end
   end

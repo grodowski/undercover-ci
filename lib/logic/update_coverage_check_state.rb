@@ -10,30 +10,35 @@ module Logic
       @coverage_check = coverage_check
     end
 
-    def queue
-      set_state(:queued)
+    def await_coverage
+      transition(:created, :awaiting_coverage)
     end
 
     def start
-      set_state(:in_progress)
+      transition(:awaiting_coverage, :in_progress)
     end
 
     def restart
-      set_state(:in_progress, "restart")
+      transition(:in_progress, :in_progress, "restart")
     end
 
     def complete
-      set_state(:complete)
+      transition(:in_progress, :complete)
     end
 
     private
 
-    def set_state(new_state, via = nil)
-      prev_state = coverage_check.state
+    def transition(expectd_old_state, new_state, via = nil)
+      old_state = coverage_check.state
+
+      unless expectd_old_state == old_state
+        raise StateTransisionError, "cannot transition from #{old_state} to #{new_state}"
+      end
+
       coverage_check.state = new_state
       coverage_check.state_log << {
         ts: Time.now.iso8601,
-        from: prev_state,
+        from: old_state,
         to: new_state,
         via: via
       }

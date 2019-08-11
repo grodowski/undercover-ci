@@ -11,9 +11,6 @@ class RunnerJob < ApplicationJob
   MAX_RETRIES = 3
 
   def perform(coverage_check_id, attempt = 1)
-    # TODO: return if already running
-    # TODO: store running state
-
     coverage_check = CoverageCheck.find(coverage_check_id)
 
     if coverage_check.coverage_reports.empty? && attempt < MAX_RETRIES

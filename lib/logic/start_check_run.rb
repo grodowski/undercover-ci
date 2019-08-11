@@ -2,6 +2,8 @@
 
 module Logic
   class StartCheckRun
+    include ClassLoggable
+
     def self.call(check_run_info)
       new(check_run_info).create_and_queue_check_run
     end
@@ -13,17 +15,21 @@ module Logic
     end
 
     def create_and_queue_check_run
-      report = CoverageCheck.find_or_initialize_by(
+      coverage_check = CoverageCheck.find_or_initialize_by(
         head_sha: check_run_info.sha,
-        # TODO: add and save base_sha
         installation_id: check_run_info.installation_id
       )
-      report.repo = check_run_info.payload&.repository
-      report.save!
 
-      # TODO: check if already running?
-      # what to do if running? - RunnerJob.. discard results and start new RunnerJob?
-      CreateCheckRunJob.perform_later(report.id)
+      unless coverage_check.state == :created
+        log "StartCheckRun exiting early, #{check_run_info} is #{coverage_check.state}"
+        return
+      end
+
+      coverage_check.repo = check_run_info.payload&.repository
+      coverage_check.save!
+
+      Logic::UpdateCoverageCheckState.new(coverage_check).await_coverage
+      CreateCheckRunJob.perform_later(coverage_check.id)
     end
   end
 end

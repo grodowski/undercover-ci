@@ -30,20 +30,18 @@ module V1
       when EVENT_TYPE_CHECK_SUITE
 
         case @payload["action"].strip
-        when /^(re)?requested$/
+        when "requested"
           File.write("check_suite.json", @payload.to_json) if Rails.env.development?
 
-          # TODO: Queue a check run instance (queued)
-          # What if already running?
           run_info = DataObjects::CheckRunInfo.from_webhook(@payload)
           Logic::StartCheckRun.call(run_info)
-        else
-          logger.debug "Webhook Unhandled: #{@payload['action']}/#{@event_type}"
+        when "rerequested"
+          logger.info "Unhandled GitHub webhook: #{@payload['action']}/#{@event_type}"
         end
 
       when EVENT_TYPE_CHECK_RUN
 
-        logger.debug "Webhook Unhandled: #{@payload['action']}/#{@event_type}"
+        logger.info "Unhandled GitHub webhook: #{@payload['action']}/#{@event_type}"
         case @payload["action"].strip
         when /^(re)?requested$/
           # FIXME: handle check_run re-requests!
@@ -53,17 +51,17 @@ module V1
       when EVENT_TYPE_INSTALLATION
 
         # TODO: create an installation record
-        logger.debug "Webhook Unhandled: #{@payload['action']}/#{@event_type}"
+        logger.info "Unhandled GitHub webhook: #{@payload['action']}/#{@event_type}"
         File.write("installation.json", @payload.to_json) if Rails.env.development?
 
       when EVENT_TYPE_INSTALLATION_REPOSITORIES
 
         # TODO: create or soft-delete a repositories
-        logger.debug "Webhook Unhandled: #{@payload['action']}/#{@event_type}"
+        logger.info "Unhandled GitHub webhook: #{@payload['action']}/#{@event_type}"
         File.write("installation_repositories.json", @payload.to_json) if Rails.env.development?
 
       else
-        logger.debug "Webhook Unhandled: #{@payload['action']}/#{@event_type}"
+        logger.info "Unhandled GitHub webhook: #{@payload['action']}/#{@event_type}"
       end
     end
 

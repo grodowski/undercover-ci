@@ -41,8 +41,8 @@ describe "GitHub Webhooks" do
     }
 
     expect(Rails.logger)
-      .to receive(:debug)
-      .with("Webhook Unhandled: start/partyhard")
+      .to receive(:info)
+      .with("Unhandled GitHub webhook: start/partyhard")
 
     post path, params: payload, headers: valid_headers
     expect(response).to be_ok
