@@ -32,17 +32,13 @@ describe "GitHub Webhooks" do
     end
   end
 
-  it "logs unhandled actions and returns ok" do
+  it "returns ok for unhandled actions" do
     payload = {action: :start}.to_json
     valid_headers = {
       "ACCEPT": "application/json",
       "HTTP_X_HUB_SIGNATURE": sign_hook(payload),
       "HTTP_X_GITHUB_EVENT": "partyhard"
     }
-
-    expect(Rails.logger)
-      .to receive(:debug)
-      .with("Webhook Unhandled: start/partyhard")
 
     post path, params: payload, headers: valid_headers
     expect(response).to be_ok
@@ -61,7 +57,8 @@ describe "GitHub Webhooks" do
       "action" => "requested",
       "check_suite" => {"head_sha" => "0fb234"},
       "installation" => {"id" => 43_009_808},
-      "repository" => {"full_name" => "grodowski/undercover-ci"}
+      "repository" => {"full_name" => "grodowski/undercover-ci"},
+      "pull_requests" => []
     }
     valid_headers = {
       "ACCEPT": "application/json",
@@ -72,11 +69,11 @@ describe "GitHub Webhooks" do
 
     post path, params: payload.to_json, headers: valid_headers
 
-    coverage_job = CoverageReportJob.last
+    coverage_job = CoverageCheck.last
     expect(coverage_job.attributes).to include(
       "installation_id" => "43009808",
       "repo" => {"full_name" => "grodowski/undercover-ci"},
-      "commit_sha" => "0fb234"
+      "head_sha" => "0fb234"
     )
 
     expect(CreateCheckRunJob).to have_received(:perform_later)

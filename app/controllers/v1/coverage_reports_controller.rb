@@ -6,7 +6,7 @@ require "securerandom"
 module V1
   class CoverageReportsController < ApplicationController
     protect_from_forgery with: :null_session
-    before_action :find_coverage_report_job
+    before_action :find_coverage_check
 
     def create
       decoded = Base64.decode64(lcov_base64)
@@ -17,9 +17,9 @@ module V1
         # Undercover::LcovParser closes the io internally 😭
         input_io = StringIO.new(decoded)
 
-        @coverage_report_job.transaction do
+        @coverage_check.transaction do
           attach_report(input_io)
-          RunnerJob.perform_later(@coverage_report_job.id)
+          RunnerJob.perform_later(@coverage_check.id)
         end
 
         head(:created)
@@ -33,16 +33,16 @@ module V1
     def validate_input(input_io)
       Undercover::LcovParser.new(input_io).parse
       true
-    rescue Undercover::LcovParseError => err
-      @error_message = err.message
+    rescue Undercover::LcovParseError => e
+      @error_message = e.message
       false
     end
 
     def attach_report(input_io)
       hex = SecureRandom.hex(2)
-      @coverage_report_job.coverage_reports.attach(
+      @coverage_check.coverage_reports.attach(
         io: input_io,
-        filename: "#{@coverage_report_job.id}_#{hex}.lcov",
+        filename: "#{@coverage_check.id}_#{hex}.lcov",
         content_type: "text/plain"
       )
     end
@@ -51,10 +51,10 @@ module V1
       params.require(:lcov_base64)
     end
 
-    def find_coverage_report_job
-      crj_params = params.require(%i[repo sha])
-      @coverage_report_job = CoverageReportJob.where("repo @> ?", {full_name: crj_params[0]}.to_json)
-                                              .where(commit_sha: crj_params[1]).first!
+    def find_coverage_check
+      check_params = params.require(%i[repo sha])
+      @coverage_check = CoverageCheck.where("repo @> ?", {full_name: check_params[0]}.to_json)
+                                     .where(head_sha: check_params[1]).first!
     end
   end
 end
