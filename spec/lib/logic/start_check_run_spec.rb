@@ -18,7 +18,7 @@ describe Logic::StartCheckRun do
   end
 
   it "returns silently and logs if CoverageCheck's state is not 'created'" do
-    coverage_check = CoverageCheck.create!(
+    CoverageCheck.create!(
       head_sha: "b4c0n1", installation_id: "123123", state: :awaiting_coverage
     )
 

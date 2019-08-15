@@ -14,8 +14,7 @@ module Logic
 
     def initialize(coverage_check)
       if coverage_check.state != :awaiting_coverage
-        log "RunUndercover exiting early, #{coverage_check.id} is #{coverage_check.state}"
-        return
+        raise RunError, "exiting early, coverage_check #{coverage_check.id} is #{coverage_check.state}"
       end
 
       raise RunError, "coverage_reports can't be blank" if coverage_check.coverage_reports.empty?
@@ -80,7 +79,7 @@ module Logic
         opt.lcov = @lcov_tmpfile.path
         opt.path = repo_path
       end
-      changeset = Undercover::Changeset.new("#{repo_path}/.git", "origin/master")
+      changeset = Undercover::Changeset.new(repo_path, @run.compare)
       Undercover::Report.new(changeset, opts).build
     end
   end
