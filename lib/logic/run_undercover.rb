@@ -35,7 +35,7 @@ module Logic
       CheckRuns::Run.new(run).post
 
       clone_repo
-      Rugged::Repository.new(repo_path).reset(run.sha, :hard)
+      Rugged::Repository.new(repo_path).checkout(run.sha)
 
       report = run_undercover_cmd
 
