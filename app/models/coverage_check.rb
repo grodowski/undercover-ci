@@ -3,8 +3,16 @@
 class CoverageCheck < ApplicationRecord
   has_many_attached :coverage_reports
 
+  validates :state, inclusion: {in: %i[created awaiting_coverage in_progress complete]}
+
   after_initialize do
+    self.state ||= :created
     self.event_log ||= []
+    self.state_log ||= []
+  end
+
+  def state
+    super&.to_sym
   end
 
   def repo_full_name

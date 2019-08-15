@@ -10,12 +10,16 @@ module Logic
       new(coverage_check).run_undercover
     end
 
-    attr_reader :coverage_check_id, :run
+    attr_reader :coverage_check, :run
 
     def initialize(coverage_check)
-      @coverage_check_id = coverage_check.id
+      if coverage_check.state != :awaiting_coverage
+        raise RunError, "exiting early, coverage_check #{coverage_check.id} is #{coverage_check.state}"
+      end
+
       raise RunError, "coverage_reports can't be blank" if coverage_check.coverage_reports.empty?
 
+      @coverage_check = coverage_check
       # In Rails 6 this will become `coverage_report_jov.coverage_reports.last.open`
       @lcov_tmpfile = Tempfile.new
       @lcov_tmpfile.write(coverage_check.coverage_reports.last.download)
@@ -24,9 +28,10 @@ module Logic
       @run = DataObjects::CheckRunInfo.from_coverage_check(coverage_check)
     end
 
-    # TODO: validation and error handling
     def run_undercover
-      log "starting run #{run} job_id: #{coverage_check_id}"
+      Logic::UpdateCoverageCheckState.new(coverage_check).start
+
+      log "starting run #{run} job_id: #{coverage_check.id}"
       CheckRuns::Run.new(run).post
 
       clone_repo
@@ -39,22 +44,15 @@ module Logic
       log "undercover warnings: #{warnings.size}"
       # TODO: format undercover results and send with Complete
 
-      log "completing analysis... #{run} job_id: #{coverage_check_id}"
+      log "completing analysis... #{run} job_id: #{coverage_check.id}"
       CheckRuns::Complete.new(run).post(warnings)
 
+      Logic::UpdateCoverageCheckState.new(coverage_check).complete
       teardown
-      log "teardown complete #{run} job_id: #{coverage_check_id}"
+      log "teardown complete #{run} job_id: #{coverage_check.id}"
     end
 
     private
-
-    # def validate_run
-    #   # TODO: validate if run can be ran:
-    #   # - was it queued?
-    #   # - lcov present?
-    #   # - repo reachable (ls-remote)?
-    #   true
-    # end
 
     # https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#http-based-git-access-by-an-installation
     def clone_repo
@@ -73,7 +71,7 @@ module Logic
     end
 
     def repo_path
-      "tmp/job/#{coverage_check_id}"
+      "tmp/job/#{coverage_check.id}"
     end
 
     def run_undercover_cmd
@@ -81,7 +79,7 @@ module Logic
         opt.lcov = @lcov_tmpfile.path
         opt.path = repo_path
       end
-      changeset = Undercover::Changeset.new("#{repo_path}/.git", "origin/master")
+      changeset = Undercover::Changeset.new(repo_path, @run.compare)
       Undercover::Report.new(changeset, opts).build
     end
   end

@@ -50,6 +50,7 @@ group :test do
   gem "simplecov"
   gem "simplecov-html"
   gem "simplecov-lcov"
+  gem "timecop"
   gem "webdrivers"
 end
 

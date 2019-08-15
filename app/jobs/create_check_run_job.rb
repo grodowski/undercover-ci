@@ -8,9 +8,9 @@ class CreateCheckRunJob < ApplicationJob
   queue_as :default
 
   def perform(coverage_check_id)
-    run = DataObjects::CheckRunInfo.from_coverage_check(
-      CoverageCheck.find(coverage_check_id)
-    )
+    coverage_check = CoverageCheck.find(coverage_check_id)
+    run = DataObjects::CheckRunInfo.from_coverage_check(coverage_check)
+
     CheckRuns::Create.new(run).post
   end
 end

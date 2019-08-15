@@ -6,7 +6,8 @@ describe RunnerJob do
   let(:check) do
     CoverageCheck.create!(
       repo: {id: 1, full_name: "user/repository"},
-      head_sha: "1a2b3c"
+      head_sha: "1a2b3c",
+      state: :awaiting_coverage
     )
   end
 
