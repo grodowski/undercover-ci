@@ -26,6 +26,10 @@ gem "undercover"
 gem "jwt"
 gem "octokit"
 
+# Auth
+gem "omniauth"
+gem "omniauth-github"
+
 # Tooling
 gem "sentry-raven"
 

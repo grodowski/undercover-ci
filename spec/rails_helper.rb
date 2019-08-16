@@ -6,6 +6,7 @@ require "pry"
 require "webmock/rspec"
 require "simplecov"
 require "simplecov-lcov"
+require "yaml"
 
 SimpleCov::Formatter::LcovFormatter.config.report_with_single_file = true
 SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new(
@@ -29,6 +30,11 @@ rescue ActiveRecord::PendingMigrationError => e
   puts e.to_s.strip
   exit 1
 end
+
+OmniAuth.config.test_mode = true
+OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(
+  YAML.load_file("spec/fixtures/auth_hash.yaml")
+)
 
 RSpec.configure do |config|
   config.fixture_path = "#{::Rails.root}/spec/fixtures"

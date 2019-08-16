@@ -1,0 +1,56 @@
+---
+provider: github
+uid: '1337'
+info:
+  nickname: foobar
+  email: foo@bar.com
+  name: Foo Bar
+  image: https://avatars1.githubusercontent.com/u/4991698?v=4
+  urls:
+    GitHub: https://github.com/foobar
+    Blog: ''
+credentials:
+  token: t0k3nt0k3nt0k3nt0k3nt0k3nt0k3nt0k3n
+  expires: false
+extra:
+  raw_info:
+    login: foobar
+    id: 1337
+    node_id: node_id
+    avatar_url: https://avatars1.githubusercontent.com/u/4991698?v=4
+    gravatar_id: ''
+    url: https://api.github.com/users/grodowski
+    html_url: https://github.com/grodowski
+    followers_url: https://api.github.com/users/grodowski/followers
+    following_url: https://api.github.com/users/grodowski/following{/other_user}
+    gists_url: https://api.github.com/users/grodowski/gists{/gist_id}
+    starred_url: https://api.github.com/users/grodowski/starred{/owner}{/repo}
+    subscriptions_url: https://api.github.com/users/grodowski/subscriptions
+    organizations_url: https://api.github.com/users/grodowski/orgs
+    repos_url: https://api.github.com/users/grodowski/repos
+    events_url: https://api.github.com/users/grodowski/events{/privacy}
+    received_events_url: https://api.github.com/users/grodowski/received_events
+    type: User
+    site_admin: false
+    name: Foo Bar
+    company: "@rainforestapp"
+    blog: ''
+    location: Warsaw, Poland
+    email:
+    hireable:
+    bio:
+    public_repos: 46
+    public_gists: 18
+    followers: 26
+    following: 45
+    created_at: '2013-07-11T18:06:21Z'
+    updated_at: '2019-07-26T08:12:00Z'
+  all_emails:
+  - email: foo@bar.com
+    primary: true
+    verified: true
+    visibility: public
+  - email: foo@baz.com
+    primary: false
+    verified: false
+    visibility:
