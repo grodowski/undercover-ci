@@ -9,6 +9,9 @@ describe Logic::RunUndercover do
     allow(Rugged::Repository).to receive(:new).and_wrap_original do |m, arg|
       m.call(arg + "/fake.git")
     end
+    allow(Undercover::Changeset).to receive(:new).and_wrap_original do |m, (repo_path, compare)|
+      m.call(repo_path.gsub(".git", ""), compare)
+    end
   end
 
   let(:coverage_check) do

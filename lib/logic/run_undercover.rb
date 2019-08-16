@@ -35,7 +35,7 @@ module Logic
       CheckRuns::Run.new(run).post
 
       clone_repo
-      Rugged::Repository.new(repo_path).checkout(run.sha)
+      checkout
 
       report = run_undercover_cmd
 
@@ -66,6 +66,12 @@ module Logic
       )
     end
 
+    def checkout
+      repo = Rugged::Repository.new(repo_path)
+      branch = repo.create_branch("undercover-ci", run.sha)
+      repo.checkout(branch)
+    end
+
     def teardown
       @lcov_tmpfile.close
     end
@@ -79,7 +85,7 @@ module Logic
         opt.lcov = @lcov_tmpfile.path
         opt.path = repo_path
       end
-      changeset = Undercover::Changeset.new(repo_path, @run.compare)
+      changeset = Undercover::Changeset.new("#{repo_path}/.git", @run.compare)
       Undercover::Report.new(changeset, opts).build
     end
   end
