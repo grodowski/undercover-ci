@@ -20,15 +20,12 @@ module Logic
       raise RunError, "coverage_reports can't be blank" if coverage_check.coverage_reports.empty?
 
       @coverage_check = coverage_check
-      # In Rails 6 this will become `coverage_report_jov.coverage_reports.last.open`
       @lcov_tmpfile = Tempfile.new
-      @lcov_tmpfile.write(coverage_check.coverage_reports.last.download)
-      @lcov_tmpfile.flush
-
       @run = DataObjects::CheckRunInfo.from_coverage_check(coverage_check)
     end
 
     def run_undercover
+      fetch_report
       Logic::UpdateCoverageCheckState.new(coverage_check).start
 
       log "starting run #{run} job_id: #{coverage_check.id}"
@@ -53,6 +50,12 @@ module Logic
     end
 
     private
+
+    def fetch_report
+      # In Rails 6 this will become `coverage_report_jov.coverage_reports.last.open`
+      @lcov_tmpfile.write(coverage_check.coverage_reports.last.download)
+      @lcov_tmpfile.flush
+    end
 
     # https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#http-based-git-access-by-an-installation
     def clone_repo
