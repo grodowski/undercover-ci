@@ -23,7 +23,10 @@ describe "GitHub auth" do
     expect(session[:user_id]).to eq(User.last.id)
   end
 
-  xit "signs out a user" do
-    # TODO: implement sign out
+  it "signs out a user" do
+    get "/auth/github/callback" # sign in
+
+    expect { delete "/auth/logout" }.to change { session[:user_id] }.from(User.last.id).to(nil)
+    expect(response).to redirect_to(root_url)
   end
 end

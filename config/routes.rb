@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   end
 
   get "/auth/github/callback", to: "sessions#create"
+  delete "/auth/logout", to: "sessions#destroy"
 
   get "/pricing", to: "home#pricing", as: :pricing_page
   get "/privacy", to: "home#privacy", as: :privacy_page
