@@ -6,18 +6,17 @@
 <div class="container">
   <div class="card-deck mb-3 text-center">
     <div class="card mb-4 shadow-sm">
-      <div class="card-header">
-        <h4 class="my-0 font-weight-normal">Beta</h4>
-      </div>
+      <!-- <div class="card-header">
+        <h4 class="my-0 font-weight-normal">Private beta</h4>
+      </div> -->
       <div class="card-body">
-        <h1 class="card-title pricing">$0 <small class="text-muted">/ mo</small></h1>
+        <h1 class="card-title pricing">Free</h1>
         <ul class="list-unstyled mt-3 mb-4">
-          <li>Unlimited users</li>
-          <li>Private and public repositories</li>
-          <li>Support via GitHub issues</li>
-          <li>Limited availability</li>
+          <li>Unlimited GitHub users</li>
+          <li>Unlimited private and public repositories</li>
+          <li>200 Pull Request checks / mo</li>
         </ul>
-        <button type="button" class="btn btn-lg btn-block btn-primary">Get started with GitHub</button>
+        <%= render partial: "partials/list_signup" %>
       </div>
     </div>
   </div>

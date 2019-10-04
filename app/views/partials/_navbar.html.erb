@@ -12,17 +12,17 @@
         <a class="nav-link" href="<%= pricing_page_path %>">Pricing</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="https://github.com/grodowski/undercover" target="_blank">Open Source</a>
+        <a class="nav-link" href="https://github.com/grodowski/undercover" target="_blank">Open source</a>
       </li>
-      <li class="nav-item">
+      <!-- <li class="nav-item">
         <a class="nav-link" href="<%= faq_page_path %>">Support</a>
-      </li>
+      </li> -->
     </ul>
     <% if ENV['FF_SELF_SIGNUP'] %>
       <% if current_user %>
-        <%= link_to "Sign Out", "/auth/logout", class: "btn btn-info", method: :delete %>
+        <%= link_to "Sign out", "/auth/logout", class: "btn btn-info", method: :delete %>
       <% else %>
-        <%= link_to "Sign In", "/auth/github", class: "btn btn-info", method: :post %>
+        <%= link_to "Sign in", "/auth/github", class: "btn btn-info", method: :post %>
       <% end %>
     <% end %>
   </div>
