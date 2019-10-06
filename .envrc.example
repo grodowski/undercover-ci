@@ -8,6 +8,7 @@ export GITHUB_AUTH_SECRET=
 export USER_TOKEN_ENCRYPTION_KEY=
 
 export SENTRY_DSN=
+export HEAP_APP_ID=
 
 # Feature toggles
 export FF_MARKETING_PAGE=
