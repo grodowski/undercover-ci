@@ -1,0 +1,16 @@
+<!-- Begin Mailchimp Signup Form -->
+<% if ENV["FF_MARKETING_PAGE"] %>
+  <form action="https://gmail.us20.list-manage.com/subscribe/post?u=150b7e4fb3f7fca9a043dcb61&amp;id=4f43c5fc2a" method="post" class="form-inline justify-content-center" target="_blank" novalidate>
+    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_150b7e4fb3f7fca9a043dcb61_4f43c5fc2a" tabindex="-1" value=""></div>
+
+    <%= label_tag :email, "Email", class: "sr-only" %>
+    <div class="input-group">
+      <%= email_field_tag :EMAIL, "", class: "form-control", placeholder: "Your email" %>
+      <div class="input-group-append">
+        <%= submit_tag "Get notified", class: "btn btn-primary" %>
+      </div>
+    </div>
+  </form>
+<% end %>
+<!-- End Mailchimp Signup Form -->

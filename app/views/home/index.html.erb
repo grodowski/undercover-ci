@@ -1,45 +1,58 @@
-<div class="starter-template">
-  <h1 class="display-4">Stop Shipping Untested Code</h1>
-  <p class="lead">Actionable checks for Ruby code coverage.<br/>Integrated into your GitHub workflow.</p>
-  <p class="lead">Available Q1 2019</p>
-  <p>
-    <a href="#" class="btn btn-lg btn-primary disabled">Install GitHub App</a>
-  </p>
-</div>
+<% if ENV["FF_MARKETING_PAGE"] %>
+  <div class="starter-template">
+    <h1 class="display-4 header-title">Actionable code coverage review</h1>
+    <p class="lead mt-5">Undercover CI reviews pull requests to <strong class="lead-highlight">help you stop shipping untested code</strong>.<br/>Integrated into your team's workflow with Ruby and GitHub.</p>
 
-<% if ENV['FF_MARKETING_PAGE'] %>
-  <div class="container marketing">
-    <div class="row featurette">
-      <div class="col-md-7">
-        <h2 class="featurette-heading">First featurette heading. <span class="text-muted">It'll blow your mind.</span></h2>
-        <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus, tellus ac cursus commodo.</p>
-      </div>
-      <div class="col-md-5">
-        <img class="featurette-image img-fluid mx-auto" data-src="holder.js/500x500/auto" alt="500x500" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22500%22%20height%3D%22500%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20500%20500%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_16635d20cf6%20text%20%7B%20fill%3A%23AAAAAA%3Bfont-weight%3Abold%3Bfont-family%3AArial%2C%20Helvetica%2C%20Open%20Sans%2C%20sans-serif%2C%20monospace%3Bfont-size%3A25pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_16635d20cf6%22%3E%3Crect%20width%3D%22500%22%20height%3D%22500%22%20fill%3D%22%23EEEEEE%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22184.7890625%22%20y%3D%22261.23125%22%3E500x500%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E" data-holder-rendered="true" style="width: 500px; height: 500px;">
-      </div>
+    <picture>
+      <source media="(min-width: 650px)" srcset="<%= image_path("check_screenshot_lg.png") %>">
+      <source media="(min-width: 300px)" srcset="<%= image_path("check_screenshot_sm.png") %>">
+      <img class="img-fluid my-3" src="check_screenshot_sm.jpg" alt="Undercover CI GitHub comments">
+    </picture>
+
+    <div class="container mb-5">
+      <% if ENV['FF_SELF_SIGNUP'] %>
+        <p>
+          <%= link_to "Sign Up", "/auth/github", class: "btn btn-lg btn-primary", method: :post %>
+        </p>
+      <% else %>
+        <p class="lead">
+          Private beta coming this fall. Sign up to be the first one to know!
+        </p>
+
+        <%= render partial: "partials/list_signup" %>
+      <% end %>
     </div>
 
-    <hr class="featurette-divider">
-
-    <div class="row featurette">
-      <div class="col-md-7 order-md-2">
-        <h2 class="featurette-heading">Oh yeah, it's that good. <span class="text-muted">See for yourself.</span></h2>
-        <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus, tellus ac cursus commodo.</p>
-      </div>
-      <div class="col-md-5 order-md-1">
-        <img class="featurette-image img-fluid mx-auto" data-src="holder.js/500x500/auto" alt="500x500" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22500%22%20height%3D%22500%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20500%20500%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_16635d20cf9%20text%20%7B%20fill%3A%23AAAAAA%3Bfont-weight%3Abold%3Bfont-family%3AArial%2C%20Helvetica%2C%20Open%20Sans%2C%20sans-serif%2C%20monospace%3Bfont-size%3A25pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_16635d20cf9%22%3E%3Crect%20width%3D%22500%22%20height%3D%22500%22%20fill%3D%22%23EEEEEE%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22184.7890625%22%20y%3D%22261.23125%22%3E500x500%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E" data-holder-rendered="true" style="width: 500px; height: 500px;">
-      </div>
-    </div>
-
-    <hr class="featurette-divider">
-
-    <div class="row featurette">
-      <div class="col-md-7">
-        <h2 class="featurette-heading">And lastly, this one. <span class="text-muted">Checkmate.</span></h2>
-        <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus, tellus ac cursus commodo.</p>
-      </div>
-      <div class="col-md-5">
-        <img class="featurette-image img-fluid mx-auto" data-src="holder.js/500x500/auto" alt="500x500" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22500%22%20height%3D%22500%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20500%20500%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_16635d20cfc%20text%20%7B%20fill%3A%23AAAAAA%3Bfont-weight%3Abold%3Bfont-family%3AArial%2C%20Helvetica%2C%20Open%20Sans%2C%20sans-serif%2C%20monospace%3Bfont-size%3A25pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_16635d20cfc%22%3E%3Crect%20width%3D%22500%22%20height%3D%22500%22%20fill%3D%22%23EEEEEE%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22184.7890625%22%20y%3D%22261.23125%22%3E500x500%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E" data-holder-rendered="true" style="width: 500px; height: 500px;">
+    <div class="container how-it-works-container">
+      <h3 class="mb-5">How it works</h3>
+      <div class="card-deck mb-5">
+        <div class="card mb-4 shadow-sm">
+          <div class="card-body">
+            <div class="text-center">
+              <i class="how-it-works-icon icon-flow-merge"></i>
+            </div>
+            <p class="lead"><strong>Open a pull request</strong></p>
+            <p class="text-muted">The CI server runs tests and uploads coverage data to Undercover CI. That's the only required post-install setup step!</p>
+          </div>
+        </div>
+        <div class="card mb-4 shadow-sm">
+          <div class="card-body">
+            <div class="text-center">
+              <i class="how-it-works-icon icon-search-outline"></i>
+            </div>
+            <p class="lead"><strong>Scan for missing diff coverage</strong></p>
+            <p class="text-muted">We scan the PR diff and verify local test coverage for each updated class, method and block, because an absolute percentage check is not enough.</p>
+          </div>
+        </div>
+        <div class="card mb-4 shadow-sm">
+          <div class="card-body">
+            <div class="text-center">
+              <i class="how-it-works-icon icon-chat-alt"></i>
+            </div>
+            <p class="lead"><strong>Fix or ack review comments</strong></p>
+            <p class="text-muted">Reveal untested methods and blocks, find unused code paths and improve your test suite</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>

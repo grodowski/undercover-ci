@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+<nav class="navbar navbar-expand-md navbar-light bg-light">
   <a class="navbar-brand" href="<%= root_path %>">Undercover CI</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-top" aria-controls="navbar-top" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
@@ -8,13 +8,22 @@
     <ul class="navbar-nav mr-auto">
       <!-- TODO: navbar helper to mark item as active -->
       <!-- class="active" -->
-      <!-- <li class="nav-item">
-        <a class="nav-link" href="#">Features <span class="sr-only">(current)</span></a>
+      <li class="nav-item">
+        <a class="nav-link" href="<%= pricing_page_path %>">Pricing</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#">Pricing</a>
+        <a class="nav-link" href="https://github.com/grodowski/undercover" target="_blank">Open source</a>
+      </li>
+      <!-- <li class="nav-item">
+        <a class="nav-link" href="<%= faq_page_path %>">Support</a>
       </li> -->
     </ul>
-    <button class="btn btn-outline-success disabled" type="submit" href="#">Install</button>
+    <% if ENV['FF_SELF_SIGNUP'] %>
+      <% if current_user %>
+        <%= link_to "Sign out", "/auth/logout", class: "btn btn-info", method: :delete %>
+      <% else %>
+        <%= link_to "Sign in", "/auth/github", class: "btn btn-info", method: :post %>
+      <% end %>
+    <% end %>
   </div>
 </nav>

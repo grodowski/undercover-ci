@@ -7,7 +7,13 @@ Rails.application.routes.draw do
     post "/coverage", to: "coverage_reports#create"
   end
 
+  get "/auth/github/callback", to: "sessions#create"
+  delete "/auth/logout", to: "sessions#destroy"
+
+  get "/pricing", to: "home#pricing", as: :pricing_page
+  get "/privacy", to: "home#privacy", as: :privacy_page
+  get "/terms", to: "home#terms", as: :terms_page
+  get "/faq", to: "home#faq", as: :faq_page
+
   root to: "home#index"
-  # TODO: comment out pages once they are ready
-  # get "/pricing", to: "home#pricing", as: :pricing_page
 end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class HomeController < ApplicationController
-  def index
-    redirect_to "https://github.com/grodowski/undercover" if Rails.env.production?
+  before_action do
+    redirect_to "https://github.com/grodowski/undercover" unless ENV["FF_MARKETING_PAGE"]
   end
 end

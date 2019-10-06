@@ -1,4 +1,4 @@
 <footer class="container px-3 py-3">
   <hr/>
-  © 2018 Jan Grodowski · <a href="#">Privacy</a> · <a href="#">Terms</a>
+  © 2019 Jan Grodowski <% if ENV["FF_TERMS_OF_SERVICE"] %> · <a href="<%= privacy_page_path %>">Privacy</a> · <a href="<%= terms_page_path %>">Terms of service</a><% end %>
 </footer>
