@@ -21,14 +21,14 @@
 
 .starter-template {
   text-align: center;
-  padding: 4rem 1.5rem;
+  padding: 2.5rem 1.5rem;
 
   @include media-breakpoint-up(md) {
-    padding: 4rem 1.5rem;
+    padding: 2.5rem 1.5rem;
   }
 
   @include media-breakpoint-up(lg) {
-    padding: 4rem 1.5rem;
+    padding: 2.5rem 1.5rem;
   }
 }
 
@@ -46,6 +46,7 @@
 }
 
 .lead-highlight {
+  font-weight: bold;
   background: var(--pattens-blue);
 }
 
@@ -84,7 +85,7 @@
 // cards
 .card-deck .card {
   min-width: 220px;
-  border: 0;
+  border: 1px solid rgba(0, 0, 0, 0.03);
 
   .card-body {
     padding: 3rem 1.25rem;

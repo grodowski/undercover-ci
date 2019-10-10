@@ -1,4 +1,4 @@
-# Undercover CI
+# UndercoverCI
 
 Undercover code coverage warnings as a Github App.
 
@@ -8,7 +8,7 @@ Check out the [undercover gem](https://github.com/grodowski/undercover) while th
 
 ## Uploading coverage data
 
-The Undercover CI only accepts LCOV-formatted coverage reports. Please use the `simplecov-lcov` gem to generate them when running your specs. Then you should be able to create a build step uploading the coverage file with `curl`.
+UndercoverCI only accepts LCOV-formatted coverage reports. Please use the `simplecov-lcov` gem to generate them when running your specs. Then you should be able to create a build step uploading the coverage file with `curl`.
 
 ⚠️ This method is still a proof of concept and should not be used for real applications. ⚠️
 

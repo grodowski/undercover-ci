@@ -1,12 +1,12 @@
 <% if ENV["FF_MARKETING_PAGE"] %>
   <div class="starter-template">
     <h1 class="display-4 header-title">Actionable code coverage review</h1>
-    <p class="lead mt-5">Undercover CI reviews pull requests to <strong class="lead-highlight">help you stop shipping untested code</strong>.<br/>Integrated into your team's workflow with Ruby and GitHub.</p>
+    <p class="lead mt-5">UndercoverCI reviews pull requests to <strong class="lead-highlight">help you always ship adequately tested code</strong>.<br/>Works with Ruby and GitHub.</p>
 
     <picture>
       <source media="(min-width: 650px)" srcset="<%= image_path("check_screenshot_lg.png") %>">
       <source media="(min-width: 300px)" srcset="<%= image_path("check_screenshot_sm.png") %>">
-      <img class="img-fluid my-3" src="check_screenshot_sm.jpg" alt="Undercover CI GitHub comments">
+      <img class="img-fluid" src="check_screenshot_sm.jpg" alt="Undercover CI GitHub comments">
     </picture>
 
     <div class="container mb-5">
@@ -15,24 +15,26 @@
           <%= link_to "Sign Up", "/auth/github", class: "btn btn-lg btn-primary", method: :post %>
         </p>
       <% else %>
-        <p class="lead">
-          Private beta coming this fall. Sign up to be the first one to know!
-        </p>
-
-        <%= render partial: "partials/list_signup" %>
+        <div class="container">
+          <p class="text-muted">
+            Private beta coming this fall. Sign up to be the first one to know!
+          </p>
+          <%= render partial: "partials/list_signup" %>
+        </div>
       <% end %>
     </div>
 
     <div class="container how-it-works-container">
-      <h3 class="mb-5">How it works</h3>
+      <h3 class="mb-3">How it works</h3>
+      <p class="lead mb-5">Reduce pull request defects by telling you when changed code is untested.</p>
       <div class="card-deck mb-5">
         <div class="card mb-4 shadow-sm">
           <div class="card-body">
             <div class="text-center">
               <i class="how-it-works-icon icon-flow-merge"></i>
             </div>
-            <p class="lead"><strong>Open a pull request</strong></p>
-            <p class="text-muted">The CI server runs tests and uploads coverage data to Undercover CI. That's the only required post-install setup step!</p>
+            <p class="lead"><strong>1. Open a pull request</strong></p>
+            <p class="text-muted">The CI server runs tests and uploads coverage data to UndercoverCI. That's the only required post-install setup step!</p>
           </div>
         </div>
         <div class="card mb-4 shadow-lg">
@@ -40,7 +42,7 @@
             <div class="text-center">
               <i class="how-it-works-icon icon-search-outline"></i>
             </div>
-            <p class="lead"><strong>Scan for missing diff coverage</strong></p>
+            <p class="lead"><strong>2. Find missing test coverage</strong></p>
             <p class="text-muted">We scan the PR diff and verify local test coverage for each updated class, method and block, because an absolute percentage check is not enough.</p>
           </div>
         </div>
@@ -49,11 +51,15 @@
             <div class="text-center">
               <i class="how-it-works-icon icon-chat-alt"></i>
             </div>
-            <p class="lead"><strong>Fix or ack review comments</strong></p>
-            <p class="text-muted">Reveal untested methods and blocks, find unused code paths and improve your test suite</p>
+            <p class="lead"><strong>3. Fix or ack review comments</strong></p>
+            <p class="text-muted">Reveal untested methods and blocks, find unused code paths and improve your test suite.</p>
           </div>
         </div>
       </div>
+    </div>
+
+    <div class="container">
+      <p></p>
     </div>
   </div>
 <% end %>
