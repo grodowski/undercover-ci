@@ -50,6 +50,7 @@ end
 
 group :test do
   gem "capybara", ">= 2.15"
+  gem "rails-controller-testing" # provides render_template
   gem "rspec-rails"
   gem "selenium-webdriver"
   gem "simplecov"
