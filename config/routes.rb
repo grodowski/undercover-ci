@@ -15,5 +15,7 @@ Rails.application.routes.draw do
   get "/terms", to: "home#terms", as: :terms_page
   get "/faq", to: "home#faq", as: :faq_page
 
+  get "/app", to: "dashboard#index", as: :dashboard
+
   root to: "home#index"
 end

@@ -1,5 +1,7 @@
 <nav class="navbar navbar-expand-md navbar-light bg-light">
-  <a class="navbar-brand" href="<%= root_path %>">Undercover CI</a>
+  <a class="navbar-brand" href="<%= root_path %>">
+    Undercover CI (<%= current_user.name %>)
+  </a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-top" aria-controls="navbar-top" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -8,12 +10,6 @@
     <ul class="navbar-nav mr-auto">
       <!-- TODO: navbar helper to mark item as active -->
       <!-- class="active" -->
-      <li class="nav-item">
-        <a class="nav-link" href="<%= pricing_page_path %>">Pricing</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="https://github.com/grodowski/undercover" target="_blank">Open source</a>
-      </li>
       <!-- <li class="nav-item">
         <a class="nav-link" href="<%= faq_page_path %>">Support</a>
       </li> -->
