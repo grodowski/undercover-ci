@@ -2,6 +2,8 @@
 
 require "github_requests"
 
+# TODO: rename all modules representing API resources to have a
+# `Resource` suffix. E.g. CheckRuns -> CheckRunsResource
 module CheckRuns
   class Base
     include GitHubRequests

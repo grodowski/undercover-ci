@@ -9,7 +9,7 @@
 #                 ||----w |
 #                 ||     ||
 # Usage:
-# ruby -e "$(curl -s https://undercover-ci.com/uploader.rb) -- [opts]"
+# ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- [opts]
 
 require "base64"
 require "net/http"

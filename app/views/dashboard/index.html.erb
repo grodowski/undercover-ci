@@ -1,15 +1,65 @@
-<div class="modal-dialog my-5" role="document">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title">Install the UndercoverCI GitHub App</h5>
-    </div>
-    <div class="modal-body">
-      UndercoverCI will ask for write permission to your checks, pull requests and code. Proceed to complete installation and configure access on your GitHub account.
-    </div>
-    <div class="modal-footer">
-      <a href="<%= dash_installation_url %>" class="btn btn-primary">
-        Install UndercoverCI on your GitHub account
-      </a>
+<% if @installations.any? %>
+  <!-- TODO: setup guide if there are no coverage checks. Link to optionally show setup guide -->
+  <div class="card mt-2 mb-5">
+    <div class="card-header">One last setup step...</div>
+    <div class="card-body ">
+      <h5 class="card-title">✅ Integrate UncercoverCI with your test suite</h5>
+      <p>In order to receive checks on GitHub warning your team about untested code that you've changed, narrowed down to methods, blocks and classes, I need you to perform one final step!</p>
+      <ol>
+        <li>
+          Update your CI configuration (<code>.circleci/config.yml</code> in case of CircleCI) to use our uploader script after running tests. Replace things in bold with your repo-specific values. Here's an example:
+          <pre><code>
+            ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- \
+                --repo <b>twitchy-tortoise/spree</b> \
+                --commit <b>$CIRCLE_SHA1</b> \
+                --lcov <b>coverage/lcov/spree.lcov</b>
+          </code></pre>
+        </li>
+        <li>If you're running specs in parallel, check out how to <a href="https://gist.github.com/grodowski/9744ff91034dce8df20c2a8210409fb0" target="_blank">merge the reports</a> into one <code>.lcov</code> file. UndercoverCI requires a single coverage report.</li>
+        <li>Store your changes and push a commit</li>
+        <li>Profit! (this window will dissapear once the app processes your first commit)</li>
+      </ol>
     </div>
   </div>
-</div>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-11">
+        <p class="lead">UndercoverCI will send coverage checks to the following accounts and repos:</p>
+      </div>
+    </div>
+  </div>
+
+  <% @installations[:installations].each do |inst| %>
+    <div class="card bg-light my-2">
+      <div class="card-body">
+        <h5 class="card-title">
+            <%= inst.dig(:account, :login) %>
+            <% if inst[:target_type].downcase == 'organization' %>
+              <%= content_tag("span", "organization", class: 'badge badge-info') %>
+            <% end %>
+        </h5>
+
+        <% @repositories[inst[:id]][:repositories].each do |repo| %>
+          <%= content_tag("p", repo[:full_name]) %>
+        <% end %>
+
+        <%= link_to "Manage on GitHub", inst[:html_url], class: "card-link" %>
+      </div>
+    </div>
+  <% end %>
+<% else %>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Install the UndercoverCI GitHub App</h5>
+      </div>
+      <div class="modal-body">
+        UndercoverCI will ask for write permission to your checks, pull requests and code. Proceed to complete installation and configure access on your GitHub account.
+      </div>
+      <div class="modal-footer">
+        <%= link_to "Install UndercoverCI on your GitHub account", dash_installation_url, class: "btn btn-light" %>
+      </div>
+    </div>
+  </div>
+<% end %>
