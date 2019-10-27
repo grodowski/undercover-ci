@@ -37,7 +37,7 @@ module Logic
 
       coverage_check.state = new_state
       coverage_check.state_log << {
-        ts: Time.now.iso8601,
+        ts: Time.now.utc.iso8601,
         from: old_state,
         to: new_state,
         via: via

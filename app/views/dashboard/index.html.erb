@@ -1,12 +1,26 @@
 <% if @installations.any? %>
-  <!-- TODO: setup guide if there are no coverage checks. Link to optionally show setup guide -->
-  <div class="container">
-    <div class="row">
-      <div class="col-sm-11">
-        <p class="lead">✅ Complete setup and integrate UncercoverCI with your test suite:</p>
-      </div>
+  <% if @checks.any? %>
+    <div class="mb-5">
+      <p class="lead">Recent pull requests</p>
+      <table class="table">
+        <tr>
+          <th>ID</th>
+          <th>Repo</th>
+          <th>State</th>
+          <th>Commit</th>
+          <!-- TODO: ~show pull request link or number of warnings -->
+        </tr>
+        <% @checks.each do |check| %>
+          <td><%= check.id %></td>
+          <td><%= check.repo_full_name %></td>
+          <td title="<%= Time.parse(check.state_log.last["ts"]) %>"><%= "#{check.state} (#{distance_of_time_in_words(Time.now, check.state_log.last["ts"], include_seconds: true)} ago)" %></td>
+          <td><code><%= check.head_sha[0..7] %></code> 👉 <code><%= check.default_branch %></code></td>
+        <% end %>
+      </table>
     </div>
-  </div>
+  <% end %>
+
+  <p class="lead"><%= @checks.any? ? "✅" : "💁‍" %> Complete setup and integrate UncercoverCI with your test suite</p>
 
   <div class="card mt-2 mb-5">
     <div class="card-header">
@@ -59,13 +73,7 @@
     </div>
   </div>
 
-  <div class="container">
-    <div class="row">
-      <div class="col-sm-11">
-        <p class="lead">UndercoverCI will send coverage checks to the following accounts and repos:</p>
-      </div>
-    </div>
-  </div>
+  <p class="lead">UndercoverCI will send coverage checks to the following accounts and repos</p>
 
   <!-- TODO: ~refactor view logic -->
   <% @installations.each do |inst| %>

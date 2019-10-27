@@ -4,9 +4,10 @@ class DashboardController < ApplicationController
   before_action :check_current_user
 
   def index
-    # TODO: ~wrap with a presenter / lib/request object, add specs
+    # TODO: ~wrap with a presenter/lib/request object, add specs
     refresh_user_installations
     @installations = current_user.installations
+    @checks = current_user.coverage_checks.order(created_at: :desc).limit(15)
   end
 
   private
