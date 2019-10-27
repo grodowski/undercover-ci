@@ -51,7 +51,7 @@ describe Logic::UpdateCoverageCheckState do
     expect(coverage_check.state_log.map(&:symbolize_keys)).to include(
       from: from,
       to: to,
-      ts: time.iso8601,
+      ts: time.utc.iso8601,
       via: via
     )
   end
