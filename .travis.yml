@@ -16,7 +16,7 @@ script:
   - RAILS_ENV=test bundle exec rails db:setup
   - bundle exec rake
   - |
-      coverage_base64=$(ruby -r base64 -e "print Base64.strict_encode64(File.read(\"coverage/lcov/undercover-ci.lcov\"))")
-      curl -iX POST -H "Content-Type: application/json" \
-      -d "{\"repo\": \"grodowski/undercover-ci\", \"sha\": \"$TRAVIS_COMMIT\", \"lcov_base64\": \"$coverage_base64\"}" \
-      https://undercover-ci.com/v1/coverage
+      ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- \
+        --repo grodowski/undercover-ci \
+        --commit $TRAVIS_COMMIT \
+        --lcov coverage/lcov/undercover-ci.lcov

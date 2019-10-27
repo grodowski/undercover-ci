@@ -8,13 +8,12 @@ Check out the [undercover gem](https://github.com/grodowski/undercover) while th
 
 ## Uploading coverage data
 
-UndercoverCI only accepts LCOV-formatted coverage reports. Please use the `simplecov-lcov` gem to generate them when running your specs. Then you should be able to create a build step uploading the coverage file with `curl`.
+UndercoverCI only accepts LCOV-formatted coverage reports. Please use the `simplecov-lcov` gem to generate them when running your specs. Then you should be able to create a build step uploading the coverage file with `uploader.rb`.
 
-⚠️ This method is still a proof of concept and should not be used for real applications. ⚠️
-
+Example:
 ```
-coverage_base64=$(ruby -r base64 -e "print Base64.strict_encode64(File.read(\"coverage/lcov/undercover-ci.lcov\"))")
-curl -iX POST -H "Content-Type: application/json" \
--d "{\"repo\": \"grodowski/undercover-ci\", \"sha\": \"$TRAVIS_COMMIT\", \"lcov_base64\": \"$coverage_base64\"}" \
-https://undercover-ci.com/v1/coverage
+ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- \
+  --repo grodowski/undercover-ci \
+  --commit $TRAVIS_COMMIT \
+  --lcov coverage/lcov/undercover-ci.lcov
 ```
