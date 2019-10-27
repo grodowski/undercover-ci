@@ -11,10 +11,12 @@
           <!-- TODO: ~show pull request link or number of warnings -->
         </tr>
         <% @checks.each do |check| %>
-          <td><%= check.id %></td>
-          <td><%= check.repo_full_name %></td>
-          <td title="<%= Time.parse(check.state_log.last["ts"]) %>"><%= "#{check.state} (#{distance_of_time_in_words(Time.now, check.state_log.last["ts"], include_seconds: true)} ago)" %></td>
-          <td><code><%= check.head_sha[0..7] %></code> 👉 <code><%= check.default_branch %></code></td>
+          <tr>
+            <td><%= check.id %></td>
+            <td><%= check.repo_full_name %></td>
+            <td title="<%= Time.parse(check.state_log.last["ts"]) %>"><%= "#{check.state} (#{distance_of_time_in_words(Time.now, check.state_log.last["ts"], include_seconds: true)} ago)" %></td>
+            <td><code><%= check.head_sha[0..7] %></code> 👉 <code><%= check.default_branch %></code></td>
+          </tr>
         <% end %>
       </table>
     </div>
