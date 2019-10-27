@@ -15,9 +15,10 @@ module Logic
     end
 
     def create_and_queue_check_run
+      find_installation
       coverage_check = CoverageCheck.find_or_initialize_by(
         head_sha: check_run_info.sha,
-        installation_id: check_run_info.installation_id
+        installation: @installation
       )
 
       unless coverage_check.state == :created
@@ -30,6 +31,12 @@ module Logic
 
       Logic::UpdateCoverageCheckState.new(coverage_check).await_coverage
       CreateCheckRunJob.perform_later(coverage_check.id)
+    end
+
+    private
+
+    def find_installation
+      @installation = Installation.find_by!(installation_id: check_run_info.installation_id)
     end
   end
 end

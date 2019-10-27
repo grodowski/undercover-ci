@@ -21,15 +21,6 @@
 
 .starter-template {
   text-align: center;
-  padding: 2.5rem 1.5rem;
-
-  @include media-breakpoint-up(md) {
-    padding: 2.5rem 1.5rem;
-  }
-
-  @include media-breakpoint-up(lg) {
-    padding: 2.5rem 1.5rem;
-  }
 }
 
 .header-title {

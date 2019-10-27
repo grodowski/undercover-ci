@@ -6,6 +6,19 @@ describe Logic::StartCheckRun do
   let(:check_run_info) do
     DataObjects::CheckRunInfo.new("author/repo", "b4c0n1", "master", "123123", nil, nil)
   end
+  let(:user) do
+    User.create!(
+      uid: "1337",
+      email: "foo@bar.com",
+      token: "sekritkey",
+      name: "Foo Bar"
+    )
+  end
+  let!(:installation) { Installation.create!(installation_id: "123123", user: user) }
+
+  xit "fails if installation does not exist" do
+    # TODO: implement sad path
+  end
 
   it "creates CoverageCheck in awaiting_coverage and dispatches a CreateCheckRunJob" do
     expect(CreateCheckRunJob).to receive(:perform_later).once
@@ -19,7 +32,7 @@ describe Logic::StartCheckRun do
 
   it "returns silently and logs if CoverageCheck's state is not 'created'" do
     CoverageCheck.create!(
-      head_sha: "b4c0n1", installation_id: "123123", state: :awaiting_coverage
+      installation: installation, head_sha: "b4c0n1", state: :awaiting_coverage
     )
 
     expect(CreateCheckRunJob).not_to receive(:perform_later)

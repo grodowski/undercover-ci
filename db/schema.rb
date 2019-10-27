@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_16_171502) do
+ActiveRecord::Schema.define(version: 2019_10_27_125334) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -43,11 +43,22 @@ ActiveRecord::Schema.define(version: 2019_08_16_171502) do
     t.jsonb "event_log"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "installation_id"
     t.jsonb "annotations"
     t.string "base_sha"
     t.string "state"
     t.jsonb "state_log"
+    t.bigint "installation_id"
+    t.index ["installation_id"], name: "index_coverage_checks_on_installation_id"
+  end
+
+  create_table "installations", force: :cascade do |t|
+    t.bigint "installation_id"
+    t.bigint "user_id"
+    t.jsonb "metadata"
+    t.jsonb "repos"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_installations_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -60,4 +71,6 @@ ActiveRecord::Schema.define(version: 2019_08_16_171502) do
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "coverage_checks", "installations"
+  add_foreign_key "installations", "users"
 end

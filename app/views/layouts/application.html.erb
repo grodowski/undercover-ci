@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>UndercoverCI - <%= current_user.name %></title>
+    <title>UndercoverCI beta - <%= current_user.name %></title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,10 +13,9 @@
 
   <body>
     <%= render 'partials/dash_navbar' %>
-    <main role="main" class="container">
+    <main role="main" class="container py-5">
       <%= yield %>
     </main>
-
-    <!-- <%= render 'partials/footer' %> -->
+    <%= render 'partials/footer' %>
   </body>
 </html>

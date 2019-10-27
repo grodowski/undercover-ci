@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class CoverageCheck < ApplicationRecord
+  belongs_to :installation
   has_many_attached :coverage_reports
 
   validates :state, inclusion: {in: %i[created awaiting_coverage in_progress complete]}

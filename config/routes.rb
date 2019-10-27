@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   get "/auth/github/callback", to: "sessions#create"
   delete "/auth/logout", to: "sessions#destroy"
 
+  get "/beta", to: "home#beta", as: :beta_page
   get "/pricing", to: "home#pricing", as: :pricing_page
   get "/privacy", to: "home#privacy", as: :privacy_page
   get "/terms", to: "home#terms", as: :terms_page

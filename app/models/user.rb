@@ -1,17 +1,20 @@
 # frozen_string_literal: true
 
 class User < ApplicationRecord
+  has_many :installations
+  has_many :coverage_checks, through: :installations
+
   validates :uid, :email, :name, :token, presence: true
 
   def self.from_omniauth(auth_hash)
-    find_or_initialize_by(uid: auth_hash[:uid]) do |user|
-      user.assign_attributes(
-        name: auth_hash.dig("info", "nickname"),
-        email: auth_hash.dig("info", "email"),
-        token: auth_hash.dig("credentials", "token")
-      )
-      user.save!
-    end
+    user = find_or_initialize_by(uid: auth_hash[:uid])
+    user.assign_attributes(
+      name: auth_hash.dig("info", "nickname"),
+      email: auth_hash.dig("info", "email"),
+      token: auth_hash.dig("credentials", "token")
+    )
+    user.save!
+    user
   end
 
   TOKEN_KEY = ENV.fetch("USER_TOKEN_ENCRYPTION_KEY").freeze

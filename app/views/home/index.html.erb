@@ -10,9 +10,9 @@
     </picture>
 
     <div class="container mb-5">
-      <% if ENV['FF_SELF_SIGNUP'] %>
+      <% if ENV["FF_SELF_SIGNUP"] && current_user.nil? %>
         <p>
-          <%= link_to "Sign Up", "/auth/github", class: "btn btn-lg btn-primary", method: :post %>
+          <%= link_to "Sign Up with GitHub", "/auth/github", class: "btn btn-lg btn-primary", method: :post %>
         </p>
       <% else %>
         <div class="container">
