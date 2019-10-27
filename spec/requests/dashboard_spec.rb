@@ -12,6 +12,15 @@ describe "Dashboard spec" do
     )
   end
 
+  before do
+    stub_request(:get, "https://api.github.com/user/installations")
+      .to_return(
+        status: 200,
+        body: "{\"total_count\": 0, \"installations\": []}",
+        headers: {"Content-Type" => "application/json"}
+      )
+  end
+
   it "renders dashboard#index for a signed in user" do
     Rails.application.env_config["omniauth.auth"] = OmniAuth.config.mock_auth[:github]
     get("/auth/github/callback")
