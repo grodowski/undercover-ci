@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class User < ApplicationRecord
+  has_many :installations
+  has_many :coverage_checks, through: :installations
+
   validates :uid, :email, :name, :token, presence: true
 
   def self.from_omniauth(auth_hash)

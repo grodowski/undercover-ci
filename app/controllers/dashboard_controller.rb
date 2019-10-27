@@ -4,12 +4,24 @@ class DashboardController < ApplicationController
   before_action :check_current_user
 
   def index
+    # TODO: ~wrap with a presenter / lib/request object, add specs
+    refresh_user_installations
+    @installations = current_user.installations
+  end
+
+  private
+
+  # TODO: ~add specs
+  def refresh_user_installations
     client = Octokit::Client.new(access_token: current_user.token)
-    # TODO: ~save installations to db, associate with user
-    # TODO: ~wrap with a presenter / lib/request object
-    @installations = client.find_user_installations.to_h
-    @repositories = @installations[:installations].each_with_object({}) do |inst, repos|
-      repos[inst[:id]] = client.find_installation_repositories_for_user(inst[:id])
+    installations = client.find_user_installations.to_h
+    installations[:installations].each do |inst|
+      repos = client.find_installation_repositories_for_user(inst[:id]).to_h
+      user_installation = current_user.installations.find_or_create_by!(installation_id: inst[:id])
+      user_installation.update!(
+        metadata: inst,
+        repos: repos[:repositories]
+      )
     end
   end
 end

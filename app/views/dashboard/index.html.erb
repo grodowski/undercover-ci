@@ -29,21 +29,22 @@
     </div>
   </div>
 
-  <% @installations[:installations].each do |inst| %>
+  <!-- TODO: ~refactor view logic -->
+  <% @installations.each do |inst| %>
     <div class="card bg-light my-2">
       <div class="card-body">
         <h5 class="card-title">
-            <%= inst.dig(:account, :login) %>
-            <% if inst[:target_type].downcase == 'organization' %>
+            <%= inst.metadata.dig("account", "login") %>
+            <% if inst.metadata.dig("target_type").downcase == 'organization' %>
               <%= content_tag("span", "organization", class: 'badge badge-info') %>
             <% end %>
         </h5>
 
-        <% @repositories[inst[:id]][:repositories].each do |repo| %>
-          <%= content_tag("p", repo[:full_name]) %>
+        <% inst.repos.each do |repo| %>
+          <%= content_tag("p", repo["full_name"]) %>
         <% end %>
 
-        <%= link_to "Manage on GitHub", inst[:html_url], class: "card-link" %>
+        <%= link_to "Manage on GitHub", inst.metadata["html_url"], class: "card-link" %>
       </div>
     </div>
   <% end %>
