@@ -1,23 +1,54 @@
 <% if @installations.any? %>
   <!-- TODO: setup guide if there are no coverage checks. Link to optionally show setup guide -->
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-11">
+        <p class="lead">One last setup step: ✅ Integrate UncercoverCI with your test suite</p>
+      </div>
+    </div>
+  </div>
+
   <div class="card mt-2 mb-5">
-    <div class="card-header">One last setup step...</div>
-    <div class="card-body ">
-      <h5 class="card-title">✅ Integrate UncercoverCI with your test suite</h5>
-      <ol>
-        <li>
-          Update your CI configuration (<code>.circleci/config.yml</code> in case of CircleCI) to use our uploader script after running tests. Replace things in bold with your values. Here's an example:
-          <pre><code>
-            ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- \
-                --repo <b>twitchy-tortoise/spree</b> \
-                --commit <b>$CIRCLE_SHA1</b> \
-                --lcov <b>coverage/lcov/spree.lcov</b>
-          </code></pre>
+    <div class="card-header">
+      <ul class="nav nav-tabs card-header-tabs" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" id="circleci-tab" data-toggle="tab" href="#circle-ci" role="tab" aria-controls="circle-ci" aria-selected="true">Circle CI</a>
         </li>
-        <li>If you're running specs in parallel, check out how to <a href="https://gist.github.com/grodowski/9744ff91034dce8df20c2a8210409fb0" target="_blank">merge the reports</a> into one <code>.lcov</code> file. UndercoverCI requires a single coverage report. </li>
-        <li>Store your changes and push a commit. ⬆️</li>
-        <li>Profit! This window will dissapear once the app processes your first commit and your team starts receiving checks about untested code that you've changed, narrowed down to methods, blocks and classes. ✨</li>
-      </ol>
+        <li class="nav-item">
+          <a class="nav-link" id="travis-tab" data-toggle="tab" href="#travis-ci" role="tab" aria-controls="travis-ci" aria-selected="false">Travis CI</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="actions-tab" data-toggle="tab" href="#actions" role="tab" aria-controls="actions" aria-selected="false">GitHub Actions</a>
+        </li>
+      </ul>
+    </div>
+    <div class="card-body">
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="circle-ci" role="tabpanel" aria-labelledby="circle-ci">
+          <ol>
+            <li>
+              Update your CI configuration (<code>.circleci/config.yml</code> in case of CircleCI) to use our uploader script after running tests. Replace things in bold with your values. Here's an example:
+              <pre><code>
+                ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- \
+                    --repo <b>twitchy-tortoise/spree</b> \
+                    --commit <b>$CIRCLE_SHA1</b> \
+                    --lcov <b>coverage/lcov/spree.lcov</b>
+              </code></pre>
+            </li>
+            <li>If you're running specs in parallel, check out how to <a href="https://gist.github.com/grodowski/9744ff91034dce8df20c2a8210409fb0" target="_blank">merge the reports</a> into one <code>.lcov</code> file. UndercoverCI requires a single coverage report. </li>
+            <li>Store your changes and push a commit. ⬆️</li>
+            <li>Profit! This window will dissapear once the app processes your first commit and your team starts receiving checks about untested code that you've changed, narrowed down to methods, blocks and classes. ✨</li>
+          </ol>
+        </div>
+
+        <div class="tab-pane fade" id="travis-ci" role="tabpanel" aria-labelledby="travis-ci">
+          Platform specific guides TBA!
+        </div>
+
+        <div class="tab-pane fade" id="actions" role="tabpanel" aria-labelledby="actions">
+          Platform specific guides TBA!
+        </div>
+      </div>
     </div>
   </div>
 
