@@ -27,4 +27,3 @@ script:
         --repo grodowski/undercover-ci \
         --commit $TRAVIS_COMMIT \
         --lcov coverage/lcov/undercover-ci.lcov
-
