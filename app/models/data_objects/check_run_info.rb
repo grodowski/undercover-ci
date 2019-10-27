@@ -27,7 +27,7 @@ module DataObjects
         job.repo.fetch("full_name"),
         job.head_sha,
         job.base_sha.presence || job.default_branch,
-        job.installation_id,
+        job.installation.installation_id,
         job.created_at
       )
     end

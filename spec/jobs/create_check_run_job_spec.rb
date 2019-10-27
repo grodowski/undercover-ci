@@ -4,9 +4,16 @@ require "rails_helper"
 
 describe CreateCheckRunJob do
   it "posts a GitHub request with coverage check data" do
+    user = User.create!(
+      uid: "1337",
+      email: "foo@bar.com",
+      token: "sekritkey",
+      name: "Foo Bar"
+    )
+    installation = Installation.create!(installation_id: "123123", user: user)
     check = CoverageCheck.create!(
+      installation: installation,
       head_sha: "953a804",
-      installation_id: "123123",
       repo: {"full_name" => "author/repo", "default_branch" => "master"}
     )
 

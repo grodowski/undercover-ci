@@ -53,6 +53,14 @@ describe "GitHub Webhooks" do
   end
 
   it "handles check_suite and creates a new check_run" do
+    user = User.create!(
+      uid: "1337",
+      email: "foo@bar.com",
+      token: "sekritkey",
+      name: "Foo Bar"
+    )
+    Installation.create!(installation_id: 43_009_808, user: user)
+
     payload = {
       "action" => "requested",
       "check_suite" => {"head_sha" => "0fb234"},
@@ -71,7 +79,6 @@ describe "GitHub Webhooks" do
 
     coverage_job = CoverageCheck.last
     expect(coverage_job.attributes).to include(
-      "installation_id" => "43009808",
       "repo" => {"full_name" => "grodowski/undercover-ci"},
       "head_sha" => "0fb234"
     )

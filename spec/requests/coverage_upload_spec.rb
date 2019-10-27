@@ -55,6 +55,13 @@ describe "Coverage Upload" do
   end
 
   def make_coverage_check
-    CoverageCheck.create!(repo: {id: 1, full_name: "user/repository"}, head_sha: "b4c0n")
+    user = User.create!(
+      uid: "1337",
+      email: "foo@bar.com",
+      token: "sekritkey",
+      name: "Foo Bar"
+    )
+    installation = Installation.create!(installation_id: "123123", user: user)
+    CoverageCheck.create!(installation: installation, repo: {id: 1, full_name: "user/repository"}, head_sha: "b4c0n")
   end
 end
