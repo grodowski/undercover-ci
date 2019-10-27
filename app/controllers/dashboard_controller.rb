@@ -12,6 +12,7 @@ class DashboardController < ApplicationController
   private
 
   # TODO: refresh user installations should soft-delete unistalled installations
+  # TODO: currently they get stuck on the dashboard!
   # TODO: ~add specs
   def refresh_user_installations
     client = Octokit::Client.new(access_token: current_user.token)
@@ -27,7 +28,7 @@ class DashboardController < ApplicationController
   end
 
   def dash_installation_url
-    app_name = Rails.env.development? ? "undercover-ci-dev" : "undercoverci"
+    app_name = Rails.env.development? ? "undercoverci-dev" : "undercoverci"
     "https://github.com/apps/#{app_name}/installations/new"
   end
   helper_method :dash_installation_url
