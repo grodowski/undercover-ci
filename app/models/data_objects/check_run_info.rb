@@ -8,7 +8,7 @@ module DataObjects
     :sha,
     :compare,
     :installation_id,
-    :created_at, # TODO: update when states and state logs are ready
+    :created_at,
     :payload
   ].freeze
 
