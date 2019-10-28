@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
+API_MIME_TYPES = %w[*/* application/json].freeze
+
 Rails.application.routes.draw do
-  API_MIME_TYPES = %w[*/* application/json].freeze
   namespace :v1, constraints: ->(req) { req.format.to_s.in?(API_MIME_TYPES) } do
     post "/hooks", to: "github_webhooks#create"
     post "/coverage", to: "coverage_reports#create"
