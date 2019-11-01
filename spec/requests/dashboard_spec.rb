@@ -13,7 +13,7 @@ describe "Dashboard spec" do
   end
 
   before do
-    stub_request(:get, "https://api.github.com/user/installations")
+    stub_request(:get, "https://api.github.com/user/installations?per_page=100")
       .to_return(
         status: 200,
         body: "{\"total_count\": 0, \"installations\": []}",
