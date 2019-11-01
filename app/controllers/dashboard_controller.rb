@@ -17,6 +17,7 @@ class DashboardController < ApplicationController
   # TODO: ~add specs
   def refresh_user_installations
     client = Octokit::Client.new(access_token: current_user.token)
+    client.auto_paginate = true # TODO: move to bg sync?
     installations = client.find_user_installations.to_h
     installations[:installations].each do |inst|
       repos = client.find_installation_repositories_for_user(inst[:id]).to_h
