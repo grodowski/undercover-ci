@@ -1,25 +1,27 @@
 <nav class="navbar navbar-expand-md navbar-light bg-light">
-  <a class="navbar-brand" href="<%= root_path %>">
-    UndercoverCI <span class="badge badge-warning">beta</span>
-  </a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-top" aria-controls="navbar-top" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
+  <div class="container">
+    <a class="navbar-brand" href="<%= root_path %>">
+      UndercoverCI <span class="badge badge-warning">beta</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-top" aria-controls="navbar-top" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-  <div id="navbar-top" class="collapse navbar-collapse">
-    <ul class="navbar-nav mr-auto">
-      <!-- TODO: navbar helper to mark item as active -->
-      <!-- class="active" -->
-      <!-- <li class="nav-item">
-        <a class="nav-link" href="<%= faq_page_path %>">Support</a>
-      </li> -->
-    </ul>
-    <% if ENV['FF_SELF_SIGNUP'] %>
-      <% if current_user %>
-        <%= link_to "Sign out", "/auth/logout", class: "btn btn-light", method: :delete %>
-      <% else %>
-        <%= link_to "Sign in", "/auth/github", class: "btn btn-light", method: :post %>
+    <div id="navbar-top" class="collapse navbar-collapse">
+      <ul class="navbar-nav mr-auto">
+        <!-- TODO: navbar helper to mark item as active -->
+        <!-- class="active" -->
+        <!-- <li class="nav-item">
+          <a class="nav-link" href="<%= faq_page_path %>">Support</a>
+        </li> -->
+      </ul>
+      <% if ENV['FF_SELF_SIGNUP'] %>
+        <% if current_user %>
+          <%= link_to "Sign out", "/auth/logout", class: "btn btn-light", method: :delete %>
+        <% else %>
+          <%= link_to "Sign in", "/auth/github", class: "btn btn-light", method: :post %>
+        <% end %>
       <% end %>
-    <% end %>
+    </div>
   </div>
 </nav>
