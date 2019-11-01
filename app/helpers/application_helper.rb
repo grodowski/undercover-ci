@@ -8,7 +8,7 @@ module ApplicationHelper
     repo = coverage_check.repo_full_name
     if coverage_check.pull_requests.any?
       pr_number = coverage_check.check_suite.dig("pull_requests", 0, "number")
-      url = "https://github.com/#{repo}/pulls/#{pr_number}/checks"
+      url = "https://github.com/#{repo}/pull/#{pr_number}/checks"
     else
       url = "https://github.com/#{repo}/commit/#{coverage_check.head_sha}"
     end
