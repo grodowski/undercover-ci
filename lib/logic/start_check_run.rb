@@ -28,6 +28,7 @@ module Logic
       end
 
       coverage_check.repo = check_run_info.payload&.repository
+      coverage_check.check_suite = check_run_info.payload&.check_suite
       coverage_check.save!
 
       Logic::UpdateCoverageCheckState.new(coverage_check).await_coverage

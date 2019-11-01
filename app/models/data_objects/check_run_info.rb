@@ -29,7 +29,8 @@ module DataObjects
         job.head_sha,
         job.base_sha.presence || job.default_branch,
         job.installation.installation_id,
-        job.created_at
+        job.created_at,
+        nil # TODO: ~load repository and check_suite from jsonb columns
       )
     end
 
