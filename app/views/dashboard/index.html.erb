@@ -1,21 +1,23 @@
 <% if @installations.any? %>
   <% if @checks.any? %>
     <div class="mb-5">
-      <p class="lead">Recent pull requests</p>
+      <p class="lead">Recent runs</p>
       <table class="table">
         <tr>
           <th>ID</th>
           <th>Repo</th>
           <th>State</th>
           <th>Commit</th>
-          <!-- TODO: ~show pull request link or number of warnings -->
+          <!-- TODO: ~show number of warnings -->
         </tr>
         <% @checks.each do |check| %>
           <tr>
             <td><%= check.id %></td>
             <td><%= check.repo_full_name %></td>
             <td title="<%= Time.parse(check.state_log.last["ts"]) %>"><%= "#{check.state} (#{distance_of_time_in_words(Time.now, check.state_log.last["ts"], include_seconds: true)} ago)" %></td>
-            <td><code><%= check.head_sha[0..7] %></code> 👉 <code><%= check.default_branch %></code></td>
+            <td>
+              <code><%= pull_request_or_commit_link(check) %></code>
+            </td>
           </tr>
         <% end %>
       </table>
