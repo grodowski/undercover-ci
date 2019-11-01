@@ -104,10 +104,9 @@ GEM
       thor (>= 0.14, < 2.0)
     json (2.2.0)
     jwt (2.2.1)
-    listen (3.1.5)
-      rb-fsevent (~> 0.9, >= 0.9.4)
-      rb-inotify (~> 0.9, >= 0.9.7)
-      ruby_dep (~> 1.2)
+    listen (3.2.0)
+      rb-fsevent (~> 0.10, >= 0.10.3)
+      rb-inotify (~> 0.9, >= 0.9.10)
     loofah (2.3.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -211,7 +210,7 @@ GEM
       rspec-mocks (~> 3.9.0)
       rspec-support (~> 3.9.0)
     rspec-support (3.9.0)
-    rubocop (0.75.1)
+    rubocop (0.76.0)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
       parser (>= 2.6)
@@ -219,7 +218,6 @@ GEM
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 1.7)
     ruby-progressbar (1.10.1)
-    ruby_dep (1.5.0)
     rubyzip (2.0.0)
     rugged (0.28.2)
     safe_yaml (1.0.5)
@@ -249,7 +247,7 @@ GEM
     selenium-webdriver (3.142.6)
       childprocess (>= 0.5, < 4.0)
       rubyzip (>= 1.2.2)
-    sentry-raven (2.11.3)
+    sentry-raven (2.12.2)
       faraday (>= 0.7.6, < 1.0)
     simplecov (0.17.1)
       docile (~> 1.1)
@@ -316,7 +314,7 @@ DEPENDENCIES
   jbuilder (~> 2.9)
   jquery-rails
   jwt
-  listen (>= 3.0.5, < 3.2)
+  listen (>= 3.0.5, < 3.3)
   octokit
   omniauth
   omniauth-github
