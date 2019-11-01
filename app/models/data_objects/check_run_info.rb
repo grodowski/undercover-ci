@@ -3,15 +3,16 @@
 require "ostruct"
 
 module DataObjects
-  CHECK_RUN_INFO_ATTRIBUTES = [
-    :full_name,
-    :sha,
-    :compare,
-    :installation_id,
-    :created_at,
-    :payload
+  CHECK_RUN_INFO_ATTRIBUTES = %i[
+    full_name
+    sha
+    compare
+    installation_id
+    created_at
+    payload
   ].freeze
 
+  # rubocop:disable Metrics/BlockLength
   CheckRunInfo = Struct.new(*CHECK_RUN_INFO_ATTRIBUTES) do
     def self.from_webhook(payload)
       payload = OpenStruct.new(payload)
@@ -34,4 +35,5 @@ module DataObjects
 
     alias_method :to_s, :inspect
   end
+  # rubocop:enable Metrics/BlockLength
 end
