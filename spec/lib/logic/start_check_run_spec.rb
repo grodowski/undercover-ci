@@ -4,7 +4,7 @@ require "rails_helper"
 
 describe Logic::StartCheckRun do
   let(:check_run_info) do
-    DataObjects::CheckRunInfo.new("author/repo", "b4c0n1", "master", "123123", nil, nil)
+    DataObjects::CheckRunInfo.new("author/repo", "b4c0n1", "c0mp4r3", "123123", nil, nil)
   end
   let(:user) do
     User.create!(
@@ -27,12 +27,14 @@ describe Logic::StartCheckRun do
 
     coverage_check = CoverageCheck.last
     expect(coverage_check.state).to eq(:awaiting_coverage)
+    expect(coverage_check.head_sha).to eq("b4c0n1")
+    expect(coverage_check.base_sha).to eq("c0mp4r3")
     expect(coverage_check).to be_persisted
   end
 
   it "returns silently and logs if CoverageCheck's state is not 'created'" do
     CoverageCheck.create!(
-      installation: installation, head_sha: "b4c0n1", state: :awaiting_coverage
+      installation: installation, head_sha: "b4c0n1", base_sha: "c0mp4r3", state: :awaiting_coverage
     )
 
     expect(CreateCheckRunJob).not_to receive(:perform_later)

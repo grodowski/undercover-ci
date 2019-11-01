@@ -16,9 +16,10 @@ module Logic
 
     def create_and_queue_check_run
       find_installation
-      coverage_check = CoverageCheck.find_or_initialize_by(
+
+      coverage_check = @installation.coverage_checks.find_or_initialize_by(
         head_sha: check_run_info.sha,
-        installation: @installation
+        base_sha: check_run_info.compare
       )
 
       unless coverage_check.state == :created
