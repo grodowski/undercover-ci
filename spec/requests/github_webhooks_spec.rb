@@ -63,9 +63,9 @@ describe "GitHub Webhooks" do
 
     payload = {
       "action" => "requested",
-      "check_suite" => {"head_sha" => "0fb234"},
+      "check_suite" => {"head_sha" => "0fb234", "head_branch" => "feature"},
       "installation" => {"id" => 43_009_808},
-      "repository" => {"full_name" => "grodowski/undercover-ci"},
+      "repository" => {"full_name" => "grodowski/undercover-ci", "default_branch" => "master"},
       "pull_requests" => []
     }
     valid_headers = {
@@ -79,7 +79,7 @@ describe "GitHub Webhooks" do
 
     coverage_job = CoverageCheck.last
     expect(coverage_job.attributes).to include(
-      "repo" => {"full_name" => "grodowski/undercover-ci"},
+      "repo" => hash_including("full_name" => "grodowski/undercover-ci"),
       "head_sha" => "0fb234"
     )
 

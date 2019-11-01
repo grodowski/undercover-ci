@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_27_125334) do
+ActiveRecord::Schema.define(version: 2019_11_01_115007) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -48,6 +48,7 @@ ActiveRecord::Schema.define(version: 2019_10_27_125334) do
     t.string "state"
     t.jsonb "state_log"
     t.bigint "installation_id"
+    t.jsonb "check_suite"
     t.index ["installation_id"], name: "index_coverage_checks_on_installation_id"
   end
 

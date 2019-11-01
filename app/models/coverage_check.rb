@@ -23,4 +23,10 @@ class CoverageCheck < ApplicationRecord
   def default_branch
     repo["default_branch"]
   end
+
+  def pull_requests
+    return [] unless check_suite
+
+    check_suite["pull_requests"]
+  end
 end
