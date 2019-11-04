@@ -1,6 +1,10 @@
 # UndercoverCI
 
-GitHub Checks with code coverage warnings from [undercover](https://github.com/grodowski/undercover).
+GitHub Checks with code coverage warnings from [undercover](https://github.com/grodowski/undercover), detecting when code being changed is untested.
+
+Works with Ruby and GitHub.
+
+![github_check_preview](app/assets/images/check_screenshot_lg.png)
 
 ## Installation
 
@@ -31,8 +35,6 @@ ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- \
 ```
 
 #### 3. Receive GitHub checks for commits and pull request
-
-![github_check_preview](app/assets/images/check_screenshot_lg.png)
 
 ## Development and contributing
 
