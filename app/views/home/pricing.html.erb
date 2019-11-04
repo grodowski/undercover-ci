@@ -1,22 +1,38 @@
 <div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
   <h1 class="display-4">Pricing</h1>
-  <p class="lead">Undercover CI is available as a hosted GitHub App and is free to use while in BETA.</p>
+  <p class="lead">UndercoverCI is fully open source and available as a hosted GitHub App.</p>
 </div>
 
 <div class="container">
-  <div class="card-deck mb-3 text-center">
-    <div class="card mb-4 shadow-sm">
-      <!-- <div class="card-header">
-        <h4 class="my-0 font-weight-normal">Private beta</h4>
-      </div> -->
+  <div class="card-deck mb-3">
+    <div class="card mb-4 shadow-lg">
+      <div class="card-header text-center">
+        <h4>GitHub App</h4>
+      </div>
       <div class="card-body">
-        <h1 class="card-title pricing">Free</h1>
-        <ul class="list-unstyled mt-3 mb-4">
-          <li>Unlimited GitHub users</li>
-          <li>Unlimited private and public repositories</li>
-          <li>200 Pull Request checks / mo</li>
-        </ul>
+        <p >Fully-featured integration with quick setup and:</p>
+        <p>👉 GitHub code coverage annotations</p>
+        <p>👉 200 pull request checks / mo</p>
+        <p>👉 Unlimited users/orgs/repos</p>
+        <p>💰 $9/mo (<b>$0 while in BETA! 🥳</b>)</p>
+        <br/>
+        <p>Sign up to get beta access:</p>
         <%= render partial: "partials/list_signup" %>
+      </div>
+    </div>
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header text-center">
+        <h4>Open Source</h4>
+      </div>
+      <div class="card-body">
+        <p>The UndercoverCI project and related Ruby gems are <b>entirely open-source</b>.</p>
+        <p>If a hosted and convenient GitHub App integration is not for you, check out these links to get started:</p>
+        <ul>
+          <p>🔗 <a href="https://medium.com/@mrgrodo/improve-your-ruby-code-reviews-with-actionable-code-coverage-and-undercover-c4480575ea69">Improve your Ruby code reviews with actionable code coverage and Undercover</a>
+          <p>🔗 <a href="https://github.com/grodowski/undercover-ci">grodowski/undercover-ci</a></p>
+          <p>🔗 <a href="https://github.com/grodowski/undercover">grodowski/undercover</a></p>
+          <p>🔗 <a href="https://github.com/grodowski/pronto-undercover">grodowski/pronto-undercover</a></p>
+        </ul>
       </div>
     </div>
   </div>
