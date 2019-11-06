@@ -13,10 +13,10 @@ gem "pg", ">= 0.18", "< 2.0"
 gem "puma", "~> 4.0"
 
 # UI Gems
-gem "bootstrap", "~> 4.3.1"
+gem "bootstrap"
 gem "coffee-rails", "~> 5.0"
 gem "jquery-rails"
-gem "sass-rails", "~> 5.0"
+gem "sass-rails", "~> 6.0"
 gem "turbolinks", "~> 5"
 gem "uglifier", ">= 1.3.0"
 
