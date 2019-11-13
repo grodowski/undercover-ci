@@ -154,7 +154,7 @@ GEM
     pry-rails (0.3.9)
       pry (>= 0.10.4)
     public_suffix (4.0.1)
-    puma (4.2.1)
+    puma (4.3.0)
       nio4r (~> 2.0)
     rack (2.0.7)
     rack-test (1.1.0)
@@ -247,7 +247,7 @@ GEM
     selenium-webdriver (3.142.6)
       childprocess (>= 0.5, < 4.0)
       rubyzip (>= 1.2.2)
-    sentry-raven (2.12.2)
+    sentry-raven (2.12.3)
       faraday (>= 0.7.6, < 1.0)
     simplecov (0.17.1)
       docile (~> 1.1)
@@ -320,7 +320,7 @@ DEPENDENCIES
   omniauth-github
   pg (>= 0.18, < 2.0)
   pry-rails
-  puma (~> 4.0)
+  puma (~> 4.3)
   rails (~> 5.2.1)
   rails-controller-testing
   rspec-rails
