@@ -16,8 +16,7 @@ gem "puma", "~> 4.0"
 gem "bootstrap"
 gem "coffee-rails", "~> 5.0"
 gem "jquery-rails"
-gem "sass-rails", "~> 6.0"
-gem "sassc", "2.2.0" # 2.2.1 breaks the build on travis
+gem "sass-rails", "~> 5.0"
 gem "turbolinks", "~> 5"
 gem "uglifier", ">= 1.3.0"
 
