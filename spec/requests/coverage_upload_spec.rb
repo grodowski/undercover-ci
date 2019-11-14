@@ -42,7 +42,7 @@ describe "Coverage Upload" do
     expect(check.reload.coverage_reports.attached?).to eq(false)
   end
 
-  it "kicks off RunUndercover" do
+  it "kicks off RunUndercover", inline_jobs: true do
     check = make_coverage_check
     contents = File.read("spec/fixtures/coverage.lcov")
 

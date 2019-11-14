@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-ruby "2.6.3"
+ruby "2.6.5"
 source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-gem "rails", "~> 5.2.1"
+gem "rails", "~> 6.0.1"
 
 gem "bcrypt", "~> 3.1.13"
 gem "bootsnap", ">= 1.1.0", require: false
@@ -13,7 +13,7 @@ gem "pg", ">= 0.18", "< 2.0"
 gem "puma", "~> 4.3"
 
 # UI Gems
-gem "bootstrap", "~> 4.3.1"
+gem "bootstrap"
 gem "coffee-rails", "~> 5.0"
 gem "jquery-rails"
 gem "sass-rails", "~> 5.0"
