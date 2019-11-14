@@ -335,8 +335,8 @@ DEPENDENCIES
   omniauth-github
   pg (>= 0.18, < 2.0)
   pry-rails
-  rails (~> 6.0.1)
   puma (~> 4.3)
+  rails (~> 6.0.1)
   rails-controller-testing
   rspec-rails
   rubocop

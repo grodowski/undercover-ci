@@ -48,9 +48,6 @@ RSpec.configure do |config|
     prev_adapter = ActiveJob::Base.queue_adapter
     ActiveJob::Base.queue_adapter = :inline
     example.run
-    (ActiveJob::Base.descendants << ActiveJob::Base).each do |a|
-      a.enable_test_adapter(ActiveJob::QueueAdapters::TestAdapter.new)
-    end
     ActiveJob::Base.queue_adapter = prev_adapter
   end
 end
