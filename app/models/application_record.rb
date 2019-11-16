@@ -7,5 +7,6 @@ class ApplicationRecord < ActiveRecord::Base
     puts "one"
     puts "two"
     puts "three"
+    puts "four"
   end
 end
