@@ -16,8 +16,13 @@ Rails.application.routes.draw do
   get "/privacy", to: "home#privacy", as: :privacy_page
   get "/terms", to: "home#terms", as: :terms_page
   get "/faq", to: "home#faq", as: :faq_page
+  get "/docs", to: "home#docs", as: :docs_page
 
-  get "/app", to: "dashboard#index", as: :dashboard
+  scope module: "dashboard" do
+    get "/app", controller: "checks", action: "index", as: :dashboard
+
+    resources :settings, only: %i[new index]
+  end
 
   root to: "home#index"
 end

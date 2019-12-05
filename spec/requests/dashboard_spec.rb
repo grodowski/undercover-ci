@@ -26,7 +26,7 @@ describe "Dashboard spec" do
     get("/auth/github/callback")
 
     get("/app")
-    expect(response).to render_template("dashboard/index")
+    expect(response).to redirect_to("/settings/new")
   end
 
   it "redirects to root url for an anonymous user" do

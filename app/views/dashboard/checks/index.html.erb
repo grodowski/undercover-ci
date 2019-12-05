@@ -1,0 +1,27 @@
+<div class="mb-5">
+  <p class="lead">Recently analysed commits</p>
+  <table class="table">
+    <tr>
+      <!-- TODO: update columns: hide id, show head branch (not just sha), commit message -->
+      <!-- TODO: show number of warnings! -->
+      <!-- TODO: add pagination with kaminari gem -->
+      <th>Repo</th> <!-- should they be grouped by repository? maybe later -->
+      <th>Commit</th>
+      <th>State</th>
+      <!-- <th>Result</th> -->
+    </tr>
+    <% @checks.each do |check| %>
+      <tr>
+        <td><%= check.repo_full_name %></td>
+        <td>
+          <code><%= pull_request_or_commit_link(check) %></code>
+        </td>
+        <td title="<%= Time.parse(check.state_log.last["ts"]) %>"><%= "#{check.state} (#{distance_of_time_in_words(Time.now, check.state_log.last["ts"], include_seconds: true)} ago)" %></td>
+        <!-- <td><%= coverage_check_result_text(check) %></td> -->
+      </tr>
+    <% end %>
+    <% if @checks.none? %>
+      <tr><td colspan=3><span>No data yet</span></td></tr>
+    <% end %>
+  </table>
+</div>

@@ -83,3 +83,10 @@
     padding: 3rem 1.25rem;
   }
 }
+
+.new-installation-image {
+  max-width: 400px;
+  @include media-breakpoint-up(lg) {
+    max-width: 500px;
+  }
+}

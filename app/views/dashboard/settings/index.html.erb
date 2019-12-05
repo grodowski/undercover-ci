@@ -1,0 +1,25 @@
+<% if @show_coverage_upload_instruction %>
+  💁‍♂️ Complete your setup and integrate UncercoverCI with your test suite
+  <%= render partial: "partials/coverage_upload_instruction" %>
+<% end %>
+
+<p class="lead">UndercoverCI will send coverage checks to the following accounts and repos</p>
+
+<% @installations.each do |inst| %>
+  <div class="card bg-light my-2">
+    <div class="card-body">
+      <h5 class="card-title">
+          <%= inst.metadata.dig("account", "login") %>
+          <% if inst.metadata.dig("target_type").downcase == 'organization' %>
+            <%= content_tag("span", "organization", class: 'badge badge-info') %>
+          <% end %>
+      </h5>
+
+      <% inst.repos.each do |repo| %>
+        <%= content_tag("p", repo["full_name"]) %>
+      <% end %>
+
+      <%= link_to "Manage on GitHub", inst.metadata["html_url"], class: "card-link" %>
+    </div>
+  </div>
+<% end %>

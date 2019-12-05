@@ -7,14 +7,8 @@
 
     <div id="navbar-top" class="collapse navbar-collapse">
       <ul class="navbar-nav mr-auto">
-        <!-- TODO: navbar helper to mark item as active -->
-        <!-- class="active" -->
-        <li class="nav-item">
-          <a class="nav-link" href="<%= pricing_page_path %>">Pricing</a>
-        </li>
-        <!-- <li class="nav-item">
-          <a class="nav-link" href="<%= faq_page_path %>">Support</a>
-        </li> -->
+        <%= nav_link_with_state("Pricing", pricing_page_path) %>
+        <%= nav_link_with_state("Docs", docs_page_path) %>
       </ul>
       <% if ENV['FF_SELF_SIGNUP'] %>
         <% if current_user %>
