@@ -19,7 +19,7 @@ module Logic
     end
 
     def restart
-      transition(:in_progress, :in_progress, "restart")
+      transition(:in_progress, :awaiting_coverage, "restart")
     end
 
     def complete

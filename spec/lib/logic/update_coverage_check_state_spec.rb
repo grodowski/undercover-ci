@@ -41,7 +41,7 @@ describe Logic::UpdateCoverageCheckState do
       expect do
         svc.start
         svc.restart
-      end.to change { coverage_check.reload.state }.from(:awaiting_coverage).to(:in_progress)
+      end.to change { coverage_check.reload.state }.from(:awaiting_coverage).to(:awaiting_coverage)
       expect_state_log("awaiting_coverage", "in_progress", Time.now, nil)
       expect_state_log("in_progress", "in_progress", Time.now, "restart")
     end
