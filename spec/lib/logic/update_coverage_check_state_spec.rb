@@ -36,14 +36,10 @@ describe Logic::UpdateCoverageCheckState do
   end
 
   it "restarts" do
-    coverage_check.update!(state: :awaiting_coverage)
+    coverage_check.update!(state: :in_progress)
     Timecop.freeze do
-      expect do
-        svc.start
-        svc.restart
-      end.to change { coverage_check.reload.state }.from(:awaiting_coverage).to(:awaiting_coverage)
-      expect_state_log("awaiting_coverage", "in_progress", Time.now, nil)
-      expect_state_log("in_progress", "in_progress", Time.now, "restart")
+      expect { svc.restart }.to change { coverage_check.reload.state }.from(:in_progress).to(:awaiting_coverage)
+      expect_state_log("in_progress", "awaiting_coverage", Time.now, "restart")
     end
   end
 
