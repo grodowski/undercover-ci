@@ -12,6 +12,7 @@ module Dashboard
       redirect_to(new_settings_url) if @installations.none?
 
       @checks = current_user.coverage_checks.order(created_at: :desc).limit(15)
+      @show_coverage_upload_instruction = @checks.none?
     end
   end
 end

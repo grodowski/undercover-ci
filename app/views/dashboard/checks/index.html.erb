@@ -1,3 +1,8 @@
+<% if @show_coverage_upload_instruction %>
+  💁‍♂️ Complete your setup and integrate UncercoverCI with your test suite
+  <%= render partial: "partials/coverage_upload_instruction" %>
+<% end %>
+
 <div class="mb-5">
   <p class="lead">Recently analysed commits</p>
   <table class="table">

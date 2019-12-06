@@ -1,10 +1,6 @@
-<% if @show_coverage_upload_instruction %>
-  💁‍♂️ Complete your setup and integrate UncercoverCI with your test suite
-  <%= render partial: "partials/coverage_upload_instruction" %>
-<% end %>
-
 <p class="lead">UndercoverCI will send coverage checks to the following accounts and repos</p>
 
+<!-- TODO: add pagination -->
 <% @installations.each do |inst| %>
   <div class="card bg-light my-2">
     <div class="card-body">

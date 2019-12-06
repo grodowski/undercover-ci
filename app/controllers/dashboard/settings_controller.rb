@@ -7,7 +7,6 @@ module Dashboard
 
     def index
       @installations = current_user.installations
-      @show_coverage_upload_instruction = current_user.coverage_checks.none?
     end
   end
 end
