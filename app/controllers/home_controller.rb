@@ -8,6 +8,11 @@ class HomeController < ApplicationController
   end
 
   def beta
-    redirect_to root_url if current_user || params[:x] != ENV.fetch("BETA_CODE")
+    if current_user || params[:x] != ENV.fetch("BETA_CODE")
+      redirect_to root_url
+      return
+    end
+
+    cookies[:beta_sign_in] = 1
   end
 end

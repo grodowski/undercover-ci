@@ -10,7 +10,7 @@
         <%= nav_link_with_state("Pricing", pricing_page_path) %>
         <%= nav_link_with_state("Docs", docs_page_path) %>
       </ul>
-      <% if ENV['FF_SELF_SIGNUP'] %>
+      <% if ENV['FF_SELF_SIGNUP'] || cookies[:beta_sign_in] %>
         <% if current_user %>
           <%= link_to "Go to app", "/app", class: "btn btn-light" %>
           <%= link_to "Sign out", "/auth/logout", class: "btn btn-light", method: :delete %>
