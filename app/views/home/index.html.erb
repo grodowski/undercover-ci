@@ -1,61 +1,59 @@
-<% if ENV["FF_MARKETING_PAGE"] %>
-  <div class="starter-template">
-    <h1 class="display-4 header-title">Actionable code coverage review</h1>
-    <p class="lead mt-5">UndercoverCI ensures that <strong class="lead-highlight">every pull request is adequately tested</strong>.<br/>Works with Ruby and GitHub.</p>
+<div class="starter-template">
+  <h1 class="display-4 header-title">Actionable code coverage review</h1>
+  <p class="lead mt-5">UndercoverCI ensures that <strong class="lead-highlight">every pull request is adequately tested</strong>.<br/>Works with Ruby and GitHub.</p>
 
-    <picture>
-      <source media="(min-width: 650px)" srcset="<%= image_path("check_screenshot_lg.png") %>">
-      <source media="(min-width: 300px)" srcset="<%= image_path("check_screenshot_sm.png") %>">
-      <img class="img-fluid" src="check_screenshot_sm.jpg" alt="Undercover CI GitHub comments">
-    </picture>
+  <picture>
+    <source media="(min-width: 650px)" srcset="<%= image_path("check_screenshot_lg.png") %>">
+    <source media="(min-width: 300px)" srcset="<%= image_path("check_screenshot_sm.png") %>">
+    <img class="img-fluid" src="check_screenshot_sm.jpg" alt="Undercover CI GitHub comments">
+  </picture>
 
-    <div class="container mb-5">
-      <% if ENV["FF_SELF_SIGNUP"] && current_user.nil? %>
-        <p>
-          <%= link_to "Sign Up with GitHub", "/auth/github", class: "btn btn-lg btn-primary", method: :post %>
+  <div class="container mb-5">
+    <% if ENV["FF_SELF_SIGNUP"] && current_user.nil? %>
+      <p>
+        <%= link_to "Sign Up with GitHub", "/auth/github", class: "btn btn-lg btn-primary", method: :post %>
+      </p>
+    <% else %>
+      <div class="container">
+        <p class="text-muted">
+          Sign up to get beta access:
         </p>
-      <% else %>
-        <div class="container">
-          <p class="text-muted">
-            Sign up to get beta access:
-          </p>
-          <%= render partial: "partials/list_signup" %>
-        </div>
-      <% end %>
-    </div>
+        <%= render partial: "partials/list_signup" %>
+      </div>
+    <% end %>
+  </div>
 
-    <div class="container how-it-works-container">
-      <h3 class="mb-3">How it works</h3>
-      <p class="lead mb-5">Stop focusing on getting to 100% test coverage.<br/>Reduce pull request defects by telling when changed code is untested.</p>
-      <div class="card-deck mb-5">
-        <div class="card mb-4 shadow-sm">
-          <div class="card-body">
-            <div class="text-center">
-              <i class="how-it-works-icon icon-flow-merge"></i>
-            </div>
-            <p class="lead"><strong>1. Open a pull request</strong></p>
-            <p class="text-muted">The CI server runs tests and uploads coverage data to UndercoverCI. That's the only required post-install setup step!</p>
+  <div class="container how-it-works-container">
+    <h3 class="mb-3">How it works</h3>
+    <p class="lead mb-5">Stop focusing on getting to 100% test coverage.<br/>Reduce pull request defects by telling when changed code is untested.</p>
+    <div class="card-deck mb-5">
+      <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+          <div class="text-center">
+            <i class="how-it-works-icon icon-flow-merge"></i>
           </div>
+          <p class="lead"><strong>1. Open a pull request</strong></p>
+          <p class="text-muted">The CI server runs tests and uploads coverage data to UndercoverCI. That's the only required post-install setup step!</p>
         </div>
-        <div class="card mb-4 shadow-lg">
-          <div class="card-body">
-            <div class="text-center">
-              <i class="how-it-works-icon icon-search-outline"></i>
-            </div>
-            <p class="lead"><strong>2. Find missing test coverage</strong></p>
-            <p class="text-muted">We scan the PR diff and verify local test coverage for each updated class, method and block, because an absolute percentage check is not enough.</p>
+      </div>
+      <div class="card mb-4 shadow-lg">
+        <div class="card-body">
+          <div class="text-center">
+            <i class="how-it-works-icon icon-search-outline"></i>
           </div>
+          <p class="lead"><strong>2. Find missing test coverage</strong></p>
+          <p class="text-muted">We scan the PR diff and verify local test coverage for each updated class, method and block, because an absolute percentage check is not enough.</p>
         </div>
-        <div class="card mb-4 shadow-sm">
-          <div class="card-body">
-            <div class="text-center">
-              <i class="how-it-works-icon icon-chat-alt"></i>
-            </div>
-            <p class="lead"><strong>3. Fix or ack review comments</strong></p>
-            <p class="text-muted">Reveal untested methods and blocks, find unused code paths and improve your test suite.</p>
+      </div>
+      <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+          <div class="text-center">
+            <i class="how-it-works-icon icon-chat-alt"></i>
           </div>
+          <p class="lead"><strong>3. Fix or ack review comments</strong></p>
+          <p class="text-muted">Reveal untested methods and blocks, find unused code paths and improve your test suite.</p>
         </div>
       </div>
     </div>
   </div>
-<% end %>
+</div>
