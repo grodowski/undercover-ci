@@ -9,6 +9,6 @@ class HomeController < ApplicationController
       return
     end
 
-    cookies[:beta_sign_in] = 1
+    cookies[:beta_sign_in] = {value: 1, expires: 1.year}
   end
 end
