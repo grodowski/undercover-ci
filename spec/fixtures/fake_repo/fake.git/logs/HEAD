@@ -1,3 +1,7 @@
 0000000000000000000000000000000000000000 953a8049abaaa57f8db4ff97a55114283355d17e Jan Grodowski <jgrodowski@gmail.com> 1565894080 +0200	commit (initial): initial commit
 953a8049abaaa57f8db4ff97a55114283355d17e aad517e917e10a21babb22f8d968c8ecce45ff6d Jan Grodowski <jgrodowski@gmail.com> 1579554389 +0100	commit: add methods to foo.rb
 aad517e917e10a21babb22f8d968c8ecce45ff6d b8f95245da7a39788914d388c2fc53781bef0402 Jan Grodowski <jgrodowski@gmail.com> 1579555226 +0100	commit (amend): add methods to foo.rb
+b8f95245da7a39788914d388c2fc53781bef0402 b8f95245da7a39788914d388c2fc53781bef0402 Jan Grodowski <jgrodowski@gmail.com> 1579953331 +0100	checkout: moving from master to feature
+b8f95245da7a39788914d388c2fc53781bef0402 b8f95245da7a39788914d388c2fc53781bef0402 Jan Grodowski <jgrodowski@gmail.com> 1579953345 +0100	checkout: moving from feature to master
+b8f95245da7a39788914d388c2fc53781bef0402 953a8049abaaa57f8db4ff97a55114283355d17e Jan Grodowski <jgrodowski@gmail.com> 1579953360 +0100	reset: moving to HEAD~1
+953a8049abaaa57f8db4ff97a55114283355d17e b8f95245da7a39788914d388c2fc53781bef0402 Jan Grodowski <jgrodowski@gmail.com> 1579953380 +0100	checkout: moving from master to feature
