@@ -66,10 +66,11 @@ ActiveRecord::Schema.define(version: 2019_12_29_132656) do
     t.bigint "coverage_check_id", null: false
     t.string "path", null: false
     t.string "node_type", null: false
+    t.string "node_name", null: false
     t.integer "start_line", null: false
     t.integer "end_line", null: false
-    t.decimal "coverage", precision: 5, scale: 2, null: false
-    t.decimal "diff_coverage", precision: 5, scale: 2, null: false
+    t.decimal "coverage", precision: 5, scale: 4, null: false
+    t.boolean "flagged", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["coverage_check_id"], name: "index_nodes_on_coverage_check_id"
