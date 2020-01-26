@@ -3,17 +3,6 @@
 require "rails_helper"
 
 describe Logic::RunUndercover do
-  before do
-    # HACK: to allow testing git interactions in a repository that's not a git submodule
-    # use fake.git as the preferred git-dir option inside spec/fixtures
-    allow(Rugged::Repository).to receive(:new).and_wrap_original do |m, arg|
-      m.call(arg + "/fake.git")
-    end
-    allow(Undercover::Changeset).to receive(:new).and_wrap_original do |m, (repo_path, compare)|
-      m.call(repo_path.gsub(".git", ""), compare)
-    end
-  end
-
   let(:coverage_check) do
     user = User.create!(
       uid: "1337",
@@ -24,7 +13,7 @@ describe Logic::RunUndercover do
     installation = Installation.create!(installation_id: "123123", user: user)
     CoverageCheck.create!(
       installation: installation,
-      head_sha: "953a804", # commit sha from fake_repo fixture
+      head_sha: "b8f95245", # commit sha from fake_repo feature branch
       repo: {"full_name" => "author/repo", "default_branch" => "master"},
       state: :awaiting_coverage
     )
@@ -56,17 +45,49 @@ describe Logic::RunUndercover do
       "https://x-access-token:token@github.com/author/repo.git",
       repo_path
     ) do
-      FileUtils.cp_r("spec/fixtures/fake_repo/.", repo_path) # fake clone, yay!
+      FileUtils.cp_r("spec/fixtures/fake_repo/", repo_path) # fake clone, yay!
+      # need to replace the git dir with a default name, since RunUndercover#run_undercover_cmd
+      # does not respect custom git dirs
+      FileUtils.mv(
+        File.join(repo_path, "fake.git"),
+        File.join(repo_path, ".git")
+      )
     end
 
     subject
 
     expect(coverage_check.reload.state).to eq(:complete)
-    expect(check_runs_stub).to have_been_requested.twice
-  end
+    expect(coverage_check.nodes.map(&:attributes).map(&:symbolize_keys)).to contain_exactly(
+      hash_including(
+        path: "foo.rb",
+        node_type: "module",
+        node_name: "Foo",
+        start_line: 1,
+        end_line: 11,
+        coverage: 0.8333,
+        flagged: false
+      ),
+      hash_including(
+        path: "foo.rb",
+        node_type: "instance method",
+        node_name: "tested",
+        start_line: 7,
+        end_line: 10,
+        coverage: 1.0,
+        flagged: false
+      ),
+      hash_including(
+        path: "foo.rb",
+        node_type: "instance method",
+        node_name: "untested",
+        start_line: 2,
+        end_line: 5,
+        coverage: 0.5,
+        flagged: true
+      )
+    )
 
-  xit "stores a serialized Undercover::Report" do
-    # pending "TODO: implement report persistence"
+    expect(check_runs_stub).to have_been_requested.twice
   end
 
   def stub_get_installation_token
