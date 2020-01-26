@@ -8,7 +8,8 @@ module Logic
 
     def initialize(coverage_check, report, warnings)
       @coverage_check = coverage_check
-      all_results = report.all_results | warnings.to_a
+      # all_results = report.all_results | warnings.to_a
+      all_results = warnings.to_a
       flagged = all_results.map { |r| warnings.include?(r) }
       @all_results_with_flagged = all_results.zip(flagged)
     end

@@ -58,24 +58,25 @@ describe Logic::RunUndercover do
 
     expect(coverage_check.reload.state).to eq(:complete)
     expect(coverage_check.nodes.map(&:attributes).map(&:symbolize_keys)).to contain_exactly(
-      hash_including(
-        path: "foo.rb",
-        node_type: "module",
-        node_name: "Foo",
-        start_line: 1,
-        end_line: 11,
-        coverage: 0.8333,
-        flagged: false
-      ),
-      hash_including(
-        path: "foo.rb",
-        node_type: "instance method",
-        node_name: "tested",
-        start_line: 7,
-        end_line: 10,
-        coverage: 1.0,
-        flagged: false
-      ),
+      # TODO: uncomment, when Undercover is updated to not return all method data, but just those from the diff
+      # hash_including(
+      #   path: "foo.rb",
+      #   node_type: "module",
+      #   node_name: "Foo",
+      #   start_line: 1,
+      #   end_line: 11,
+      #   coverage: 0.8333,
+      #   flagged: false
+      # ),
+      # hash_including(
+      #   path: "foo.rb",
+      #   node_type: "instance method",
+      #   node_name: "tested",
+      #   start_line: 7,
+      #   end_line: 10,
+      #   coverage: 1.0,
+      #   flagged: false
+      # ),
       hash_including(
         path: "foo.rb",
         node_type: "instance method",
