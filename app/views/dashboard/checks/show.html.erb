@@ -1,0 +1,32 @@
+<div class="mb-5">
+  <p class="lead">Commit report</p>
+  <table class="table">
+    <tbody>
+      <tr>
+        <td><%= @check.repo_full_name %></td>
+        <td>
+          <code><%= pull_request_or_commit_link(@check) %></code>
+        </td>
+        <td>
+          <%= coverage_result_badge(@check) %>
+        </td>
+        <td title="<%= @check.state_log.last&.fetch("ts") %>">
+          <% if @check.state != :created %>
+            <%= "#{@check.state} (#{distance_of_time_in_words(Time.now, @check.state_log.last&.fetch("ts"), include_seconds: true)} ago)" %>
+          <% else %>
+            <%= @check.state %>
+          <% end %>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="lead">Coverage results</p>
+  <table class="table">
+    <tbody>
+      <% @check.nodes.each do |node| %>
+        <tr><td><%= node %></td></tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

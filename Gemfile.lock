@@ -69,6 +69,9 @@ GEM
       autoprefixer-rails (>= 9.1.0)
       popper_js (>= 1.14.3, < 2)
       sassc-rails (>= 2.0.0)
+    bootstrap4-kaminari-views (1.0.1)
+      kaminari (>= 0.13)
+      rails (>= 3.1)
     builder (3.2.4)
     byebug (11.0.1)
     capybara (3.30.0)
@@ -117,6 +120,18 @@ GEM
       thor (>= 0.14, < 2.0)
     json (2.2.0)
     jwt (2.2.1)
+    kaminari (1.2.0)
+      activesupport (>= 4.1.0)
+      kaminari-actionview (= 1.2.0)
+      kaminari-activerecord (= 1.2.0)
+      kaminari-core (= 1.2.0)
+    kaminari-actionview (1.2.0)
+      actionview
+      kaminari-core (= 1.2.0)
+    kaminari-activerecord (1.2.0)
+      activerecord
+      kaminari-core (= 1.2.0)
+    kaminari-core (1.2.0)
     listen (3.2.1)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -323,12 +338,14 @@ DEPENDENCIES
   bcrypt (~> 3.1.13)
   bootsnap (>= 1.1.0)
   bootstrap
+  bootstrap4-kaminari-views
   byebug
   capybara (>= 2.15)
   coffee-rails (~> 5.0)
   jbuilder (~> 2.9)
   jquery-rails
   jwt
+  kaminari
   listen (>= 3.0.5, < 3.3)
   octokit
   omniauth

@@ -9,6 +9,8 @@ gem "rails", "~> 6.0.2"
 gem "bcrypt", "~> 3.1.13"
 gem "bootsnap", ">= 1.1.0", require: false
 gem "jbuilder", "~> 2.9"
+gem "kaminari"
+gem "bootstrap4-kaminari-views"
 gem "pg", ">= 0.18", "< 2.0"
 gem "puma", "~> 4.3"
 
