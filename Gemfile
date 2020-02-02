@@ -10,12 +10,12 @@ gem "bcrypt", "~> 3.1.13"
 gem "bootsnap", ">= 1.1.0", require: false
 gem "jbuilder", "~> 2.9"
 gem "kaminari"
-gem "bootstrap4-kaminari-views"
 gem "pg", ">= 0.18", "< 2.0"
 gem "puma", "~> 4.3"
 
 # UI Gems
 gem "bootstrap"
+gem "bootstrap4-kaminari-views"
 gem "coffee-rails", "~> 5.0"
 gem "jquery-rails"
 gem "sass-rails", "~> 5.0"
