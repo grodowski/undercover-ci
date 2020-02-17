@@ -21,12 +21,31 @@
     </tbody>
   </table>
 
-  <p class="lead">Coverage results</p>
-  <table class="table">
-    <tbody>
-      <% @check.nodes.each do |node| %>
-        <tr><td><%= node %></td></tr>
-      <% end %>
-    </tbody>
-  </table>
+  <p class="lead">Diff coverage results</p>
+
+  <% if @check.nodes.empty? %>
+    <p class="text-muted text-center">No results</p>
+  <% else %>
+    <table class="table">
+      <tbody>
+        <% @check.nodes.each do |node| %>
+          <div class="card mb-2">
+            <div class="card-header">
+              <%= badge_label_for_node(node) %>
+              <code><%= "#{node.path}:#{node.start_line}:#{node.end_line}" %></code>
+            </div>
+            <div class="card-body">
+              <%= node.node_type.capitalize %> <code><%= node.node_name %></code> has been changed without sufficient tests. Coverage: <b><%= format_node_coverage(node) %></b>.
+            </div>
+          </div>
+        <% end %>
+      </tbody>
+    </table>
+    <% end %>
+
+  <hr/>
+  <small>
+    <span class="badge badge-warning">warning</span>: missing coverage within diff lines, reported to GitHub
+    <span class="badge badge-info">info</span>: missing coverage within changed methods and classes (outside of diff lines), not reported to GitHub
+  </small>
 </div>

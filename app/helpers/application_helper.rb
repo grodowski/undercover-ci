@@ -28,6 +28,27 @@ module ApplicationHelper
     end
   end
 
+  def badge_label_for_node(node)
+    flag = node.flagged? ? "warning" : "info"
+    content_tag(:span, class: "badge badge-#{flag}") do
+      flag
+    end
+  end
+
+  def format_node_coverage(node)
+    # TODO: store coverage array to display lines?
+    color, text = if node.coverage == 1.0
+                    [:default, ""]
+                  elsif node.flagged?
+                    [:yellow, ", some changed lines were untested"]
+                  else
+                    [:blue, ""]
+                  end
+    color_class = "node-coverage-#{color}"
+    content_tag(:span, "#{node.coverage * 100}%", class: color_class) + \
+      content_tag(:span, text)
+  end
+
   def nav_link_with_state(link_text, path, **html_args)
     class_names = ["nav-link"]
     class_names << "active" if request.path == path

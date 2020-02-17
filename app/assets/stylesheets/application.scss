@@ -17,6 +17,8 @@
 :root {
   --shark-blue: #212529;
   --pattens-blue: #DBEDFF;
+  --info-blue: #17A2B8;
+  --warning-yellow: #FFC107;
 }
 
 .starter-template {
@@ -93,4 +95,16 @@
 
 .row-href {
   cursor: pointer;
+}
+
+.node-coverage-yellow {
+  color: var(--warning-yellow);
+}
+
+.node-coverage-blue {
+  color: var(--info-blue);
+}
+
+.node-coverage-default {
+  color: inherit;
 }
