@@ -4,6 +4,19 @@ require "rails_helper"
 require "check_runs"
 
 describe CheckRuns::Complete do
+  describe "#format_lines" do
+    it "formats lines" do
+      obj = described_class.new(nil)
+
+      expect(obj.format_lines([1])).to eq([1])
+      expect(obj.format_lines([1, 2, 3])).to eq([1..3])
+      expect(obj.format_lines([1, 3, 4])).to eq([1, 3..4])
+      expect(obj.format_lines([1, 2, 4])).to eq([1..2, 4])
+      expect(obj.format_lines([1, 2, 4])).to eq([1..2, 4])
+      expect(obj.format_lines([1, 2, 4, 6, 2, 1, 2, 3])).to eq([1..2, 4, 6, 2, 1..3])
+    end
+  end
+
   it "transforms Undercover::Result into annotations" do
     run = DataObjects::CheckRunInfo.new(
       "grodowski/undercover-ci",
@@ -21,11 +34,11 @@ describe CheckRuns::Complete do
       annotations: [
         {
           path: "app/models/application_record.rb",
-          start_line: 2,
+          start_line: 1,
           end_line: 5,
           annotation_level: "warning",
           title: "Untested instance method",
-          message: "Instance method `method` is missing coverage for line 3 (node coverage: 0.5)"
+          message: "Instance method `method` is missing coverage for lines 3..4 (node coverage: 0.3333)"
         }
       ]
     )
@@ -42,10 +55,10 @@ describe CheckRuns::Complete do
   end
 
   def undercover_result_fixture
-    mock_node = double(human_name: "instance method", name: "method", first_line: 2, last_line: 5)
+    mock_node = double(human_name: "instance method", name: "method", first_line: 1, last_line: 5)
     Undercover::Result.new(
       mock_node,
-      [[3, 0], [4, 1]],
+      [[2, 1], [3, 0], [4, 0]],
       "app/models/application_record.rb"
     )
   end

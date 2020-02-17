@@ -26,6 +26,15 @@ module CheckRuns
       log "#{run} response: #{client.last_response.status}"
     end
 
+    # TODO: deserves to be moved elswhere
+    def format_lines(lines)
+      prev = lines[0]
+      slices = lines.slice_before do |e|
+        (prev + 1 != e).tap { prev = e }
+      end
+      slices.map { |slice_first, *, slice_last| slice_last ? (slice_first..slice_last) : slice_first }
+    end
+
     private
 
     # @return [Array] matching the format expected by GitHub Checks API
@@ -36,7 +45,7 @@ module CheckRuns
         # TODO: duplicates pronto-undercover logic, move to Undercover::Result
         lines = result.coverage.map { |ln, _cov| ln if result.uncovered?(ln) }.compact
         message = "#{result.node.human_name.capitalize} `#{result.node.name}` is missing" \
-                  " coverage for line#{'s' if lines.size > 1} #{lines.join(', ')}" \
+                  " coverage for line#{'s' if lines.size > 1} #{format_lines(lines).join(',')}" \
                   " (node coverage: #{result.coverage_f})"
         {
           path: result.file_path,
