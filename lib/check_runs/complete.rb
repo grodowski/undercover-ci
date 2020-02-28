@@ -1,4 +1,4 @@
-# frozen_string_literal: true
+ # frozen_string_literal: true
 
 module CheckRuns
   class Complete < Base
@@ -8,16 +8,16 @@ module CheckRuns
       client.post(
         "/repos/#{run.full_name}/check-runs",
         head_sha: run.sha,
-        name: "Code coverage",
+        name: "coverage",
         status: "completed",
-        started_at: run.created_at, # TODO: replace when we store states
-        completed_at: Time.now.iso8601, # TODO: store this in model
+        started_at: run.created_at,
+        completed_at: run.last_ts,
         conclusion: conclusion_for_run(undercover_warnings),
-        details_url: "https://undercover-ci.com",
-        external_id: "", # TODO: create an external id
+        details_url: details_url,
+        external_id: run.external_id,
         output: {
           title: "Code coverage report",
-          summary: summary_for_run(undercover_warnings),
+          summary: summary_for_run,
           text: text_for_run(undercover_warnings),
           annotations: warnings_to_annotations(undercover_warnings)
         },
@@ -58,24 +58,32 @@ module CheckRuns
       end
     end
 
-    # TODO: conditional copy
-    # - if no warnings, tell that it's a clean PR!
-    # - if warnings present, suggest to add test coverage
-    # - show some stats
-    #   - num methods / classes / changed / added / removed
-    #   - avg coverage per method
-    # - show a random tip
     def conclusion_for_run(warnings)
       warnings.empty? ? "success" : "failure"
     end
 
-    # TODO: failure / aborted check run copy
-    def summary_for_run(_warnings)
-      "TODO: create summary_for_run"
+    def summary_for_run
+      complete_message = run.num_warnings.zero? ? "Ship it!" : "Some methods are missing tests!"
+      num = ActionController::Base.helpers.pluralize(run.num_warnings, "warning")
+      "Underover CI has detected #{num} in this changeset. #{complete_message}"
     end
 
+    def details_url
+      # TODO: figure out the default_url_options problem!
+      Rails.application.routes.url_helpers.check_url(
+        run.external_id,
+        host: "https://undercover-ci.com"
+        # host: Rails.application.config.action_controller.default_url_options[:host]
+      )
+    end
+
+    # TODO: ideas
+    # - show some stats
+    #   - num methods / classes / changed / added / removed
+    #   - avg coverage per method
+    # - show a random tip
     def text_for_run(_warnings)
-      "TODO: create text_for_run"
+      "" # TODO: complete text_for_run
     end
   end
 end
