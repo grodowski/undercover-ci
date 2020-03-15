@@ -37,6 +37,7 @@ describe CheckRuns::Complete do
     allow(check_run_complete).to receive(:installation_api_client) { dummy_github }
 
     expected_output = hash_including(
+      summary: "🚨 Undercover CI has detected 2 warnings in this changeset.",
       annotations: [
         {
           path: "app/models/application_record.rb",

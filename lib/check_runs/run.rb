@@ -9,8 +9,9 @@ module CheckRuns
         head_sha: run.sha,
         name: "coverage",
         status: "in_progress",
-        started_at: Time.now.iso8601,
-        external_id: "", # TODO: create an external id
+        started_at: run.created_at,
+        details_url: details_url,
+        external_id: run.external_id,
         output: {
           title: "In progress",
           summary: summary_for_run,
@@ -24,10 +25,8 @@ module CheckRuns
     private
 
     def summary_for_run
-      <<-TEXT
-      Undercover CI is scanning this PR for untested methods,
-      blocks and classes that have been changed in this changeset.
-      TEXT
+      "Undercover CI is scanning this PR for untested methods, " \
+      "blocks and classes that have changed in this commit."
     end
 
     def text_for_run

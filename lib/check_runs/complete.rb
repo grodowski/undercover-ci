@@ -16,7 +16,7 @@ module CheckRuns
         details_url: details_url,
         external_id: run.external_id,
         output: {
-          title: "Code coverage report",
+          title: "Complete",
           summary: summary_for_run,
           text: text_for_run(undercover_warnings),
           annotations: warnings_to_annotations(undercover_warnings)
@@ -63,18 +63,9 @@ module CheckRuns
     end
 
     def summary_for_run
-      complete_message = run.num_warnings.zero? ? "Ship it!" : "Some methods are missing tests!"
+      complete_message = run.num_warnings.zero? ? "🚀 Ship it!" : "🚨"
       num = ActionController::Base.helpers.pluralize(run.num_warnings, "warning")
-      "Underover CI has detected #{num} in this changeset. #{complete_message}"
-    end
-
-    def details_url
-      # TODO: figure out the default_url_options problem!
-      Rails.application.routes.url_helpers.check_url(
-        run.external_id,
-        host: "https://undercover-ci.com"
-        # host: Rails.application.config.action_controller.default_url_options[:host]
-      )
+      "#{complete_message} Undercover CI has detected #{num} in this changeset."
     end
 
     # TODO: ideas

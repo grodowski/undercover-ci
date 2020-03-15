@@ -9,7 +9,9 @@ module CheckRuns
         head_sha: run.sha,
         name: "coverage",
         status: "queued",
-        external_id: "", # TODO: set to check database id
+        started_at: run.created_at,
+        details_url: details_url,
+        external_id: run.external_id,
         output: {
           title: "Queued",
           summary: "Awaiting coverage data",
