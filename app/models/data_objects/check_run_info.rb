@@ -37,7 +37,7 @@ module DataObjects
         db_check.created_at,
         nil, # TODO: ~load repository and check_suite from jsonb columns
         db_check.state,
-        db_check.id,
+        db_check.id.to_s,
         db_check.state_log.last&.fetch("ts"),
         db_check.nodes.size
       )
