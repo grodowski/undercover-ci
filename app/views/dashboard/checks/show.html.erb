@@ -35,7 +35,7 @@
               <code><%= "#{node.path}:#{node.start_line}:#{node.end_line}" %></code>
             </div>
             <div class="card-body">
-              <%= node.node_type.capitalize %> <code><%= node.node_name %></code> has been changed without sufficient tests. Coverage: <b><%= format_node_coverage(node) %></b>.
+              <%= node.node_type.capitalize %> <code><%= node.node_name %></code>. Coverage: <b><%= format_node_coverage(node) %></b>.
             </div>
           </div>
         <% end %>
