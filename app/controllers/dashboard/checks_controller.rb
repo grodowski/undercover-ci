@@ -11,8 +11,12 @@ module Dashboard
       @installations = current_user.installations
       redirect_to(new_settings_url) if @installations.none?
 
-      @checks = current_user.coverage_checks.order(created_at: :desc).limit(15)
+      @checks = current_user.coverage_checks.with_counts.order(created_at: :desc).page(params[:page])
       @show_coverage_upload_instruction = @checks.none?
+    end
+
+    def show
+      @check = current_user.coverage_checks.with_counts.includes(:nodes).find(params[:id])
     end
   end
 end

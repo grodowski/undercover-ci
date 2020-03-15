@@ -10,9 +10,14 @@ module DataObjects
     installation_id
     created_at
     payload
+    state
+    external_id
+    last_ts
+    num_warnings
   ].freeze
 
   # rubocop:disable Metrics/BlockLength
+  # TODO: consider refactoring into OpenStruct/Class with named attrs
   CheckRunInfo = Struct.new(*CHECK_RUN_INFO_ATTRIBUTES) do
     def self.from_webhook(payload)
       payload = OpenStruct.new(payload)
@@ -23,14 +28,18 @@ module DataObjects
       new(full_name, sha, compare, installation_id, nil, payload)
     end
 
-    def self.from_coverage_check(job)
+    def self.from_coverage_check(db_check)
       new(
-        job.repo.fetch("full_name"),
-        job.head_sha,
-        job.base_sha.presence || job.default_branch,
-        job.installation.installation_id,
-        job.created_at,
-        nil # TODO: ~load repository and check_suite from jsonb columns
+        db_check.repo.fetch("full_name"),
+        db_check.head_sha,
+        db_check.base_sha.presence || db_check.default_branch,
+        db_check.installation.installation_id,
+        db_check.created_at,
+        nil, # TODO: ~load repository and check_suite from jsonb columns
+        db_check.state,
+        db_check.id,
+        db_check.state_log.last&.fetch("ts"),
+        db_check.nodes.size
       )
     end
 

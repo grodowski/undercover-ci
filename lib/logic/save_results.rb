@@ -6,7 +6,9 @@ module Logic
       new(coverage_check, report, warnings).call
     end
 
-    def initialize(coverage_check, report, warnings)
+    # TODO: store all results once Undercover::Report
+    # narrows them down to just those in the changeset
+    def initialize(coverage_check, _report, warnings)
       @coverage_check = coverage_check
       # all_results = report.all_results | warnings.to_a
       all_results = warnings.to_a

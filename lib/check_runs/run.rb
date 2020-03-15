@@ -7,12 +7,13 @@ module CheckRuns
       client.post(
         "/repos/#{run.full_name}/check-runs",
         head_sha: run.sha,
-        name: "Code coverage",
+        name: "coverage",
         status: "in_progress",
-        started_at: Time.now.iso8601,
-        external_id: "", # TODO: create an external id
+        started_at: run.created_at,
+        details_url: details_url,
+        external_id: run.external_id,
         output: {
-          title: "Analysing code coverage",
+          title: "In progress",
           summary: summary_for_run,
           text: text_for_run
         },
@@ -24,17 +25,15 @@ module CheckRuns
     private
 
     def summary_for_run
-      <<-TEXT
-      Undercover CI scans this PR for untested methods,
-      blocks and classes that have been added or changed in this diff.
-      TEXT
+      "Undercover CI is scanning this PR for untested methods, " \
+      "blocks and classes that have changed in this commit."
     end
 
     def text_for_run
       # TODO: show random tip
       # - how to set up undercover locally
       # - how to test $thing (rake task, concurrent programs etc...)
-      "⏳☕️ Please wait while code coverage report is being generated..."
+      "⏳☕️ ..."
     end
   end
 end

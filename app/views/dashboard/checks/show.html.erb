@@ -1,0 +1,51 @@
+<div class="mb-5">
+  <p class="lead">Commit report</p>
+  <table class="table">
+    <tbody>
+      <tr>
+        <td><%= @check.repo_full_name %></td>
+        <td>
+          <code><%= pull_request_or_commit_link(@check) %></code>
+        </td>
+        <td>
+          <%= coverage_result_badge(@check) %>
+        </td>
+        <td title="<%= @check.state_log.last&.fetch("ts") %>">
+          <% if @check.state != :created %>
+            <%= "#{@check.state} (#{distance_of_time_in_words(Time.now, @check.state_log.last&.fetch("ts"), include_seconds: true)} ago)" %>
+          <% else %>
+            <%= @check.state %>
+          <% end %>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="lead">Diff coverage results</p>
+
+  <% if @check.nodes.empty? %>
+    <p class="text-muted text-center">No results</p>
+  <% else %>
+    <table class="table">
+      <tbody>
+        <% @check.nodes.each do |node| %>
+          <div class="card mb-2">
+            <div class="card-header">
+              <%= badge_label_for_node(node) %>
+              <code><%= "#{node.path}:#{node.start_line}:#{node.end_line}" %></code>
+            </div>
+            <div class="card-body">
+              <%= node.node_type.capitalize %> <code><%= node.node_name %></code>. Coverage: <b><%= format_node_coverage(node) %></b>.
+            </div>
+          </div>
+        <% end %>
+      </tbody>
+    </table>
+    <% end %>
+
+  <hr/>
+  <small>
+    <span class="badge badge-warning">warning</span>: missing coverage within diff lines, reported to GitHub
+    <span class="badge badge-info">info</span>: missing coverage within changed methods and classes (outside of diff lines), not reported to GitHub
+  </small>
+</div>

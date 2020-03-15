@@ -43,7 +43,8 @@ module Logic
       # TODO: fix Undercover reporter to store warnings in self, avoids one extra param
       # TODO: improve error handling with transactions
       Logic::SaveResults.call(coverage_check, report, warnings)
-      CheckRuns::Complete.new(run).post(warnings)
+      run_with_results = DataObjects::CheckRunInfo.from_coverage_check(coverage_check)
+      CheckRuns::Complete.new(run_with_results).post(warnings)
       Logic::UpdateCoverageCheckState.new(coverage_check).complete
       teardown
       log "teardown complete #{run} job_id: #{coverage_check.id}"

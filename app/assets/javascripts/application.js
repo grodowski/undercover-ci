@@ -19,3 +19,9 @@
 //= require popper
 
 //= require_tree .
+
+$(document).on("turbolinks:load", function() {
+  $(".row-href").click(function() {
+      window.location = $(this).data("href");
+  });
+});

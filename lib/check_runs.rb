@@ -15,6 +15,15 @@ module CheckRuns
     def initialize(run)
       @run = run
     end
+
+    def details_url
+      # TODO: figure out the default_url_options problem!
+      Rails.application.routes.url_helpers.check_url(
+        run.external_id,
+        host: "https://undercover-ci.com"
+        # host: Rails.application.config.action_controller.default_url_options[:host]
+      )
+    end
   end
 end
 

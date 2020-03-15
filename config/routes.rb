@@ -20,6 +20,7 @@ Rails.application.routes.draw do
 
   scope module: "dashboard" do
     get "/app", controller: "checks", action: "index", as: :dashboard
+    resources :checks, only: :show
 
     resources :settings, only: %i[new index]
   end
