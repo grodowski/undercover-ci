@@ -39,7 +39,7 @@ module DataObjects
         db_check.state,
         db_check.id.to_s,
         db_check.state_log.last&.fetch("ts"),
-        db_check.nodes.size
+        db_check.nodes.flagged.size
       )
     end
 
