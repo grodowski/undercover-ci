@@ -4,6 +4,8 @@ class HomeController < ApplicationController
   layout "static_page"
 
   def beta
+    puts 'fooo'
+
     if current_user || params[:x] != ENV.fetch("BETA_CODE")
       redirect_to root_url
       return
