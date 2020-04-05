@@ -35,14 +35,13 @@ module Logic
       checkout
 
       report = run_undercover_cmd
-      warnings = report.build_warnings
-
-      log "undercover warnings: #{warnings.size}"
+      warnings = report.flagged_results
+      log "undercover warnings: #{warnings.size}, " \
+          "total nodes: #{report.all_results.size}"
       log "completing analysis... #{run} job_id: #{coverage_check.id}"
 
-      # TODO: fix Undercover reporter to store warnings in self, avoids one extra param
       # TODO: improve error handling with transactions
-      Logic::SaveResults.call(coverage_check, report, warnings)
+      Logic::SaveResults.call(coverage_check, report)
       run_with_results = DataObjects::CheckRunInfo.from_coverage_check(coverage_check)
       CheckRuns::Complete.new(run_with_results).post(warnings)
       Logic::UpdateCoverageCheckState.new(coverage_check).complete

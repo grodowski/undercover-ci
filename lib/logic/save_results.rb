@@ -2,28 +2,23 @@
 
 module Logic
   class SaveResults
-    def self.call(coverage_check, report, warnings)
-      new(coverage_check, report, warnings).call
+    def self.call(coverage_check, report)
+      new(coverage_check, report).call
     end
 
-    # TODO: store all results once Undercover::Report
-    # narrows them down to just those in the changeset
-    def initialize(coverage_check, _report, warnings)
+    def initialize(coverage_check, report)
       @coverage_check = coverage_check
-      # all_results = report.all_results | warnings.to_a
-      all_results = warnings.to_a
-      flagged = all_results.map { |r| warnings.include?(r) }
-      @all_results_with_flagged = all_results.zip(flagged)
+      @all_results = report.all_results.to_a
     end
 
     def call
-      all_results_with_flagged.each { |r_tuple| build_node(*r_tuple) }
+      all_results.each { |result| build_node(result) }
       coverage_check.save!
     end
 
     private
 
-    def build_node(node_result, flagged)
+    def build_node(node_result)
       coverage_check.nodes << Node.new(
         path: node_result.file_path,
         node_type: node_result.node.human_name,
@@ -31,10 +26,10 @@ module Logic
         start_line: node_result.first_line,
         end_line: node_result.last_line,
         coverage: node_result.coverage_f,
-        flagged: flagged
+        flagged: node_result.flagged?
       )
     end
 
-    attr_reader :coverage_check, :all_results_with_flagged
+    attr_reader :coverage_check, :all_results
   end
 end
