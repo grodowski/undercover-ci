@@ -25,15 +25,11 @@ module CheckRuns
     private
 
     def summary_for_run
-      "Undercover CI is scanning this PR for untested methods, " \
-      "blocks and classes that have changed in this commit."
+      "Undercover CI is running against this commit..."
     end
 
     def text_for_run
-      # TODO: show random tip
-      # - how to set up undercover locally
-      # - how to test $thing (rake task, concurrent programs etc...)
-      "⏳☕️ ..."
+      "⏳"
     end
   end
 end
