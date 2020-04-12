@@ -13,7 +13,7 @@ module DataObjects
     state
     external_id
     last_ts
-    num_warnings
+    nodes
   ].freeze
 
   # rubocop:disable Metrics/BlockLength
@@ -39,7 +39,7 @@ module DataObjects
         db_check.state,
         db_check.id.to_s,
         db_check.state_log.last&.fetch("ts"),
-        db_check.nodes.flagged.size
+        db_check.nodes # TODO: wrap AR models with a dedicated read model
       )
     end
 
@@ -52,6 +52,14 @@ module DataObjects
       else
         payload.check_suite.fetch("before") # sha of HEAD~1
       end
+    end
+
+    def success?
+      num_warnings.zero?
+    end
+
+    def num_warnings
+      @num_warnings ||= nodes.flagged.size
     end
 
     alias_method :to_s, :inspect

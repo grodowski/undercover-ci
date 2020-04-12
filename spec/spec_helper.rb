@@ -8,7 +8,6 @@ RSpec.configure do |config|
     mocks.verify_partial_doubles = true
   end
   config.shared_context_metadata_behavior = :apply_to_host_groups
-  config.profile_examples = 10
   config.order = :random
   # Seed global randomisation in specs using the rspec seed
   Kernel.srand config.seed

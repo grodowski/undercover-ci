@@ -28,7 +28,7 @@ describe CheckRuns::Complete do
       :complete,
       1337,
       "2020-02-02T16:20:47Z",
-      2
+      check_run_fixture.nodes
     )
     check_run_complete = described_class.new(run)
 
@@ -36,8 +36,18 @@ describe CheckRuns::Complete do
     allow(dummy_github).to receive_message_chain(:last_response, :status)
     allow(check_run_complete).to receive(:installation_api_client) { dummy_github }
 
+    expected_text = <<~TEXT.chomp
+      Revision `abc123` has modified the following 2 code locations. Results marked with ⚠️ have untested lines added or changed in this commit, look into them!
+
+      name | coverage
+      :--- | ---:
+      ⚠️ instance method `method` | 0.0
+      instance method `method` | 1.0
+    TEXT
+
     expected_output = hash_including(
-      summary: "🚨 Undercover CI has detected 2 warnings in this changeset.",
+      summary: "🚨 Undercover CI has detected 1 warning in this changeset.",
+      text: expected_text,
       annotations: [
         {
           path: "app/models/application_record.rb",
@@ -50,9 +60,7 @@ describe CheckRuns::Complete do
       ]
     )
 
-    check_run_complete.post(
-      [undercover_result_fixture]
-    )
+    check_run_complete.post(undercover_report_fixture)
 
     expect(dummy_github)
       .to have_received(:post) do |path, payload|
@@ -66,12 +74,50 @@ describe CheckRuns::Complete do
       end
   end
 
-  def undercover_result_fixture
-    mock_node = double(human_name: "instance method", name: "method", first_line: 1, last_line: 5)
-    Undercover::Result.new(
-      mock_node,
-      [[2, 1], [3, 0], [4, 0]],
-      "app/models/application_record.rb"
+  def check_run_fixture
+    mock_result = undercover_report_fixture.all_results[0]
+    # TODO: not ideal, will need refactoring
+    inst = Installation.create
+    CoverageCheck.create!(
+      installation: inst,
+      state: :complete,
+      nodes: [
+        Node.new(
+          node_type: "instance method",
+          node_name: "method",
+          start_line: mock_result.first_line,
+          end_line: mock_result.last_line,
+          coverage: 1.0,
+          flagged: false,
+          path: mock_result.file_path
+        ),
+        Node.new(
+          node_type: "instance method",
+          node_name: "method",
+          start_line: mock_result.first_line,
+          end_line: mock_result.last_line,
+          coverage: 0.0,
+          flagged: true,
+          path: mock_result.file_path
+        )
+      ]
     )
+  end
+
+  def undercover_report_fixture
+    mock_node = double(human_name: "instance method", name: "method", first_line: 1, last_line: 5)
+    results = [
+      Undercover::Result.new(
+        mock_node,
+        [[2, 1], [3, 0], [4, 0]],
+        "app/models/application_record.rb"
+      ),
+      Undercover::Result.new(
+        mock_node,
+        [[2, 1], [3, 0], [4, 0]],
+        "app/models/application_record.rb"
+      )
+    ]
+    instance_double(Undercover::Report, all_results: results, flagged_results: [results[0]])
   end
 end
