@@ -68,7 +68,7 @@ module CheckRuns
     def summary_for_run
       complete_message = run.num_warnings.zero? ? "🚀 Ship it!" : "🚨"
       num = ActionController::Base.helpers.pluralize(run.num_warnings, "warning")
-      "#{complete_message} Undercover CI has detected #{num} in this changeset."
+      "#{complete_message} UndercoverCI has detected #{num} in this changeset."
     end
 
     def text_for_run
@@ -79,10 +79,10 @@ module CheckRuns
                 "look into them!"
       end
       text += "\n\n"
-      rows = ["name | coverage", ":--- | ---:"]
+      rows = ["file | name | coverage", ":--- | :--- | ---:"]
       format_to_md = proc do |node|
         flag = node.flagged? ? "⚠️ " : ""
-        ["#{flag}#{node.node_type} `#{node.node_name}`", node.coverage]
+        [node.path, "#{flag}#{node.node_type} `#{node.node_name}`", node.coverage]
       end
       rows += @run
               .nodes

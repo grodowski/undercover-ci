@@ -25,7 +25,7 @@ module CheckRuns
     private
 
     def summary_for_run
-      "Undercover CI is running against this commit..."
+      "UndercoverCI is running against this commit..."
     end
 
     def text_for_run

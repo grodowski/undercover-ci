@@ -39,14 +39,14 @@ describe CheckRuns::Complete do
     expected_text = <<~TEXT.chomp
       Revision `abc123` has modified the following 2 code locations. Results marked with ⚠️ have untested lines added or changed in this commit, look into them!
 
-      name | coverage
-      :--- | ---:
-      ⚠️ instance method `method` | 0.0
-      instance method `method` | 1.0
+      file | name | coverage
+      :--- | :--- | ---:
+      app/models/application_record.rb | ⚠️ instance method `method` | 0.0
+      app/models/application_record.rb | instance method `method` | 1.0
     TEXT
 
     expected_output = hash_including(
-      summary: "🚨 Undercover CI has detected 1 warning in this changeset.",
+      summary: "🚨 UndercoverCI has detected 1 warning in this changeset.",
       text: expected_text,
       annotations: [
         {
