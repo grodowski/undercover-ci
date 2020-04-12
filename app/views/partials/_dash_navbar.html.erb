@@ -1,7 +1,8 @@
 <nav class="navbar navbar-expand-md navbar-dark bg-dark">
   <div class="container">
-    <a class="navbar-brand" href="<%= root_path %>">
-      UndercoverCI <span class="badge badge-warning">beta</span>
+    <a class="navbar-brand d-flex align-items-center" href="<%= root_path %>">
+      <%= image_tag "logo/apple-touch-icon.png", class: 'logo-img' %>
+      <div class="px-1">UndercoverCI <span class="badge badge-warning">beta</span></div>
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-top" aria-controls="navbar-top" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -13,7 +14,7 @@
         <%= nav_link_with_state("Settings", settings_path) %>
         <%= nav_link_with_state("Docs", docs_page_path, target: "_blank") %>
       </ul>
-      <% if ENV['FF_SELF_SIGNUP'] %>
+      <% if ENV['FF_SELF_SIGNUP'] || cookies[:beta_sign_in] %>
         <% if current_user %>
           <%= link_to "Sign out", "/auth/logout", class: "btn btn-light", method: :delete %>
         <% else %>
