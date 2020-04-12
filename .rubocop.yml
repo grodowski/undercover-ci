@@ -21,6 +21,10 @@ Style/StringLiterals:
   Enabled: true
   EnforcedStyle: double_quotes
 
+Layout/LineLength:
+  Enabled: true
+  Max: 120
+
 Layout/SpaceInsideHashLiteralBraces:
   Enabled: true
   EnforcedStyle: no_space
@@ -37,10 +41,6 @@ Metrics/PerceivedComplexity:
 Metrics/AbcSize:
   Enabled: false
   Max: 20
-
-Metrics/LineLength:
-  Enabled: true
-  Max: 120
 
 Metrics/BlockLength:
   Enabled: true
