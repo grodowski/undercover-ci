@@ -77,16 +77,16 @@ describe "Dashboard spec" do
       expect(response.body).to include("<span class=\"badge badge-warning\">warning</span>")
       expect(response.body).to include(
         "Instance method <code>hello</code>. " \
-        "Coverage: <b><span class=\"node-coverage-yellow\">60.0%</span><span>, some changed " \
-        "lines were untested</span></b>"
+        "Coverage: <span class=\"node-coverage-yellow\">60.0%</span><span> (contains untested " \
+        "diff lines)</span>"
       )
       expect(response.body).to include(
         "Instance method <code>hello</code>. " \
-        "Coverage: <b><span class=\"node-coverage-default\">100.0%</span><span></span></b>"
+        "Coverage: <span class=\"node-coverage-default\">100.0%</span><span></span>"
       )
       expect(response.body).to include(
         "Instance method <code>hello</code>. " \
-        "Coverage: <b><span class=\"node-coverage-blue\">80.0%</span><span></span></b>"
+        "Coverage: <span class=\"node-coverage-blue\">80.0%</span><span></span>"
       )
     end
   end

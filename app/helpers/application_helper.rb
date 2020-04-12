@@ -40,7 +40,7 @@ module ApplicationHelper
     color, text = if node.coverage == 1.0
                     [:default, ""]
                   elsif node.flagged?
-                    [:yellow, ", some changed lines were untested"]
+                    [:yellow, " (contains untested diff lines)"]
                   else
                     [:blue, ""]
                   end
