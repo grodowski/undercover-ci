@@ -2,16 +2,13 @@
   <div class="card-header">
     <ul class="nav nav-tabs card-header-tabs" role="tablist">
       <li class="nav-item">
+        <a class="nav-link" id="actions-tab" data-toggle="tab" href="#actions" role="tab" aria-controls="actions" aria-selected="false">GitHub Actions</a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link active" id="circleci-tab" data-toggle="tab" href="#circle-ci" role="tab" aria-controls="circle-ci" aria-selected="true">Circle CI</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" id="travis-tab" data-toggle="tab" href="#travis-ci" role="tab" aria-controls="travis-ci" aria-selected="false">Travis CI</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" id="semaphore-tab" data-toggle="tab" href="#semaphore-ci" role="tab" aria-controls="semaphore-ci" aria-selected="false">Semaphore CI</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" id="actions-tab" data-toggle="tab" href="#actions" role="tab" aria-controls="actions" aria-selected="false">GitHub Actions</a>
       </li>
     </ul>
   </div>
@@ -35,27 +32,70 @@
             Update your CI configuration (<code>.circleci/config.yml</code> in case of CircleCI) to use our uploader script after running tests. Replace things in bold with your values. Here's an example:
             <pre><code>
               ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- \
-                  --repo <b>$your-username/$repository-name</b> \
-                  --commit <b>$CIRCLE_SHA1</b> \
-                  --lcov <b>coverage/lcov/$repository-name.lcov</b>
+                --repo <b>$your-username/$repository-name</b> \
+                --commit <b>$CIRCLE_SHA1</b> \
+                --lcov <b>coverage/lcov/$repository-name.lcov</b>
             </code></pre>
           </li>
           <li>Store your changes, push a commit and... profit! Soon you'll receive your first GitHub check looking for untested code. 🔍✨</li>
         </ol>
 
-        <p class="small text-muted">* Undercover requires a single coverage report file. Check out how to <a href="https://gist.github.com/grodowski/9744ff91034dce8df20c2a8210409fb0" target="_blank">merge coverage reports</a> if you use parallel builds to run specs in CI.</p>
+        <p class="small text-muted">* Undercover requires a single coverage report file. Check out how to <a href="/docs#parallel-tests" target="_blank">merge coverage reports</a> if you use parallel builds to run specs in CI.</p>
+      </div>
+
+      <div class="tab-pane fade" id="actions" role="tabpanel" aria-labelledby="actions">
+        <ol>
+          <li>
+            Add <code>simplecov</code> and <code>simplecov-lcov</code> gems to report test coverage. Configure them in <code>spec_helper.rb</code> or <code>test_helper.rb</code> by appending this snippet to the beginning of the file:
+            <pre><code>
+              require 'simplecov'
+              require 'simplecov-lcov'
+              SimpleCov::Formatter::LcovFormatter.config.report_with_single_file = true
+              SimpleCov.formatter = SimpleCov::Formatter::LcovFormatter
+              SimpleCov.start do
+                add_filter(/^\/spec\//) # For RSpec, use `test` for MiniTest
+              end
+            </code></pre>
+          </li>
+          <li>
+            Update your CI configuration (e.g. <code>.github/workflows/ruby.yml</code>) to use the uploader script after running tests. Replace things in bold with your values. Here's a full workflow example:
+            <pre><code>
+              name: Rails Unit Tests
+              on: [push, pull_request]
+              jobs:
+                build:
+                  runs-on: ubuntu-latest
+                  steps:
+                  - uses: actions/checkout@v2
+                  - name: Set up Ruby 2.7
+                    uses: actions/setup-ruby@v1
+                    with:
+                      ruby-version: 2.7
+                  - name: Build and test with Rake
+                    env:
+                      RAILS_ENV: test
+                    run: |
+                      sudo apt-get -yqq install libsqlite3-dev
+                      gem install bundler
+                      bundle install --jobs 4 --retry 3
+                      bundle exec rails webpacker:install
+                      bundle exec rails db:create
+                      bundle exec rails db:migrate
+                      bundle exec rails test
+                      ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- \
+                        --repo <b>$your-username/$repository-name</b> \
+                        --commit <b>$GITHUB_SHA</b> \
+                        --lcov <b>coverage/lcov/$repository-name.lcov</b>
+            </code></pre>
+          </li>
+          <li>Store your changes, push a commit and... profit! Soon you'll receive your first GitHub check looking for untested code. 🔍✨</li>
+        </ol>
+
+        <p class="small text-muted">* Undercover requires a single coverage report file. Check out how to <a href="/docs#parallel-tests" target="_blank">merge coverage reports</a> if you use parallel builds to run specs in CI.</p>
       </div>
 
       <div class="tab-pane fade" id="travis-ci" role="tabpanel" aria-labelledby="travis-ci">
         👀 Travis guide TBA!
-      </div>
-
-      <div class="tab-pane fade" id="semaphore-ci" role="tabpanel" aria-labelledby="semaphore-ci">
-        😢 Semaphore guide TBA!
-      </div>
-
-      <div class="tab-pane fade" id="actions" role="tabpanel" aria-labelledby="actions">
-        🙄 Actions guide TBA!
       </div>
     </div>
   </div>

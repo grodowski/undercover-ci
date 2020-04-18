@@ -50,6 +50,7 @@ module DataObjects
       elsif payload.check_suite.fetch("head_branch") != payload.repository.fetch("default_branch")
         payload.repository.fetch("default_branch")
       else
+        # TODO: value of `before` is bogus for force pushes. Use HEAD~1 or default_branch~1?
         payload.check_suite.fetch("before") # sha of HEAD~1
       end
     end

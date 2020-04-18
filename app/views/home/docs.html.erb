@@ -1,15 +1,186 @@
-<h2 class="mb-3">Getting started</h2>
-<h4 class="mb-2">1. Add UndercoverCI to your GitHub account</h4>
-<p>
-  The signup is still invite-only - please head to the <%= link_to("home page", root_path) %> to subscribe.
-  Follow the signup instructions to connect your GitHub account and select a subset of
-  your repositories to share with UndercoverCI.
-</p>
-<p class="text-center">
-  <%= image_tag("install_screenshot.png", class: "border new-installation-image") %>
-</p>
-<p>
-  Once you do that, UndercoverCI will start to analyse every new commit and pull request.
-</p>
-<h4 class="mb-2">2. Configure coverage data reporting</h4>
-<%= render partial: "partials/coverage_upload_instruction" %>
+<% content_for(:title) { "Docs" } %>
+
+<div class="container">
+  <h4>Table of contents</h4>
+      <ul class="list-unstyled">
+        <li class=""><a href="#how-it-works">How it works</a></li>
+        <li class=""><a href="#getting-started">Getting started</a>
+          <ul>
+            <li class=""><a href="#installation">Installation</a>
+            <li class=""><a href="#reporting">Report test coverage</a>
+            <li class=""><a href="#verifying-setup">Verify your setup</a>
+            <li class=""><a href="#undercover-cli">Bonus: shorten the feedback loop with local CLI</a>
+          </ul>
+        </li>
+        <li class=""><a href="#configuration">Configuration</a>
+          <ul>
+            <li class=""><a href="#undercover-uploader">UndercoverCI uploader</a>
+            <li class=""><a href="#parallel-tests">Parallel tests</a>
+          </ul>
+        </li>
+        <li class=""><a href="#development">Development</a>
+      </ul>
+
+      <h2 id="how-it-works" class="mt-5 py-1">How it works</h2>
+
+      <p>
+        UndercoverCI is a robot who protects your Ruby codebase from untested code changes. It works with every Ruby project that can report test coverage with SimpleCov. Chances are, you're already doing that while running tests on a CI server.
+      </p>
+
+      <figure class="text-center my-4">
+        <%= image_tag("passed-check.png", class: "border figure-img img-fluid docs-image-sm") %>
+        <figcaption class="figure-caption text-center">A passed coverage check.</figcaption>
+      </figure>
+
+      <p>
+        The GitHub App reacts to commit and pull request events by queueing a new <code>coverage</code> check. Once your tests finish and upload the coverage report file, UndercoverCI parses the commit diff and correlates the structure of your changes (classes, modules, methods and blocks) against the uploaded test coverage report. The result is a passed or failed commit check result reported to GitHub.
+      </p>
+
+      <p>
+        If any untested lines of code are found, a failed check will highlight them and ask you to add tests. Once tests are added, the comments will go away and the check status will turn to passed ✅.
+      </p>
+
+      <p>
+        When the diff lines have full test coverage, you'll see a passed check with an additional breakdown of all code locations changed by this commit. Use it to find additional improvement opportunities in the surrounding lines and methods - reviewing your pull request is a good time to do that.
+      </p>
+
+      <figure class="text-center my-4">
+        <%= image_tag("location-breakdown.png", class: "border docs-image") %>
+        <figcaption class="figure-caption text-center">A passed check can provide some coverage insights too.</figcaption>
+      </figure>
+
+      <hr/>
+      <h2 id="getting-started" class="mt-5 py-1">Getting started</h2>
+
+      Follow these 3 steps to get started with UndercoverCI.
+
+      <h4 id="installation" class="mt-5 mb-2">1. Install the app on your GitHub account</h4>
+      <p>
+        Sign up from the home page or just follow <%= link_to("the GitHub sign up link", "/auth/github", method: :post) %> to sign up for a free account. You'll be prompted to install the app on your GitHub account with the ability to enable the integration for selected repositories.
+      </p>
+
+      <div class="alert alert-info" role="alert">
+        Enjoy the benefit of joining early! 🥳 UndercoverCI is a paid subscription service that you can <b>use free of charge while in beta</b>. Please note that the availability is limited.<br/><br/> See the <%= link_to "pricing page", pricing_page_path, class: "alert-link" %> for more information including options that will remain free even when beta ends.
+      </div>
+
+      <p>
+        Once you do that, UndercoverCI will start sending commit checks every commit and pull request. There is just one final step to receive coverage results in them.
+      </p>
+
+      <h4 id="reporting" class="mt-5 mb-2">2. Report test coverage data to UndercoverCI</h4>
+
+      <p>
+        UndercoverCI analyses each commit against a matching test coverage file. Make sure your Ruby project reports test coverage and uploads them from your build server by following the instructions below:
+      </p>
+
+      <%= render partial: "partials/coverage_upload_instruction" %>
+
+      <h4 id="verifying-setup" class="mt-5 mb-2">3. Verify your setup</h4>
+
+      <p>
+        You have installed the UndercoverCI GitHub app and configured your CI to publish test coverage reports for analysis. In order to verify that your setup is working, create a branch and push a small code change to your repository – adding a dummy method should suffice to trigger a sample coverage warning:
+      </p>
+
+      <figure class="text-center my-4">
+        <%= image_tag("annotation.png", class: "border docs-image") %>
+        <figcaption class="figure-caption text-center">A GitHub code annotation triggered by untested diff lines.</figcaption>
+      </figure>
+
+      <p>
+        If you made it here, it means your code review setup with UndercoverCI is ready!
+      </p>
+
+      <h4 id="undercover-cli" class="mt-5 mb-2">Bonus: shorten the feedback loop with the local CLI</h4>
+
+      <p>
+        UndercoverCI coverage comments are generated by the undercover ruby gem that you can use locally too. While GitHub Check comments provide coding standards and consistency, you can shorten your feedback loop and check for missing coverage with every local commit thanks to the <code>undercover</code> CLI command.
+
+        You can install it from RubyGems with:
+        <pre><code>
+          gem install undercover
+        </code></pre>
+        Then, check for missing coverage inside uncommited changes by running specs and invoking <code>undercover</code>. Use the <code>--compare</code> flag to compare against a specific commit or branch, which is similar to what UndercoverCI performs when analysing your pushed pull requests:
+        <pre><code>
+          undercover --compare base-branch
+          undercover --compare HEAD~1
+        </code></pre>
+      </p>
+      <p>
+        Visit the <a href="https://github.com/grodowski/undercover">undercover</a> GitHub page to see more examples including integrations with Overcommit and Pronto hooks.
+      </p>
+    </div>
+
+    <hr/>
+    <h2 id="configuration" class="mt-5">Configuration</h2>
+    <h4 id="undercover-uploader" class="mt-5 mb-2">UndercoverCI uploader</h4>
+
+    <p>
+      The uploader script runs in your CI build environment and uploads coverage reports to UndercoverCI. This way the coverage files are processed against a git diff and generate a commit check. A sample call for the <code>grodowski/undercover</code> repository built on CircleCI could look like this:
+
+      <pre><code>
+        ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- \
+                  --repo grodowski/undercover \
+                  --commit $CIRCLE_SHA1 \
+                  --lcov coverage/lcov/undercover.lcov
+      </code></pre>
+
+      The <code>uploader.rb</code> script is securely downloaded and evaluated with the required command-line options:
+    </p>
+    <p>
+      <h6 class="mb-2 mt-3"><code>--repo</code></h6>
+      The <code>$org/$repo</code> formatted name matching exactly how your repository appears on GitHub.
+
+      <h6 class="mb-2 mt-3"><code>--commit</code></h6>
+      Current build commit SHA to identify on GitHub. This value will be provided by the CI build environment, e.g. <code>$CIRCLE_SHA1</code> for CircleCI, <code>$GITHUB_SHA</code> for GitHub Actions or <code>$TRAVIS_COMMIT</code> for TravisCI.</li>
+
+      <h6 class="mb-2 mt-3"><code>--lcov</code></h6>
+      A relative path to the coverage report, will look like <code>coverage/lcov/$reponame.lcov</code> unless SimpleCov's config defaults were changed.
+    </p>
+
+    <h4 id="parallel-tests" class="mt-5 mb-2">Parallel tests</h4>
+    <p>
+      If your CI build runs tests in parallel, there's an extra merge step to be performed before uploading coverage results, because the uploader script only accepts a single file at the time of writing this document. While partial coverage results might be supported in a future release, this Ruby snippet should get you started with merging multiple coverage reports:
+
+      <pre><code>
+        #!/usr/bin/env ruby
+        # frozen_string_literal: true
+
+        require 'simplecov'
+        require 'simplecov-lcov'
+
+        puts('Merging coverage results from parallel CircleCI tests containers into a single LCOV report...')
+
+        results = []
+        Dir['/home/circleci/rspec/*.resultset.json'].each do |path|
+          resultset = JSON.parse(File.read(path))
+          resultset.each do |_, data|
+            cmd = File.basename(path)
+            results << SimpleCov::Result.from_hash(cmd => data)
+          end
+          print '.'
+        end
+        puts
+
+        merged_result = SimpleCov::ResultMerger.merge_results(*results)
+
+        SimpleCov::Formatter::LcovFormatter.config.report_with_single_file = true
+        SimpleCov::Formatter::LcovFormatter.config.single_report_path = ARGV[0] || 'coverage.lcov'
+        SimpleCov::Formatter::LcovFormatter.new.format(merged_result)
+
+        puts("Done! LCOV saved to #{SimpleCov::Formatter::LcovFormatter.config.single_report_path}")
+      </code></pre>
+    </p>
+
+    <hr/>
+    <h2 id="development" class="mt-5">Development</h2>
+    <p>
+      The UndercoverCI Github App and the underlying undercover gem are developed and available on GitHub under a standard MIT license. Your contributions are welcome!
+
+      <ul>
+        <li><a href="https://github.com/grodowski/undercover-ci">grodowski/undercover-ci</a></li>
+        <li><a href="https://github.com/grodowski/undercover">grodowski/undercover</a></li>
+      </ul>
+    </p>
+    <br/>
+    <hr/>
+</div>
