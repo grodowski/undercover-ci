@@ -33,15 +33,17 @@
       </figure>
 
       <p>
-        The GitHub App reacts to commit and pull request events by queueing a new <code>coverage</code> check. Once your tests finish and upload the coverage report file, UndercoverCI parses the commit diff and correlates the structure of your changes (classes, modules, methods and blocks) against the uploaded test coverage report. The result is a passed or failed commit check result reported to GitHub.
+        The GitHub App reacts to commit and pull request events by queueing a new <code>coverage</code> check. Once your tests finish and upload the coverage report file, UndercoverCI parses the commit diff and correlates the structure of your changes (classes, modules, methods and blocks) against the uploaded test coverage report. The result is a passed or failed commit check reported to GitHub.
       </p>
 
+      <h5>Passed</h5>
       <p>
-        If any untested lines of code are found, a failed check will highlight them and ask you to add tests. Once tests are added, the comments will go away and the check status will turn to passed ✅.
+        When the diff lines have full test coverage, you'll see a passed check with an additional breakdown of all changed code locations. Use it to find additional test coverage improvement opportunities in the surrounding lines and methods - reviewing your pull request is a good time to do that.
       </p>
 
+      <h5>Failed</h5>
       <p>
-        When the diff lines have full test coverage, you'll see a passed check with an additional breakdown of all code locations changed by this commit. Use it to find additional improvement opportunities in the surrounding lines and methods - reviewing your pull request is a good time to do that.
+        When untested lines of code are found, a failed check will highlight them and ask you to add tests. Once tests are added, the comments will go away and the check status will turn to passed ✅.
       </p>
 
       <figure class="text-center my-4">
@@ -52,26 +54,28 @@
       <hr/>
       <h2 id="getting-started" class="mt-5 py-1">Getting started</h2>
 
-      Follow these 3 steps to get started with UndercoverCI.
+      Follow these 3 steps to get started with UndercoverCI and receive automated test coverage comments.
 
       <h4 id="installation" class="mt-5 mb-2">1. Install the app on your GitHub account</h4>
       <p>
-        Sign up from the home page or just follow <%= link_to("the GitHub sign up link", "/auth/github", method: :post) %> to sign up for a free account. You'll be prompted to install the app on your GitHub account with the ability to enable the integration for selected repositories.
+        Sign up from the home page or just follow <%= link_to("the GitHub sign up link", "/auth/github", method: :post) %> to sign up. You'll be prompted to install the app on your GitHub account or organisation and give permissions to selected repositories.
       </p>
 
       <div class="alert alert-info" role="alert">
-        Enjoy the benefit of joining early! 🥳 UndercoverCI is a paid subscription service that you can <b>use free of charge while in beta</b>. Please note that the availability is limited.<br/><br/> See the <%= link_to "pricing page", pricing_page_path, class: "alert-link" %> for more information including options that will remain free even when beta ends.
+        Enjoy the benefit of joining early! 🥳 UndercoverCI is <b>free of charge while in beta</b>. Please note that the availability is limited.<br/><br/> See the <%= link_to "pricing page", pricing_page_path, class: "alert-link" %> for more information including options that will remain free even when beta ends.
       </div>
 
       <p>
-        Once you do that, UndercoverCI will start sending commit checks every commit and pull request. There is just one final step to receive coverage results in them.
+        Once installed, UndercoverCI will send checks for every commit and pull request. There is just one final step to receive meaningful coverage results in them.
       </p>
 
       <h4 id="reporting" class="mt-5 mb-2">2. Report test coverage data to UndercoverCI</h4>
 
       <p>
-        UndercoverCI analyses each commit against a matching test coverage file. Make sure your Ruby project reports test coverage and uploads them from your build server by following the instructions below:
+        UndercoverCI analyses each commit against a matching test coverage file. Make sure your Ruby project reports test coverage and uploads the report file to UndercoverCI by following the instructions below:
       </p>
+
+      <p>If your CI system isn't listed below, take a look at the general <a href="#undercover-uploader">uploader documentation</a> for more details.</p>
 
       <%= render partial: "partials/coverage_upload_instruction" %>
 
