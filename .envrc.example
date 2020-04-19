@@ -12,6 +12,12 @@ export HEAP_APP_ID=
 
 export BETA_CODE=223fa1f2409130a1a41f66b578aa9635
 
+# AWS config for ActiveStorage
+export AWS_ACCESS_KEY_ID=
+export AWS_SECRET_ACCESS_KEY=
+export AWS_REGION=
+export AWS_ACTIVESTORAGE_BUCKET=
+
 # Feature toggles
 # export FF_TERMS_OF_SERVICE=
 # export FF_SELF_SIGNUP=
