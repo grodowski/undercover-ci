@@ -13,6 +13,7 @@ gem "jbuilder", "~> 2.9"
 gem "kaminari"
 gem "pg", ">= 0.18", "< 2.0"
 gem "puma", "~> 4.3"
+gem "sidekiq"
 
 # UI Gems
 gem "bootstrap"
