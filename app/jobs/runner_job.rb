@@ -7,7 +7,9 @@ require "check_runs"
 class RunnerJob < ApplicationJob
   include ClassLoggable
   queue_as :default
+  retry_on ActiveStorage::FileNotFoundError # defaults to 3s wait, 5 attempts
 
+  # TODO: remove MAX_RETRY logic
   MAX_RETRIES = 3
 
   def perform(coverage_check_id, attempt = 1)
