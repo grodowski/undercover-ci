@@ -64,7 +64,7 @@ describe "Dashboard spec" do
       expect(response.body).to include("<span class=\"badge badge-warning\">1 warning</span>")
     end
 
-    context 'with a github installation' do
+    context "with a github installation" do
       let(:github_installations) { [{id: 1_337, app_id: 18_310}] }
 
       it "creates a user_installation and installation" do
