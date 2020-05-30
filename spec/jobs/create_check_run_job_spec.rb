@@ -10,7 +10,7 @@ describe CreateCheckRunJob do
       token: "sekritkey",
       name: "Foo Bar"
     )
-    installation = Installation.create!(installation_id: "123123", user: user)
+    installation = Installation.create!(installation_id: "123123", users: [user])
     check = CoverageCheck.create!(
       installation: installation,
       head_sha: "953a804",

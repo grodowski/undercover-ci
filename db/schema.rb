@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_29_132656) do
+ActiveRecord::Schema.define(version: 2020_05_30_165119) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -54,12 +54,11 @@ ActiveRecord::Schema.define(version: 2019_12_29_132656) do
 
   create_table "installations", force: :cascade do |t|
     t.bigint "installation_id"
-    t.bigint "user_id"
     t.jsonb "metadata"
     t.jsonb "repos"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_installations_on_user_id"
+    t.index ["installation_id"], name: "index_installations_on_installation_id", unique: true
   end
 
   create_table "nodes", force: :cascade do |t|
@@ -76,6 +75,16 @@ ActiveRecord::Schema.define(version: 2019_12_29_132656) do
     t.index ["coverage_check_id"], name: "index_nodes_on_coverage_check_id"
   end
 
+  create_table "user_installations", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "installation_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["installation_id"], name: "index_user_installations_on_installation_id"
+    t.index ["user_id", "installation_id"], name: "index_user_installations_on_user_id_and_installation_id", unique: true
+    t.index ["user_id"], name: "index_user_installations_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email"
     t.string "name"
@@ -83,9 +92,11 @@ ActiveRecord::Schema.define(version: 2019_12_29_132656) do
     t.string "token"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["uid"], name: "index_users_on_uid", unique: true
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "coverage_checks", "installations"
-  add_foreign_key "installations", "users"
+  add_foreign_key "user_installations", "installations"
+  add_foreign_key "user_installations", "users"
 end

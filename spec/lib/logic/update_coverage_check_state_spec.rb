@@ -10,7 +10,7 @@ describe Logic::UpdateCoverageCheckState do
       token: "sekritkey",
       name: "Foo Bar"
     )
-    installation = Installation.create!(installation_id: "123123", user: user)
+    installation = Installation.create!(installation_id: "123123", users: [user])
     CoverageCheck.create!(installation: installation, repo: {id: 1, full_name: "user/repository"}, head_sha: "b4c0n")
   end
   let(:svc) do

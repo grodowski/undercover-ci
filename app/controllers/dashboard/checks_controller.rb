@@ -7,7 +7,6 @@ module Dashboard
 
     def index
       # TODO: ~wrap with a presenter/lib/request object, add specs
-      refresh_user_installations
       @installations = current_user.installations
       redirect_to(new_settings_url) if @installations.none?
 
