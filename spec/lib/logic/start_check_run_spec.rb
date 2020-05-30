@@ -14,7 +14,7 @@ describe Logic::StartCheckRun do
       name: "Foo Bar"
     )
   end
-  let!(:installation) { Installation.create!(installation_id: "123123", user: user) }
+  let!(:installation) { Installation.create!(installation_id: "123123", users: [user]) }
 
   xit "fails if installation does not exist" do
     # TODO: implement sad path

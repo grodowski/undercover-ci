@@ -59,7 +59,7 @@ describe "GitHub Webhooks" do
       token: "sekritkey",
       name: "Foo Bar"
     )
-    Installation.create!(installation_id: 43_009_808, user: user)
+    Installation.create!(installation_id: 43_009_808, users: [user])
 
     payload = {
       "action" => "requested",
