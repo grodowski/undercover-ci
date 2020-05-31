@@ -11,7 +11,7 @@ class CreateUserInstallations < ActiveRecord::Migration[6.0]
       dir.up do
         # assumes no duplicates in `installations`
         Installation.find_each do |inst|
-          UserInstallation.create!(installation: inst, user: inst.user)
+          UserInstallation.create!(installation_id: inst.id, user_id: inst.user_id)
         end
       end
     end
