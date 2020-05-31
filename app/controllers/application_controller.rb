@@ -37,7 +37,7 @@ class ApplicationController < ActionController::Base
       # associates with existing installation or creates a new one. Add specs
       installation = Installation.find_by(installation_id: inst[:id])
       if installation
-        current_user.installations << installation
+        current_user.installations << installation unless current_user.installations.include?(installation)
       else
         installation = current_user.installations.create!(installation_id: inst[:id])
       end
