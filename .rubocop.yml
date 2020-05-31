@@ -1,11 +1,42 @@
 AllCops:
-  TargetRubyVersion: 2.4.4
+  EnabledByDefault: true
+  TargetRubyVersion: 2.7.1
   Exclude:
     - db/migrate/*
     - db/schema.rb
     - spec/fixtures/**/*
     - tmp/**/*
     - vendor/**/*
+
+Lint/NumberConversion:
+  Enabled: false
+
+Bundler/GemComment:
+  Enabled: false
+
+Style/MethodCallWithArgsParentheses:
+  Enabled: false
+
+Style/StringHashKeys:
+  Enabled: false
+
+Style/Copyright:
+  Enabled: false
+
+Style/InlineComment:
+  Enabled: false
+
+Style/MethodCalledOnDoEndBlock:
+  Enabled: false
+
+Style/DocumentationMethod:
+  Enabled: false
+
+Style/ConstantVisibility:
+  Enabled: false
+
+Style/MissingElse:
+  Enabled: false
 
 Style/RegexpLiteral:
   EnforcedStyle: slashes
@@ -20,6 +51,15 @@ Style/Documentation:
 Style/StringLiterals:
   Enabled: true
   EnforcedStyle: double_quotes
+
+Style/DisableCopsWithinSourceCodeDirective:
+  Enabled: false
+
+Layout/MultilineMethodArgumentLineBreaks:
+  Enabled: false
+
+Layout/MultilineAssignmentLayout:
+  Enabled: false
 
 Layout/LineLength:
   Enabled: true

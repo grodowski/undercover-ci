@@ -2,9 +2,9 @@
 
 module Logic
   class RunUndercover
-    RunError = Class.new(StandardError)
-
     include ClassLoggable
+
+    RunError = Class.new(StandardError)
 
     def self.call(coverage_check)
       new(coverage_check).run_undercover

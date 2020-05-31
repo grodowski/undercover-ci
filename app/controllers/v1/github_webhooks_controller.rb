@@ -11,6 +11,7 @@ module V1
       EVENT_TYPE_INSTALLATION = "installation", # TODO
       EVENT_TYPE_INSTALLATION_REPOSITORIES = "installation_repositories" # TODO
     ].freeze
+    ALLOWED_DIGEST = %w[sha sha1 sha224 sha256 sha384 sha512].freeze
 
     before_action do
       request.body.rewind
@@ -65,8 +66,6 @@ module V1
       end
     end
 
-    ALLOWED_DIGEST = %w[sha sha1 sha224 sha256 sha384 sha512].freeze
-
     def parse_and_validate_webhook(payload_raw)
       begin
         @payload = JSON.parse(payload_raw)
@@ -76,6 +75,7 @@ module V1
       their_signature_header = request.headers["HTTP_X_HUB_SIGNATURE"] || "sha1="
       method, their_digest = their_signature_header.split("=")
       head(:unauthorized) && return unless method.in?(ALLOWED_DIGEST)
+
       our_digest = OpenSSL::HMAC.hexdigest(method, WEBHOOK_SECRET, payload_raw)
       head(:unauthorized) unless their_digest == our_digest
     end

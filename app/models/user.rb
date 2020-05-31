@@ -21,7 +21,7 @@ class User < ApplicationRecord
   TOKEN_KEY = ENV.fetch("USER_TOKEN_ENCRYPTION_KEY").freeze
 
   def token=(new_token)
-    cipher = OpenSSL::Cipher::AES256.new(:CBC).encrypt
+    cipher = OpenSSL::Cipher.new("AES-256-CBC").encrypt
     cipher.key = TOKEN_KEY
     iv = cipher.random_iv
     super(Base64.encode64(iv + cipher.update(new_token) + cipher.final))
@@ -31,9 +31,9 @@ class User < ApplicationRecord
     return if super.blank?
 
     decoded_base64 = Base64.decode64(super)
-    cipher = OpenSSL::Cipher::AES256.new(:CBC).decrypt
+    cipher = OpenSSL::Cipher.new("AES-256-CBC").decrypt
     cipher.key = TOKEN_KEY
     cipher.iv = decoded_base64[0..15]
-    cipher.update(decoded_base64[16..-1]) + cipher.final
+    cipher.update(decoded_base64[16..]) + cipher.final
   end
 end
