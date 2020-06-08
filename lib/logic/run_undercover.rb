@@ -13,19 +13,21 @@ module Logic
     attr_reader :coverage_check, :run
 
     def initialize(coverage_check)
-      if coverage_check.state != :awaiting_coverage
-        raise RunError, "exiting early, coverage_check #{coverage_check.id} is #{coverage_check.state}"
-      end
+      @lcov_tmpfile = Tempfile.new
+      @coverage_check = coverage_check
+      @run = DataObjects::CheckRunInfo.from_coverage_check(coverage_check)
 
       raise RunError, "coverage_reports can't be blank" if coverage_check.coverage_reports.empty?
 
-      @coverage_check = coverage_check
-      @lcov_tmpfile = Tempfile.new
-      @run = DataObjects::CheckRunInfo.from_coverage_check(coverage_check)
+      fetch_report
     end
 
     def run_undercover
-      fetch_report
+      if coverage_check.state != :awaiting_coverage
+        log "exiting early, coverage_check #{coverage_check.id} is #{coverage_check.state}"
+        return
+      end
+
       Logic::UpdateCoverageCheckState.new(coverage_check).start
 
       log "starting run #{run} job_id: #{coverage_check.id}"

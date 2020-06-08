@@ -20,10 +20,17 @@ describe Logic::RunUndercover do
   end
   subject { described_class.call(coverage_check) }
 
-  it "raises a RunError if CoverageCheck is not in awaiting_coverage state" do
+  it "logs and returns when CoverageCheck is not in awaiting_coverage state" do
+    coverage_check.coverage_reports.attach(
+      io: File.open("spec/fixtures/coverage.lcov"),
+      filename: "#{coverage_check.id}_b4c0n.lcov",
+      content_type: "text/plain"
+    )
     coverage_check.update!(state: :created)
 
-    expect { subject }.to raise_error(Logic::RunUndercover::RunError, /exiting early/)
+    allow(Rails.logger).to receive(:info)
+    expect(Rails.logger).to receive(:info).once.with(a_string_matching(/\[Logic::RunUndercover\] exiting early/))
+    expect(subject).to be_nil
   end
 
   it "raises a RunError if CoverageCheck has zero attached coverage reports" do

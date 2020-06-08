@@ -19,7 +19,8 @@ module V1
 
         @coverage_check.transaction do
           attach_report(input_io)
-          RunnerJob.perform_later(@coverage_check.id)
+          # Wait 5 seconds to let ActiveStorage process the attachment
+          RunnerJob.set(wait: 5.seconds).perform_later(@coverage_check.id)
         end
 
         head(:created)

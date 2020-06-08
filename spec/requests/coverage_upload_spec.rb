@@ -42,16 +42,47 @@ describe "Coverage Upload" do
     expect(check.reload.coverage_reports.attached?).to eq(false)
   end
 
-  it "kicks off RunUndercover", inline_jobs: true do
+  it "enqueues RunUndercover in 5 seconds" do
     check = make_coverage_check
     contents = File.read("spec/fixtures/coverage.lcov")
 
-    fake_run = class_spy(Logic::RunUndercover)
-    stub_const("Logic::RunUndercover", fake_run)
+    Timecop.freeze do
+      expect do
+        post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
+      end.to have_enqueued_job(RunnerJob).at(5.seconds.from_now)
+    end
 
-    post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
+    expect(response.status).to eq(201)
+  end
 
-    expect(fake_run).to have_received(:call)
+  context "with inline jobs" do
+    before do
+      # TODO: remove once https://github.com/rails/rails/issues/37270 is addressed in rails 6.0.2
+      RunnerJob.itself # load it
+      (ActiveJob::Base.descendants << ActiveJob::Base).each(&:disable_test_adapter)
+      @prev_adapter = ActiveJob::Base.queue_adapter
+      ActiveJob::Base.queue_adapter = :inline
+    end
+
+    after do
+      ActiveJob::Base.queue_adapter = @prev_adapter
+    end
+
+    it "kicks off RunUndercover" do
+      # can't test set(wait: 5.seconds) with inline adapter
+      allow(RunnerJob).to receive(:set) { RunnerJob }
+
+      check = make_coverage_check
+      contents = File.read("spec/fixtures/coverage.lcov")
+
+      fake_run = class_spy(Logic::RunUndercover)
+      stub_const("Logic::RunUndercover", fake_run)
+
+      post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
+
+      expect(response.status).to eq(201)
+      expect(fake_run).to have_received(:call)
+    end
   end
 
   def make_coverage_check

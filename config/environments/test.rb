@@ -34,7 +34,7 @@ Rails.application.configure do
   config.active_storage.service = :test
 
   # Use the inline adapter for development
-  config.active_job.queue_adapter = :inline
+  config.active_job.queue_adapter = :test
 
   config.action_mailer.perform_caching = false
 
