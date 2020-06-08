@@ -57,7 +57,7 @@ describe "Dashboard spec" do
       )
 
       get("/auth/github/callback")
-      expect(get("/app")).to render_template("dashboard/checks/index")
+      get("/app")
       expect(response.body).to include(
         "<a href=\"https://github.com//commit/1337SHA\"><code>1337SHA</code> 👉 <code></code></a>"
       )
@@ -113,7 +113,7 @@ describe "Dashboard spec" do
       end
 
       get("/auth/github/callback")
-      expect(get("/checks/#{check.id}")).to render_template("dashboard/checks/show")
+      get("/checks/#{check.id}")
       expect(response.body).to include("<span class=\"badge badge-warning\">warning</span>")
       expect(response.body).to include(
         "Instance method <code>hello</code>. " \

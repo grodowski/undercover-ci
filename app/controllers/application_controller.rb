@@ -30,9 +30,14 @@ class ApplicationController < ActionController::Base
   def refresh_user_installations
     client = Octokit::Client.new(access_token: current_user.token)
     client.auto_paginate = true # TODO: move to bg sync?
-    installations = client.find_user_installations.to_h
+    installations = client.find_user_installations(
+      accept: "application/vnd.github.machine-man-preview+json"
+    ).to_h
     installations[:installations].each do |inst|
-      repos = client.find_installation_repositories_for_user(inst[:id]).to_h
+      repos = client.find_installation_repositories_for_user(
+        inst[:id],
+        accept: "application/vnd.github.machine-man-preview+json"
+      ).to_h
 
       # associates with existing installation or creates a new one. Add specs
       installation = Installation.find_by(installation_id: inst[:id])
