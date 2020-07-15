@@ -21,6 +21,11 @@ describe Logic::UpdateCoverageCheckState do
     expect { svc.await_coverage }.to change { coverage_check.reload.state }.from(:created).to(:awaiting_coverage)
   end
 
+  it "updates state to expired" do
+    coverage_check.update!(state: :awaiting_coverage)
+    expect { svc.expire }.to change { coverage_check.reload.state }.from(:awaiting_coverage).to(:expired)
+  end
+
   it "updates state to in_progress" do
     coverage_check.update!(state: :awaiting_coverage)
     expect { svc.start }.to change { coverage_check.reload.state }.from(:awaiting_coverage).to(:in_progress)

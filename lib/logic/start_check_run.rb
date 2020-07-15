@@ -32,6 +32,7 @@ module Logic
       coverage_check.save!
 
       Logic::UpdateCoverageCheckState.new(coverage_check).await_coverage
+      ExpireCheckJob.set(wait: 1.hour).perform_later(coverage_check.id)
       CreateCheckRunJob.perform_later(coverage_check.id)
     end
 

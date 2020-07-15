@@ -52,13 +52,17 @@ describe Logic::StartCheckRun do
       )
     end
 
-    it "stores the repository and check_suite keys" do
+    it "stores the repository and check_suite keys and enqueues an expiry check" do
       expect(CreateCheckRunJob).to receive(:perform_later).once
-      described_class.call(check_run_info)
 
-      coverage_check = CoverageCheck.last
-      expect(coverage_check.check_suite).to eq("id" => "1234")
-      expect(coverage_check.repo).to eq("full_name" => "grodowski/undercover-ci")
+      Timecop.freeze do
+        described_class.call(check_run_info)
+
+        coverage_check = CoverageCheck.last
+        expect(ExpireCheckJob).to have_been_enqueued.at(1.hour.from_now).with(coverage_check.id)
+        expect(coverage_check.check_suite).to eq("id" => "1234")
+        expect(coverage_check.repo).to eq("full_name" => "grodowski/undercover-ci")
+      end
     end
   end
 end
