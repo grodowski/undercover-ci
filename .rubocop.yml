@@ -11,6 +11,9 @@ AllCops:
 Lint/NumberConversion:
   Enabled: false
 
+Lint/ConstantResolution:
+  Enabled: false
+
 Bundler/GemComment:
   Enabled: false
 
