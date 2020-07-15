@@ -1,10 +1,12 @@
 # UndercoverCI
 
+[![Build Status](https://travis-ci.org/grodowski/undercover-ci.svg?branch=master)](https://travis-ci.org/grodowski/undercover-ci)
+
 GitHub Checks with code coverage warnings from [undercover](https://github.com/grodowski/undercover), detecting when code being changed is untested.
 
 Works with Ruby and GitHub.
 
-![github_check_preview](app/assets/images/check_screenshot_lg.png)
+![github_check_preview](app/assets/images/check_screenshot.png)
 
 ## Installation
 
