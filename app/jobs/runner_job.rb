@@ -10,7 +10,8 @@ class RunnerJob < ApplicationJob
 
   # defaults to 3s wait, 5 attempts
   retry_on ActiveStorage::FileNotFoundError,
-           Logic::RunUndercover::RunError
+           Logic::RunUndercover::RunError,
+           Octokit::Error
 
   def perform(coverage_check_id)
     coverage_check = CoverageCheck.find(coverage_check_id)

@@ -6,6 +6,7 @@ require "check_runs"
 # RunnerJob will start once coverage results are stored.
 class CreateCheckRunJob < ApplicationJob
   queue_as :default
+  retry_on Octokit::Error # defaults to 3s wait, 5 attempts
 
   def perform(coverage_check_id)
     coverage_check = CoverageCheck.find(coverage_check_id)

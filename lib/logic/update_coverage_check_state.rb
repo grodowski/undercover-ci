@@ -7,7 +7,7 @@ module Logic
     end
 
     def expire
-      transition(:awaiting_coverage, :expired)
+      transition(%i[awaiting_coverage in_progress], :expired)
     end
 
     def start
@@ -23,7 +23,7 @@ module Logic
     end
 
     def cancel
-      transition(:created, :canceled)
+      transition(%i[created awaiting_coverage in_progress], :canceled)
     end
   end
 end

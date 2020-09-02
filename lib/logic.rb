@@ -15,7 +15,7 @@ module Logic
     def transition(expectd_old_state, new_state, via = nil)
       old_state = record.state
 
-      unless expectd_old_state == old_state
+      unless old_state.in?(Array(expectd_old_state))
         raise StateTransisionError,
               "cannot transition #{record.class}:#{record.id} from #{old_state} to #{new_state}"
       end
