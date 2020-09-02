@@ -19,7 +19,19 @@ RSpec.describe ExpireCheckJob, type: :job do
     )
   end
 
+  before { allow_any_instance_of(CheckRuns::TimedOut).to receive(:post) }
+
   it "expires the check when it's awaiting_coverage" do
+    expect_any_instance_of(CheckRuns::TimedOut).to receive(:post).once
+
+    described_class.perform_now(check.id)
+
+    check.reload
+    expect(check.state).to eq(:expired)
+  end
+
+  it "expires the check when it's in_progress" do
+    check.update!(state: :in_progress)
     described_class.perform_now(check.id)
 
     check.reload
@@ -27,10 +39,12 @@ RSpec.describe ExpireCheckJob, type: :job do
   end
 
   it "is a no-op in any other case" do
-    check.update!(state: :in_progress)
+    expect_any_instance_of(CheckRuns::TimedOut).not_to receive(:post)
+
+    check.update!(state: :complete)
     described_class.perform_now(check.id)
 
     check.reload
-    expect(check.state).to eq(:in_progress)
+    expect(check.state).to eq(:complete)
   end
 end

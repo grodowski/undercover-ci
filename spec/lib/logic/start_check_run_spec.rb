@@ -59,7 +59,7 @@ describe Logic::StartCheckRun do
         described_class.call(check_run_info)
 
         coverage_check = CoverageCheck.last
-        expect(ExpireCheckJob).to have_been_enqueued.at(1.hour.from_now).with(coverage_check.id)
+        expect(ExpireCheckJob).to have_been_enqueued.at(90.minutes.from_now).with(coverage_check.id)
         expect(coverage_check.check_suite).to eq("id" => "1234")
         expect(coverage_check.repo).to eq("full_name" => "grodowski/undercover-ci")
       end

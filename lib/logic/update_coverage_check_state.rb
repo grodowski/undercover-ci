@@ -15,7 +15,7 @@ module Logic
     end
 
     def expire
-      transition(:awaiting_coverage, :expired)
+      transition(%i[awaiting_coverage in_progress], :expired)
     end
 
     def start
@@ -34,8 +34,7 @@ module Logic
 
     def transition(expectd_old_state, new_state, via = nil)
       old_state = coverage_check.state
-
-      unless expectd_old_state == old_state
+      unless old_state.in?(Array(expectd_old_state))
         raise StateTransisionError, "cannot transition from #{old_state} to #{new_state}"
       end
 
