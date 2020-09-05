@@ -33,7 +33,10 @@ describe CheckRuns::TimedOut do
         expect(payload[:status]).to eq("completed")
         expect(payload[:completed_at]).to eq("2020-02-02T16:20:47Z")
         expect(payload[:details_url]).to eq("https://undercover-ci.com/checks/1337")
-        expect(payload[:output]).to match(title: "Timed Out")
+        expect(payload[:output]).to match(
+          title: "Timed Out",
+          summary: "UndercoverCI did not receive coverage data for this check"
+        )
       end
   end
 end

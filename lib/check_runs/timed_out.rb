@@ -14,7 +14,10 @@ module CheckRuns
         conclusion: "timed_out",
         details_url: details_url,
         external_id: run.external_id,
-        output: {title: "Timed Out"},
+        output: {
+          title: "Timed Out",
+          summary: "UndercoverCI did not receive coverage data for this check",
+        },
         accept: "application/vnd.github.antiope-preview+json"
       )
       log "#{run} response: #{client.last_response.status}"

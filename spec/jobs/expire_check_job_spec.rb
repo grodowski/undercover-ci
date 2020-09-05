@@ -37,14 +37,4 @@ RSpec.describe ExpireCheckJob, type: :job do
     check.reload
     expect(check.state).to eq(:expired)
   end
-
-  it "is a no-op in any other case" do
-    expect_any_instance_of(CheckRuns::TimedOut).not_to receive(:post)
-
-    check.update!(state: :complete)
-    described_class.perform_now(check.id)
-
-    check.reload
-    expect(check.state).to eq(:complete)
-  end
 end
