@@ -10,6 +10,8 @@ module Logic
       transition(:subscribed, :unsubscribed)
     end
 
-    # TODO: unlimited - manual state
+    def end_beta
+      transition(:beta, :unsubscribed)
+    end
   end
 end

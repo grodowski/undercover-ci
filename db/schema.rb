@@ -78,6 +78,7 @@ ActiveRecord::Schema.define(version: 2020_09_05_105442) do
   create_table "subscriptions", force: :cascade do |t|
     t.bigint "installation_id", null: false
     t.string "gumroad_id"
+    t.string "license_key"
     t.string "state"
     t.datetime "end_date"
     t.jsonb "state_log"

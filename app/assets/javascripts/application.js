@@ -25,3 +25,32 @@ $(document).on("turbolinks:load", function() {
       window.location = $(this).data("href");
   });
 });
+
+// refresh page when Gumroad iframe modal closes
+var gumroadSaleData = null;
+var gumroadOnCloseListener = function(e) {
+  if (e.origin !== "https://gumroad.com")
+    return;
+
+  var data = JSON.parse(e.data);
+  if (data.parentMethod === "maximizeIframe") {
+    $('a.gumroad-subscribe').addClass("disabled");
+  }
+
+  if (data.post_message_name === "sale") {
+    gumroadSaleData = data;
+  }
+
+  if (data.parentMethod === "minimizeIframe") {
+    $('a.gumroad-subscribe').removeClass("disabled");
+    if (gumroadSaleData) {
+      var query = `#installation_${gumroadSaleData.url_params.installation_id} a.gumroad-subscribe`
+      $(query).html("Your license is activating. Page will reload in a sec...");
+      $(query).addClass("disabled");
+      setTimeout(function() {
+        Turbolinks.visit(location.toString());
+      }, 6000);
+    }
+  }
+};
+window.addEventListener('message', gumroadOnCloseListener, false);

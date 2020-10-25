@@ -15,7 +15,7 @@
       </ul>
       <% if ENV['FF_SELF_SIGNUP'] || cookies[:beta_sign_in] %>
         <% if current_user %>
-          <%= link_to "Go to app", "/app", class: "btn btn-light" %>
+          <%= link_to "Dashboard", "/app", class: "btn btn-light" %>
           <%= link_to "Sign out", "/auth/logout", class: "btn btn-light", method: :delete %>
         <% else %>
           <%= link_to "Sign in", "/auth/github", class: "btn btn-light", method: :post %>
