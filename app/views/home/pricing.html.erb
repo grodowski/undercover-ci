@@ -6,26 +6,30 @@
 </div>
 
 <div class="container">
-  <div class="card-deck mb-3">
+  <div class="card-deck mb-5">
     <div class="card mb-4 shadow-lg">
       <div class="card-header text-center">
-        <h4>GitHub App</h4>
+        <h4>GitHub Organization</h4>
       </div>
       <div class="card-body">
-        <p >Fully-featured integration with quick setup and:</p>
+        <div class="mb-4">
+          <h4>$49 per month</h4>
+          <span class="text-muted">VAT not included, try it free for 14 days</span>
+        </div>
+        <p >Fully-featured GitHub integration with quick setup and:</p>
         <p>👉 Coverage warnings as GitHub annotations</p>
         <p>👉 Diff coverage breakdown for each commit</p>
-        <p>👉 Unlimited users/repos</p>
-        <p>💰 Use it for free while in beta! The planned subscription cost is $29/mo per organisation.</p>
+        <p>👉 Unlimited builds for private and public repos</p>
+        <p>👉 Unlimited users</p>
         <br/>
-        <% if ENV["FF_SELF_SIGNUP"] && current_user.nil? %>
+        <% if current_user.nil? %>
           <p class="text-center">
-            <p class="text-muted">UndercoverCI is in limited beta.</p>
             <%= link_to "Sign Up with GitHub", "/auth/github", class: "btn btn-md btn-primary", method: :post %>
           </p>
         <% else %>
-          <p class="text-muted">UndercoverCI is in limited beta. Get an invite today!</p>
-          <%= render partial: "partials/list_signup" %>
+          <p class="text-center">
+            <%= link_to "Start subscription", settings_path, class: "btn btn-md btn-primary" %>
+          </p>
         <% end %>
       </div>
     </div>
@@ -38,10 +42,82 @@
         <p>If a hosted and convenient GitHub App integration is not for you, check out these links to get started:</p>
         <ul>
           <p>🔗 <a href="https://medium.com/@mrgrodo/improve-your-ruby-code-reviews-with-actionable-code-coverage-and-undercover-c4480575ea69">Improve your Ruby code reviews with actionable code coverage and Undercover</a>
-          <p>🔗 <a href="https://github.com/grodowski/undercover-ci">grodowski/undercover-ci</a></p>
           <p>🔗 <a href="https://github.com/grodowski/undercover">grodowski/undercover</a></p>
           <p>🔗 <a href="https://github.com/grodowski/pronto-undercover">grodowski/pronto-undercover</a></p>
+          <p>🔗 <a href="https://github.com/nimblehq/danger-undercover">nimblehq/danger-undercover</a></p>
         </ul>
+      </div>
+    </div>
+  </div>
+  <hr/>
+
+  <div>
+    <h4 class="text-center my-4" >FAQ</h4>
+    <p>
+      <a class="lead" data-toggle="collapse" href="#collapse_1" role="button" aria-expanded="false" aria-controls="collapse_1">
+        How do I pay?
+      </a>
+    </p>
+    <div class="collapse" id="collapse_1">
+      <div class="card card-body mt-1 mb-3">
+        You can pay for UndercoverCI with an accepted credit card (Discover, Visa, Mastercard, AMEX, Diner's Club) or PayPal. Subscriptions and payments are handled by Gumroad Inc. where you can access and modify your data as well as cancel anytime.
+      </div>
+    </div>
+
+    <p>
+      <a class="lead" data-toggle="collapse" href="#collapse_2" role="button" aria-expanded="false" aria-controls="collapse_2">
+        Will I receive a VAT invoice?
+      </a>
+    </p>
+    <div class="collapse" id="collapse_2">
+      <div class="card card-body mt-1 mb-3">
+        <span><%= link_to "Yes", "https://customers.gumroad.com/article/194-i-need-an-invoice" %>. Moreover, Gumroad refunds the full VAT amount to all EU-based business customers (location dependent).</span>
+      </div>
+    </div>
+
+    <p>
+      <a class="lead" data-toggle="collapse" href="#collapse_3" role="button" aria-expanded="false" aria-controls="collapse_3">
+        How can I invite more users to use UndercoverCI?
+      </a>
+    </p>
+    <div class="collapse" id="collapse_3">
+      <div class="card card-body mt-1 mb-3">
+        A single subscription allows you to use UndercoverCI within a single GitHub organization only. All members of your organization gain access instantly once they sign in with the correct GitHub login.
+      </div>
+    </div>
+
+    <p>
+      <a class="lead" data-toggle="collapse" href="#collapse_4" role="button" aria-expanded="false" aria-controls="collapse_4">
+        Which languages and SCMs are supported?
+      </a>
+    </p>
+    <div class="collapse" id="collapse_4">
+      <div class="card card-body mt-1 mb-3">
+        UncercoverCI is a dedicated GitHub integration which suports all Ruby and Ruby on Rails projects.
+      </div>
+    </div>
+
+    <p>
+      <a class="lead" data-toggle="collapse" href="#collapse_5" role="button" aria-expanded="false" aria-controls="collapse_5">
+        Do I have to give access to my code?
+      </a>
+    </p>
+    <div class="collapse" id="collapse_5">
+      <div class="card card-body mt-1 mb-3">
+        <p>Yes. UndercoverCI will ask for the following GitHub permissions: Email address, Repository metadata (read-only), Repository contents (read-only), Checks (read and write). Permissions can be fine-tuned and granted only for selected repositories.</p>
+
+        <p>Look into the <code>undercover</code> gem and command-line tool for a self-hosted (and free) alternative.</p>
+      </div>
+    </div>
+
+    <p>
+      <a class="lead" data-toggle="collapse" href="#collapse_6" role="button" aria-expanded="false" aria-controls="collapse_6">
+        What if I am building open source?
+      </a>
+    </p>
+    <div class="collapse" id="collapse_6">
+      <div class="card card-body mt-1 mb-3">
+        The service is free to use for public repositories. If you're an open source contributor you can use UndercoverCI free of charge.
       </div>
     </div>
   </div>

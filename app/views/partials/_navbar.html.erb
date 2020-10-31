@@ -3,6 +3,7 @@
     <a class="navbar-brand d-flex align-items-center" href="<%= root_path %>">
       <%= image_tag "logo/apple-touch-icon.png", class: 'logo-img' %>
       <div class="px-1">UndercoverCI</div>
+      <span class="badge badge-secondary">beta</span>
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-top" aria-controls="navbar-top" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -13,13 +14,11 @@
         <%= nav_link_with_state("Pricing", pricing_page_path) %>
         <%= nav_link_with_state("Docs", docs_page_path) %>
       </ul>
-      <% if ENV['FF_SELF_SIGNUP'] || cookies[:beta_sign_in] %>
-        <% if current_user %>
-          <%= link_to "Go to app", "/app", class: "btn btn-light" %>
-          <%= link_to "Sign out", "/auth/logout", class: "btn btn-light", method: :delete %>
-        <% else %>
-          <%= link_to "Sign in", "/auth/github", class: "btn btn-light", method: :post %>
-        <% end %>
+      <% if current_user %>
+        <%= link_to "Dashboard", "/app", class: "btn btn-light" %>
+        <%= link_to "Sign out", "/auth/logout", class: "btn btn-light", method: :delete %>
+      <% else %>
+        <%= link_to "Sign in", "/auth/github", class: "btn btn-light", method: :post %>
       <% end %>
     </div>
   </div>

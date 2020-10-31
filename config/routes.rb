@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   namespace :v1, constraints: ->(req) { req.format.to_s.in?(API_MIME_TYPES) } do
     post "/hooks", to: "github_webhooks#create"
     post "/coverage", to: "coverage_reports#create"
+    post "/sale", to: "gumroad_ping#create"
   end
 
   get "/auth/github/callback", to: "sessions#create"
@@ -17,6 +18,7 @@ Rails.application.routes.draw do
   get "/terms", to: "home#terms", as: :terms_page
   get "/faq", to: "home#faq", as: :faq_page
   get "/docs", to: "home#docs", as: :docs_page
+  get "/subscription_confirmation", to: "home#subscription_confirmation"
 
   scope module: "dashboard" do
     get "/app", controller: "checks", action: "index", as: :dashboard

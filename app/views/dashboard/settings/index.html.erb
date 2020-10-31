@@ -1,23 +1,29 @@
-<p class="lead">UndercoverCI will send coverage checks to the following accounts and repos</p>
+<p class="lead">UndercoverCI will send coverage checks to the following accounts and repositories</p>
 
 <!-- TODO: add pagination -->
 <% @installations.each do |inst| %>
   <div class="card bg-light my-2">
-    <div class="card-body">
-      <h5 class="card-title">
-          <%= inst.metadata.dig("account", "login") %>
-          <% if inst.metadata.dig("target_type").downcase == 'organization' %>
-            <%= content_tag("span", "organization", class: 'badge badge-info') %>
-          <% end %>
-      </h5>
-
-      <% inst.repos.each do |repo| %>
-        <%= content_tag("p", repo["full_name"]) %>
+    <div class="card-header">
+      <%= inst.metadata.dig("account", "login") %>
+      <% if inst.metadata.dig("target_type").downcase == 'organization' %>
+        <%= content_tag("span", "organization", class: 'badge badge-info') %>
       <% end %>
+    </div>
 
-      <%= link_to "Manage on GitHub", inst.metadata["html_url"], class: "card-link" %>
+    <div id="installation_<%= inst.installation_id %>" class="card-body">
+      <% if inst.org? %>
+        <h6>Subscription</h6>
+        <p>GitHub Org accounts require a subscription to process Pull Requests in private repositories.</p>
+        <%= gumroad_subscribe_link(inst) %>
+        <hr/>
+      <% end %>
+      <h6>GitHub Repos (<%= link_to "Manage", inst.metadata["html_url"] %>)</h6>
+      <ul>
+        <% inst.repos.each do |repo| %>
+          <%= content_tag("li", repo["full_name"]) %>
+        <% end %>
+      </ul>
     </div>
   </div>
 <% end %>
-
-<%= link_to "Add UndercoverCI to a new GitHub account", dash_installation_url, class: "btn btn-primary" %>
+<%= link_to "Add account", dash_installation_url, class: "btn btn-primary" %>

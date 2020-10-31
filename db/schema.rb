@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_30_165119) do
+ActiveRecord::Schema.define(version: 2020_09_05_105442) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -75,6 +75,18 @@ ActiveRecord::Schema.define(version: 2020_05_30_165119) do
     t.index ["coverage_check_id"], name: "index_nodes_on_coverage_check_id"
   end
 
+  create_table "subscriptions", force: :cascade do |t|
+    t.bigint "installation_id", null: false
+    t.string "gumroad_id"
+    t.string "license_key"
+    t.string "state"
+    t.datetime "end_date"
+    t.jsonb "state_log"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["installation_id"], name: "index_subscriptions_on_installation_id"
+  end
+
   create_table "user_installations", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "installation_id", null: false
@@ -97,6 +109,7 @@ ActiveRecord::Schema.define(version: 2020_05_30_165119) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "coverage_checks", "installations"
+  add_foreign_key "subscriptions", "installations"
   add_foreign_key "user_installations", "installations"
   add_foreign_key "user_installations", "users"
 end

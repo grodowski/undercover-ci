@@ -4,21 +4,16 @@
 
   <picture>
     <source srcset="<%= image_path("check_screenshot.png") %>">
-    <img class="img-fluid hero-img mt-4 mb-5" src="check_screenshot_sm.png" alt="UndercoverCI GitHub comments">
+    <img class="img-fluid hero-img mt-4 mb-5" alt="UndercoverCI GitHub comments">
   </picture>
 
   <div class="container mb-5">
-    <% if ENV["FF_SELF_SIGNUP"] && current_user.nil? %>
+    <% if current_user.nil? %>
       <div class="container">
         <p class="text-muted">
           The UndercoverCI app is free while in beta, sign up to install it for your repositories
         </p>
         <%= link_to "Sign Up with GitHub", "/auth/github", class: "btn btn-lg btn-primary", method: :post %>
-      </div>
-    <% else %>
-      <div class="container">
-        <p class="text-muted">UndercoverCI is in limited beta. Get an invite today!</p>
-        <%= render partial: "partials/list_signup" %>
       </div>
     <% end %>
   </div>

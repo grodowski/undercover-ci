@@ -24,4 +24,31 @@ $(document).on("turbolinks:load", function() {
   $(".row-href").click(function() {
       window.location = $(this).data("href");
   });
+  if (window.GumroadOverlay) {
+    window.GumroadOverlay = new GumroadOverlayManager();
+  }
 });
+
+// refresh page when Gumroad iframe modal closes
+var gumroadSaleData = null;
+var gumroadOnCloseListener = function(e) {
+  if (e.origin !== "https://gumroad.com")
+    return;
+
+  var data = JSON.parse(e.data);
+  if (data.parentMethod === "maximizeIframe") {
+    $('a.gumroad-subscribe').addClass("disabled");
+  }
+
+  if (data.post_message_name === "sale") {
+    gumroadSaleData = data;
+  }
+
+  if (data.parentMethod === "minimizeIframe") {
+    $('a.gumroad-subscribe').removeClass("disabled");
+    if (gumroadSaleData) {
+      Turbolinks.visit("/subscription_confirmation");
+    }
+  }
+};
+window.addEventListener('message', gumroadOnCloseListener, false);

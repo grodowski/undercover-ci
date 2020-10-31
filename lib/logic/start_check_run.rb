@@ -16,11 +16,7 @@ module Logic
 
     def create_and_queue_check_run
       find_installation
-
-      coverage_check = @installation.coverage_checks.find_or_initialize_by(
-        head_sha: check_run_info.sha,
-        base_sha: check_run_info.compare
-      )
+      build_coverage_check
 
       unless coverage_check.state == :created
         log "StartCheckRun exiting early, #{check_run_info} is #{coverage_check.state}"
@@ -37,8 +33,18 @@ module Logic
 
     private
 
+    attr_reader :coverage_check, :installation
+
     def find_installation
       @installation = Installation.find_by!(installation_id: check_run_info.installation_id)
+    end
+
+    def build_coverage_check
+      @coverage_check = @installation.coverage_checks.find_or_initialize_by(
+        head_sha: check_run_info.sha,
+        base_sha: check_run_info.compare
+      )
+      Logic::UpdateCoverageCheckState.new(coverage_check).cancel unless installation.active?
     end
   end
 end

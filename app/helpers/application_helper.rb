@@ -56,4 +56,38 @@ module ApplicationHelper
       link_to link_text, path, {class: class_names.join(" ")}.merge(html_args)
     end
   end
+
+  def gumroad_subscribe_link(installation)
+    return unless ENV["FF_SUBSCRIPTION"]
+
+    subscribe_link = link_to(
+      "Subscribe",
+      "https://gum.co/" \
+        "#{Gumroad::SUBSCRIPTION_PRODUCT_PERMALINK}" \
+        "?installation_id=#{installation.installation_id}",
+      class: "btn btn-primary gumroad-subscribe", target: "_blank"
+    )
+    subscription = installation.subscription
+    return subscribe_link unless subscription
+
+    if subscription.active? && !subscription.trial?
+      if subscription.end_date.present?
+        expires_on_text = "(expires on #{subscription.end_date.to_date.to_formatted_s(:long)})"
+      end
+      return content_tag :div, "Active license: #{subscription.license_key} #{expires_on_text}"
+    end
+
+    content = content_tag(:span)
+    if subscription.trial?
+      trial_text = if subscription.active?
+                     "Trial ends in #{distance_of_time_in_words_to_now(subscription.trial_expiry_date)}: " \
+                       "(#{subscription.trial_expiry_date.to_date.to_formatted_s(:long)})"
+                   else
+                     "Trial expired"
+                   end
+      content += content_tag(:div, trial_text)
+    end
+
+    content + subscribe_link
+  end
 end
