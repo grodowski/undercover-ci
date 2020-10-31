@@ -17,5 +17,9 @@ module Logic
     def complete
       transition(:in_progress, :complete)
     end
+
+    def cancel
+      transition(:created, :canceled)
+    end
   end
 end

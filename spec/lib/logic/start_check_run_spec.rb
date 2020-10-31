@@ -14,13 +14,21 @@ describe Logic::StartCheckRun do
       name: "Foo Bar"
     )
   end
-  let!(:installation) { Installation.create!(installation_id: "123123", users: [user]) }
+  let(:installation) { Installation.create!(installation_id: "123123", users: [user]) }
 
-  xit "fails if installation does not exist" do
-    # TODO: implement sad path
+  before do
+    allow(ENV).to receive(:[]).and_call_original
+    allow(ENV).to receive(:[]).with("FF_SUBSCRIPTION") { "1" }
+  end
+
+  it "fails if installation does not exist" do
+    expect(CreateCheckRunJob).not_to receive(:perform_later)
+
+    expect { described_class.call(check_run_info) }.to raise_error(ActiveRecord::RecordNotFound)
   end
 
   it "creates CoverageCheck in awaiting_coverage and dispatches a CreateCheckRunJob" do
+    installation.itself
     expect(CreateCheckRunJob).to receive(:perform_later).once
 
     described_class.call(check_run_info)
@@ -53,12 +61,55 @@ describe Logic::StartCheckRun do
     end
 
     it "stores the repository and check_suite keys" do
+      installation.itself
       expect(CreateCheckRunJob).to receive(:perform_later).once
+
       described_class.call(check_run_info)
 
       coverage_check = CoverageCheck.last
       expect(coverage_check.check_suite).to eq("id" => "1234")
       expect(coverage_check.repo).to eq("full_name" => "grodowski/undercover-ci")
+    end
+  end
+
+  context "with an active subscription" do
+    before do
+      installation.subscriptions.create(
+        state: :subscribed, gumroad_id: "subxxx", license_key: "1337"
+      )
+    end
+
+    it "creates CoverageCheck in awaiting_coverage and dispatches a CreateCheckRunJob" do
+      expect(CreateCheckRunJob).to receive(:perform_later).once
+
+      described_class.call(check_run_info)
+
+      coverage_check = CoverageCheck.last
+      expect(coverage_check.state).to eq(:awaiting_coverage)
+      expect(coverage_check.head_sha).to eq("b4c0n1")
+      expect(coverage_check.base_sha).to eq("c0mp4r3")
+      expect(coverage_check).to be_persisted
+    end
+  end
+
+  context "with an inactive subscription" do
+    before do
+      installation.subscriptions.create(
+        state: :unsubscribed, gumroad_id: "subxxx", license_key: "1337",
+        end_date: 1.day.ago
+      )
+    end
+
+    it "creates CoverageCheck in canceled state" do
+      expect(CreateCheckRunJob).not_to receive(:perform_later)
+
+      described_class.call(check_run_info)
+
+      coverage_check = CoverageCheck.last
+      expect(coverage_check.state).to eq(:canceled)
+      expect(coverage_check.head_sha).to eq("b4c0n1")
+      expect(coverage_check.base_sha).to eq("c0mp4r3")
+      expect(coverage_check).to be_persisted
     end
   end
 end

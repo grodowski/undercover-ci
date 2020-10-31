@@ -26,6 +26,9 @@ class Installation < ApplicationRecord
   end
 
   def active?
+    return true unless ENV["FF_SUBSCRIPTION"]
+    return true unless subscription
+
     subscription.active?
   end
 end
