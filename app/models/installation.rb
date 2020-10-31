@@ -12,6 +12,8 @@ class Installation < ApplicationRecord
   after_create :ensure_subscription
 
   def github_type
+    return unless metadata.present?
+
     metadata["target_type"].downcase
   end
 
@@ -36,7 +38,7 @@ class Installation < ApplicationRecord
 
   def ensure_subscription
     return unless ENV["FF_SUBSCRIPTION"]
-    return if subscription.present?
+    return if user? || subscription.present?
 
     subscriptions.create
   end

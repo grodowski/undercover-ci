@@ -9,9 +9,12 @@ RSpec.describe Installation, type: :model do
   end
 
   describe "create" do
-    it "ensures a trial subscription" do
+    it "ensures a trial subscription for orgs" do
       user = User.create!(uid: "1", email: "foo@bar.com", token: "sekrit", name: "Foo")
-      installation = Installation.create!(installation_id: "123123", users: [user])
+      installation = Installation.create!(
+        installation_id: "123123", users: [user],
+        metadata: {target_type: "Organization"}
+      )
 
       expect(installation.subscription).to be_persisted
       expect(installation.subscription.attributes).to match(
@@ -22,5 +25,15 @@ RSpec.describe Installation, type: :model do
         )
       )
     end
+  end
+
+  it "doesn't create a subscription for users" do
+    user = User.create!(uid: "1", email: "foo@bar.com", token: "sekrit", name: "Foo")
+    installation = Installation.create!(
+      installation_id: "123123", users: [user],
+      metadata: {target_type: "User"}
+    )
+
+    expect(installation.subscription).to eq(nil)
   end
 end

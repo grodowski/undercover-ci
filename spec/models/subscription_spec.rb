@@ -9,7 +9,7 @@ RSpec.describe Subscription, type: :model do
     end
 
     it "is true when unsubscribed trial" do
-      installation = Installation.create!(installation_id: "123123")
+      installation = Installation.create!(installation_id: "123123", metadata: {target_type: "Organization"})
       subscription = Subscription.create!(
         state: :unsubscribed,
         installation: installation,
