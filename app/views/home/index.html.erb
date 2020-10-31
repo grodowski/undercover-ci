@@ -8,17 +8,12 @@
   </picture>
 
   <div class="container mb-5">
-    <% if ENV["FF_SELF_SIGNUP"] && current_user.nil? %>
+    <% if current_user.nil? %>
       <div class="container">
         <p class="text-muted">
           The UndercoverCI app is free while in beta, sign up to install it for your repositories
         </p>
         <%= link_to "Sign Up with GitHub", "/auth/github", class: "btn btn-lg btn-primary", method: :post %>
-      </div>
-    <% else %>
-      <div class="container">
-        <p class="text-muted">UndercoverCI is in limited beta. Get an invite today!</p>
-        <%= render partial: "partials/list_signup" %>
       </div>
     <% end %>
   </div>

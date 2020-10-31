@@ -20,7 +20,7 @@ export AWS_ACTIVESTORAGE_BUCKET=
 
 # Feature toggles
 # export FF_TERMS_OF_SERVICE=
-# export FF_SELF_SIGNUP=
+# export FF_SUBSCRIPTION=
 
 # Gumroad
 export GUMROAD_SELLER_ID=

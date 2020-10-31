@@ -6,26 +6,30 @@
 </div>
 
 <div class="container">
-  <div class="card-deck mb-3">
+  <div class="card-deck mb-5">
     <div class="card mb-4 shadow-lg">
       <div class="card-header text-center">
         <h4>GitHub App</h4>
       </div>
       <div class="card-body">
-        <p >Fully-featured integration with quick setup and:</p>
+        <div class="mb-4">
+          <h4>$49 per month</h4>
+          <span class="text-muted">VAT not included, try it free for 14 days</span>
+        </div>
+        <p >Fully-featured GitHub integration with quick setup and:</p>
         <p>👉 Coverage warnings as GitHub annotations</p>
         <p>👉 Diff coverage breakdown for each commit</p>
-        <p>👉 Unlimited users/repos</p>
-        <p>💰 Use it for free while in beta! The planned subscription cost is $29/mo per organisation.</p>
+        <p>👉 Unlimited builds for private and public repos</p>
+        <p>👉 Unlimited users</p>
         <br/>
-        <% if ENV["FF_SELF_SIGNUP"] && current_user.nil? %>
+        <% if current_user.nil? %>
           <p class="text-center">
-            <p class="text-muted">UndercoverCI is in limited beta.</p>
             <%= link_to "Sign Up with GitHub", "/auth/github", class: "btn btn-md btn-primary", method: :post %>
           </p>
         <% else %>
-          <p class="text-muted">UndercoverCI is in limited beta. Get an invite today!</p>
-          <%= render partial: "partials/list_signup" %>
+          <p class="text-center">
+            <%= link_to "Start subscription", settings_path, class: "btn btn-md btn-primary" %>
+          </p>
         <% end %>
       </div>
     </div>
