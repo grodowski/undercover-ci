@@ -3,6 +3,11 @@
 require "rails_helper"
 
 describe Logic::ProcessSale do
+  before do
+    allow(ENV).to receive(:[]).and_call_original
+    allow(ENV).to receive(:[]).with("FF_SUBSCRIPTION") { "1" }
+  end
+
   let(:gumroad_ping_params) do
     {
       "seller_id" => "xxxx",
