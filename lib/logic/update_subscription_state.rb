@@ -6,8 +6,11 @@ module Logic
       transition(%i[beta unsubscribed], :subscribed)
     end
 
-    def unsubscribe
-      transition(:subscribed, :unsubscribed)
+    def unsubscribe(end_date)
+      record.transaction do
+        record.end_date = end_date
+        transition(:subscribed, :unsubscribed)
+      end
     end
 
     def end_beta

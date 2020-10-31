@@ -42,7 +42,7 @@ describe Logic::ProcessSale do
   it "returns an error when a subscription with license key already exists" do
     installation = Installation.create!(installation_id: "123123")
     Subscription.create!(
-      state: :unsubscribed,
+      state: :subscribed,
       installation: installation,
       gumroad_id: "subxxx",
       license_key: "1337"

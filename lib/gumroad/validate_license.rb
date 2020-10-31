@@ -13,7 +13,7 @@ module Gumroad
       @license_key = license_key
     end
 
-    attr_reader :license_key
+    attr_reader :license_key, :license
 
     def call
       @res = Net::HTTP.post(
@@ -33,13 +33,13 @@ module Gumroad
     private
 
     def license_valid?
-      license = DataObjects::Gumroad::LicenseKey.new(JSON.parse(@res.body))
-      Logic::Status.new(license.active? ? nil : "inactive license key")
+      @license = DataObjects::Gumroad::LicenseKey.new(JSON.parse(@res.body))
+      Logic::Status.new(@license.active? ? nil : "inactive license key")
     end
 
     def license_not_found
-      license = DataObjects::Gumroad::LicenseKey.new(JSON.parse(@res.body))
-      Logic::Status.new(license.message)
+      @license = DataObjects::Gumroad::LicenseKey.new(JSON.parse(@res.body))
+      Logic::Status.new(@license.message)
     end
   end
 end

@@ -21,8 +21,15 @@ module DataObjects
         return false unless success
 
         purchase["permalink"] == ::Gumroad::SUBSCRIPTION_PRODUCT_PERMALINK &&
-          purchase["subscription_cancelled_at"].blank? &&
-          purchase["subscription_failed_at"].blank?
+          cancelled_at.blank? && failed_at.blank?
+      end
+
+      def failed_at
+        purchase["subscription_failed_at"]&.to_time
+      end
+
+      def cancelled_at
+        purchase["subscription_cancelled_at"]&.to_time
       end
     end
   end
