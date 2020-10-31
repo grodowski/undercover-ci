@@ -15,8 +15,8 @@
         <h6>Subscription</h6>
         <p>GitHub Org accounts require a subscription to process Pull Requests in private repositories.</p>
         <%= gumroad_subscribe_link(inst) %>
+        <hr/>
       <% end %>
-      <hr/>
       <h6>GitHub Repos (<%= link_to "Manage", inst.metadata["html_url"] %>)</h6>
       <ul>
         <% inst.repos.each do |repo| %>

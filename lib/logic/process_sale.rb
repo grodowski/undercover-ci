@@ -30,6 +30,7 @@ module Logic
           state: :subscribed
         )
       end
+      Status.new(nil)
     end
 
     private
