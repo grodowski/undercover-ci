@@ -24,6 +24,9 @@ $(document).on("turbolinks:load", function() {
   $(".row-href").click(function() {
       window.location = $(this).data("href");
   });
+  if (window.GumroadOverlay) {
+    window.GumroadOverlay = new GumroadOverlayManager();
+  }
 });
 
 // refresh page when Gumroad iframe modal closes

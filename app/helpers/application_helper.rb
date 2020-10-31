@@ -64,7 +64,7 @@ module ApplicationHelper
       "Subscribe",
       "https://gum.co/" \
         "#{Gumroad::SUBSCRIPTION_PRODUCT_PERMALINK}" \
-        "?yearly=true&installation_id=#{installation.installation_id}",
+        "?installation_id=#{installation.installation_id}",
       class: "btn btn-primary gumroad-subscribe", target: "_blank"
     )
     subscription = installation.subscription
