@@ -3,7 +3,7 @@
 class Subscription < ApplicationRecord
   belongs_to :installation
 
-  validates :gumroad_id, :license_key, presence: true
+  validates :gumroad_id, :license_key, presence: true, if: -> { state == :subscribed }
   validates :state, inclusion: {in: %i[beta unsubscribed subscribed]}
 
   scope :active, -> { where("end_date IS NULL or end_date > ?", Time.now) }

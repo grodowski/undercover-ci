@@ -91,7 +91,7 @@ describe Logic::ProcessSale do
     expect(res.error?).to eq(true)
     expect(res.error).to eq("gumroad license error, inactive license key")
 
-    expect(installation.subscription).to be_nil
+    expect(installation.subscription.gumroad_id).to be_nil
   end
 
   it "fails if Gumroad doesn't deliver the installation_id" do
