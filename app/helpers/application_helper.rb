@@ -71,9 +71,9 @@ module ApplicationHelper
     return subscribe_link unless subscription
 
     if subscription.active? && !subscription.trial?
-      expires_on_text = if subscription.end_date.present?
-                          "(expires on #{subscription.end_date.to_date.to_formatted_s(:long)})"
-                        end
+      if subscription.end_date.present?
+        expires_on_text = "(expires on #{subscription.end_date.to_date.to_formatted_s(:long)})"
+      end
       return content_tag :div, "Active license: #{subscription.license_key} #{expires_on_text}"
     end
 
