@@ -10,6 +10,8 @@ env:
     - USER_TOKEN_ENCRYPTION_KEY=b4c9n703342e24806a9f64e08c053dca
     - HEAP_APP_ID=heap_app_id
     - AWS_ACTIVESTORAGE_BUCKET=test-bucket
+    - GUMROAD_SELLER_ID=53113R
+    - GUMROAD_SUBSCRIPTION_PRODUCT_PERMALINK=undercover-ci
 addons:
   postgresql: "9.6"
 script:
