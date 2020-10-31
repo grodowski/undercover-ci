@@ -44,12 +44,7 @@ var gumroadOnCloseListener = function(e) {
   if (data.parentMethod === "minimizeIframe") {
     $('a.gumroad-subscribe').removeClass("disabled");
     if (gumroadSaleData) {
-      var query = `#installation_${gumroadSaleData.url_params.installation_id} a.gumroad-subscribe`
-      $(query).html("Your license is activating. Page will reload in a sec...");
-      $(query).addClass("disabled");
-      setTimeout(function() {
-        Turbolinks.visit(location.toString());
-      }, 6000);
+      Turbolinks.visit("/subscription_confirmation");
     }
   }
 };

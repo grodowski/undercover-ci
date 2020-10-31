@@ -1,0 +1,23 @@
+<div class="starter-template m-md-5">
+  <h1 class="text-left mb-5">You have subscribed to UndercoverCI!</h1>
+
+  <p class="lead text-left mb-md-5">
+    Your license key is being activated and your organisation account will be ready in just a moment. This page will automatically redirect to <%= link_to "settings", settings_path %> in 15 seconds...
+  </p>
+
+  <p class="lead text-left">
+    I'd like to personally thank you for your interest in UndercoverCI! Please don't hesitate to <a href="mailto:jan@undercover-ci.com">reach out</a> if you need any support or have feedback.
+  </p>
+  <p class="lead text-left">
+    Cheers,<br/>
+    Jan
+  </p>
+</div>
+<script>
+  $(document).on("turbolinks:load", function() {
+    setTimeout(
+    function() {
+      Turbolinks.visit("/settings");
+    }, 15000
+  )});
+</script>

@@ -11,4 +11,8 @@ class HomeController < ApplicationController
 
     cookies[:beta_sign_in] = {value: 1, expires: 1.year}
   end
+
+  def subscription_confirmation
+    redirect_to root_url unless current_user
+  end
 end

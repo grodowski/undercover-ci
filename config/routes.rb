@@ -18,6 +18,7 @@ Rails.application.routes.draw do
   get "/terms", to: "home#terms", as: :terms_page
   get "/faq", to: "home#faq", as: :faq_page
   get "/docs", to: "home#docs", as: :docs_page
+  get "/subscription_confirmation", to: "home#subscribption_confirmation"
 
   scope module: "dashboard" do
     get "/app", controller: "checks", action: "index", as: :dashboard
