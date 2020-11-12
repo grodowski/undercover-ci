@@ -1,5 +1,6 @@
 <div class="starter-template">
   <h1 class="display-4 header-title">Actionable code coverage review</h1>
+
   <p class="lead mt-5">UndercoverCI ensures that <strong class="lead-highlight">every pull request is adequately tested</strong>.<br/>Works with Ruby and GitHub.</p>
 
   <picture>
@@ -11,7 +12,7 @@
     <% if current_user.nil? %>
       <div class="container">
         <p class="text-muted">
-          The UndercoverCI app is free while in beta, sign up to install it for your repositories
+          The UndercoverCI app is free while in beta, sign up to install it for your repositories.<br/>Organization plans start at $49 per month with a free 14-day trial.
         </p>
         <%= link_to "Sign Up with GitHub", "/auth/github", class: "btn btn-lg btn-primary", method: :post %>
       </div>
@@ -28,7 +29,7 @@
             <i class="how-it-works-icon icon-flow-merge"></i>
           </div>
           <p class="lead"><strong>1. Open a pull request</strong></p>
-          <p class="text-muted">The CI server runs tests and uploads coverage data to UndercoverCI. That's the only required post-install setup step!</p>
+          <p>The CI server runs tests and uploads coverage data to UndercoverCI. That's the only required post-install setup step!</p>
         </div>
       </div>
       <div class="card mb-4 shadow-lg">
@@ -37,7 +38,7 @@
             <i class="how-it-works-icon icon-search-outline"></i>
           </div>
           <p class="lead"><strong>2. Find missing test coverage</strong></p>
-          <p class="text-muted">We scan the PR diff and verify local test coverage for each updated class, method and block, because an absolute percentage check is not enough.</p>
+          <p>We scan the PR diff and verify local test coverage for each updated class, method and block, because an absolute percentage check is not enough.</p>
         </div>
       </div>
       <div class="card mb-4 shadow-sm">
@@ -46,9 +47,78 @@
             <i class="how-it-works-icon icon-chat-alt"></i>
           </div>
           <p class="lead"><strong>3. Fix or ack review comments</strong></p>
-          <p class="text-muted">Reveal untested methods and blocks, find unused code paths and improve your test suite.</p>
+          <p>Reveal untested methods and blocks, find unused code paths and improve your test suite.</p>
         </div>
       </div>
     </div>
+  </div>
+
+  <div class="container how-it-works-container">
+    <p class="lead">These companies review  pull requests with UndercoverCI</p>
+    <div class="row">
+      <div class="col">
+        <picture>
+          <source srcset="<%= image_path("fieldly_black.png") %>" />
+          <img class="img-fluid trusted-by-img" alt="Rainforest QA" />
+        </picture>
+      </div>
+      <div class="col">
+        <picture>
+          <source srcset="<%= image_path("rfqa.png") %>" />
+          <img class="img-fluid trusted-by-img" alt="Rainforest QA" />
+        </picture>
+      </div>
+      <div class="col">
+        <picture>
+          <source srcset="<%= image_path("rhino_black.png") %>" />
+          <img class="img-fluid trusted-by-img rhino" alt="Rainforest QA" />
+        </picture>
+      </div>
+    </div>
+  </div>
+
+  <p class="lead mt-5 pt-5">Read more about Ruby code coverage and unit testing strategy</p>
+
+  <div class="card-deck">
+  <div class="card mb-4 shadow-sm">
+    <div  class="text-left card-body">
+      <a class="lead" href="https://medium.com/@mrgrodo/introducing-undercoverci-98c6c50793f2" target="_blank">Introducing UndercoverCI</a>
+      <blockquote>
+        <p class="mb-0">Today, I’m launching UndercoverCI— a CI robot who protects your Ruby codebase from untested code changes. Take a moment to learn why you should add it to your team’s code review workflow.</p>
+        <p class="mb-0">Adding UndercoverCI to your code review workflow will prevent untested code changes from slipping into production without anyone noticing.</p>
+        <footer class="blockquote-footer"><a href="https://twitter.com/@mrgrodo">@mrgrodo</a> in <a href="https://medium.com/@mrgrodo/introducing-undercoverci-98c6c50793f2" target="_blank"><cite title="Introducing UndercoverCI">Introducing UndercoverCI</cite></a></footer>
+      </blockquote>
+    </div>
+  </div>
+
+  <div class="card mb-4 shadow-sm">
+    <div  class="text-left card-body">
+      <a class="lead" href="https://www.codementor.io/@theundefined/ruby-the-misconceptions-of-100-code-coverage-keituk3qc" target="_blank">The misconceptions of 100% Code Coverage</a>
+      <blockquote>
+        <p class="mb-0">For existing projects, because of the sheer workload of having to write the tests to cover code that you have not written to fill the gaps, it is much harder to get to the confidence level that having 100% coverage brings, but at least by using code coverage reports you can make informed decisions on how risky a change to parts of your application are going to be.</p>
+        <footer class="blockquote-footer"><a href="https://github.com/the-undefined">@the-undefined</a> in <a href="https://www.codementor.io/@theundefined/ruby-the-misconceptions-of-100-code-coverage-keituk3qc" target="_blank"><cite title="Ruby: The misconceptions of 100% Code Coverage">Ruby: The misconceptions of 100% Code Coverage</cite></a></footer>
+      </blockquote>
+    </div>
+  </div>
+
+  <div class="card mb-4 shadow-sm">
+    <div  class="text-left card-body">
+      <a class="lead" href="https://medium.com/futuredev/stop-shipping-untested-ruby-code-with-undercover-1edc963be4a6" target="_blank">Stop shipping untested Ruby code with undercover</a>
+      <blockquote>
+        <p class="mb-0">Undercover is a code review utility that takes the ideas from code quality tools like RuboCop or Pronto and applies them to coverage. If 100% test coverage is not what we want to invest our time in, how about making sure that just the code in scope of our changes is tested well? Undercover does that and triggers warnings on untested parts of our code based on a changeset from git and a set of rules.</p>
+        <footer class="blockquote-footer"><a href="https://twitter.com/@mrgrodo">@mrgrodo</a> in <a href="https://medium.com/futuredev/stop-shipping-untested-ruby-code-with-undercover-1edc963be4a6" target="_blank"><cite title="Stop shipping untested Ruby code with undercover">Stop shipping untested Ruby code with undercover</cite></a></footer>
+      </blockquote>
+    </div>
+  </div>
+  </div>
+  <div class="jumbotron">
+    <% if current_user.nil? %>
+      <div class="container">
+        <p class="text-muted">
+          The UndercoverCI app is free while in beta, sign up to install it for your repositories.<br/>Organization plans start at $49 per month with a free 14-day trial.
+        </p>
+        <%= link_to "Sign Up with GitHub", "/auth/github", class: "btn btn-lg btn-primary", method: :post %>
+      </div>
+    <% end %>
   </div>
 </div>
