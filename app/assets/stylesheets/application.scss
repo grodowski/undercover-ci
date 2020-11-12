@@ -40,6 +40,10 @@
   }
 }
 
+.dispay-condensed {
+  letter-spacing: -0.8px;
+}
+
 .logo-img {
   width: 28px;
   height: 28px;
@@ -47,24 +51,18 @@
 
 .hero-img {
   @include media-breakpoint-up(lg) {
-    width: 70%;
+    width: 90%;
   }
 }
 
 .trusted-by-img {
   max-height: 60px;
-  opacity: 0.6;
-  filter: saturate(0);
   &.rhino {
     max-height: 35px;
     margin-top: 9px;
     @include media-breakpoint-down(sm) {
       margin-top: 0px;
     }
-  }
-  &:hover {
-    opacity: 0.85;
-    filter: saturate(1);
   }
 }
 
