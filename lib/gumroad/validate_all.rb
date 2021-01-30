@@ -16,7 +16,7 @@ module Gumroad
       if status.error?
         log "key:#{subscription.license_key} installation:#{installation_id} error:#{status.error}"
         if validator.license.cancelled_at
-          Logic::UpdateSubscriptionState.unsubscribe(
+          Logic::UpdateSubscriptionState.new(subscription).unsubscribe(
             validator.license.cancelled_at
           )
         end
