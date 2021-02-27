@@ -4,7 +4,7 @@ ruby "2.7.1"
 source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-gem "rails", "~> 6.0"
+gem "rails", "~> 6.0.0"
 
 gem "aws-sdk-s3", require: false
 gem "bcrypt", "~> 3.1.15"
