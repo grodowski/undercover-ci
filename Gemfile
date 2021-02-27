@@ -34,6 +34,7 @@ gem "octokit"
 # Auth
 gem "omniauth"
 gem "omniauth-github"
+gem "omniauth-rails_csrf_protection"
 
 # Tooling
 gem "sentry-raven"
