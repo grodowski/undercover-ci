@@ -41,22 +41,41 @@ module CheckRuns
     # TODO: can be updated to read directly from `run.nodes` instead of passing `undercover_report`
     # @return [Array] matching the format expected by GitHub Checks API
     # https://developer.github.com/v3/checks/runs/#output-object
+
+    # TODO: what's a good way to warn about uncovered branches in a line in a github comment...
+    # ... ?
+    # test out start_column and end_column - how to get that from the coverage data?
+    # message / raw_details - what can I output?
+
+    # TODO: branch coverage support
+    # x fix duplicates
+    # x branch output in annotations
+    # branch count in summary
     def warnings_to_annotations
       results = @undercover_report.flagged_results
       log "posting warnings: #{results}"
       results.map do |result|
         # TODO: duplicates pronto-undercover logic, move to Undercover::Result
-        lines = result.coverage.map { |ln, _cov| ln if result.uncovered?(ln) }.compact
+        lines = result.coverage.map { |ln, *| ln if result.uncovered?(ln) }.compact.uniq
         message = "#{result.node.human_name.capitalize} `#{result.node.name}` is missing" \
                   " coverage for line#{'s' if lines.size > 1} #{format_lines(lines).join(',')}" \
-                  " (node coverage: #{result.coverage_f})"
+                  " (node coverage: #{result.coverage_f})."
+
+        lines_missing_branch_cov = result.coverage.map do |ln, _block, _branch, cov|
+          ln if cov&.zero?
+        end.compact.uniq
+        if lines_missing_branch_cov.any?
+          message += "\nMissing branch coverage found in line#{'s' if lines_missing_branch_cov.size > 1} " \
+            "#{format_lines(lines_missing_branch_cov).join(',')}."
+        end
         {
           path: result.file_path,
           start_line: result.first_line,
           end_line: result.last_line,
           annotation_level: "warning",
           title: "Untested #{result.node.human_name}",
-          message: message
+          message: message,
+          raw_details: result.pretty_print
         }
       end
     end
@@ -79,10 +98,15 @@ module CheckRuns
                 "look into them!"
       end
       text += "\n\n"
-      rows = ["file | name | coverage", ":--- | :--- | ---:"]
+      rows = ["file | name | coverage | branches", ":--- | :--- | ---: | ---:"]
       format_to_md = proc do |node|
         flag = node.flagged? ? "⚠️ " : ""
-        [node.path, "#{flag}#{node.node_type} `#{node.node_name}`", node.coverage]
+        [
+          node.path,
+          "#{flag}#{node.node_type} `#{node.node_name}`",
+          node.coverage,
+          total_branches_for_node(node)
+        ]
       end
       rows += @run
               .nodes
@@ -90,6 +114,20 @@ module CheckRuns
               .map(&format_to_md)
               .map { |row| row.join(" | ") }
       text + rows.join("\n")
+    end
+
+    # TODO: read directly from node and not @undercover_report
+    def total_branches_for_node(node)
+      result = @undercover_report.flagged_results.find do |res|
+        res.file_path == node.path && res.first_line == node.start_line && res.node.name == node.node_name
+      end
+      return unless result
+
+      branches = result.coverage.select { |cov| cov.size == 4 } # BRDA branch
+      count_covered = branches.count { |cov| cov[3].positive? } # was that branch covered?
+      return if branches.size.zero?
+
+      "#{count_covered}/#{branches.size}"
     end
   end
 end
