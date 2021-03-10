@@ -40,4 +40,31 @@ ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- \
 
 ## Development and contributing
 
-TODO
+Here's a short summary of the development feeback loop with webhooks delivered through `ngrok`.
+
+1. Start `rails s`. ActiveJob jobs are processed synchronously in `development`, so that's all you need.
+
+2. Start `ngrok http 3000` to accept webhooks locally.
+
+3. Configure the UndercoverCI (DEV) on GitHub to to point at your `ngrok` url
+
+4. Make a test commit in `twitchy-tortoise/undercover-test` or any other test app that has UndercoverCI (DEV) installed.
+
+5. Push it
+
+```
+git commit --amend -m  "test with branch cov" && git push -f
+```
+
+6. Send a fake coverage report using the uploader API with the `--url` flag pointing to the local server:
+
+```
+ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- \
+                  --repo twitchy-tortoise/undercover-test \
+                  --commit $(git rev-parse HEAD) \
+                  --lcov coverage/lcov/undercover-test.lcov \
+                  --url http://localhost:3000/v1/coverage
+201
+```
+
+7. Check out app logs for errors and see the newly created GitHub Check on the commit.
