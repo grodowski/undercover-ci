@@ -41,16 +41,6 @@ module CheckRuns
     # TODO: can be updated to read directly from `run.nodes` instead of passing `undercover_report`
     # @return [Array] matching the format expected by GitHub Checks API
     # https://developer.github.com/v3/checks/runs/#output-object
-
-    # TODO: what's a good way to warn about uncovered branches in a line in a github comment...
-    # ... ?
-    # test out start_column and end_column - how to get that from the coverage data?
-    # message / raw_details - what can I output?
-
-    # TODO: branch coverage support
-    # x fix duplicates
-    # x branch output in annotations
-    # branch count in summary
     def warnings_to_annotations
       results = @undercover_report.flagged_results
       log "posting warnings: #{results}"
