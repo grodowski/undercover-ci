@@ -37,25 +37,48 @@ describe CheckRuns::Complete do
     allow(check_run_complete).to receive(:installation_api_client) { dummy_github }
 
     expected_text = <<~TEXT.chomp
-      Revision `abc123` has modified the following 2 code locations. Results marked with ⚠️ have untested lines added or changed in this commit, look into them!
+      Revision `abc123` has modified the following 3 code locations. Results marked with ⚠️ have untested lines added or changed in this commit, look into them!
 
-      file | name | coverage
-      :--- | :--- | ---:
-      app/models/application_record.rb | ⚠️ instance method `method` | 0.0
-      app/models/application_record.rb | instance method `method` | 1.0
+      file | name | coverage | branches
+      :--- | :--- | ---: | ---:
+      spec/fixtures/application_record.rb | ⚠️ instance method `method` | 0.0 | 2/4
+      spec/fixtures/application_record.rb | ⚠️ instance method `method` | 0.0 | 2/4
+      spec/fixtures/application_record.rb | instance method `method` | 1.0 | 2/4
     TEXT
 
     expected_output = hash_including(
-      summary: "🚨 UndercoverCI has detected 1 warning in this changeset.",
+      summary: "🚨 UndercoverCI has detected 2 warnings in this changeset.",
       text: expected_text,
       annotations: [
         {
-          path: "app/models/application_record.rb",
+          path: "spec/fixtures/application_record.rb",
           start_line: 1,
-          end_line: 5,
+          end_line: 6,
           annotation_level: "warning",
           title: "Untested instance method",
-          message: "Instance method `method` is missing coverage for lines 3..4 (node coverage: 0.3333)"
+          message: "Instance method `method` is missing coverage for lines 3..5 (node coverage: 0.25)." \
+            "\nMissing branch coverage found in lines 4..5.",
+          raw_details: "1: test_line hits: n/a\n" \
+            "2: test_line hits: 1\n" \
+            "3: test_line hits: 0\n" \
+            "4: test_line hits: 0 branches: 1/2\n" \
+            "5: test_line hits: 0 branches: 1/2\n" \
+            "6: test_line hits: n/a"
+        },
+        {
+          path: "spec/fixtures/application_record.rb",
+          start_line: 1,
+          end_line: 6,
+          annotation_level: "warning",
+          title: "Untested instance method",
+          message: "Instance method `method` is missing coverage for lines 3..5 (node coverage: 0.25)." \
+            "\nMissing branch coverage found in line 4.",
+          raw_details: "1: test_line hits: n/a\n" \
+            "2: test_line hits: 1\n" \
+            "3: test_line hits: 0\n" \
+            "4: test_line hits: 0 branches: 1/2\n" \
+            "5: test_line hits: 0 branches: 2/2\n" \
+            "6: test_line hits: n/a"
         }
       ]
     )
@@ -76,6 +99,7 @@ describe CheckRuns::Complete do
 
   def check_run_fixture
     mock_result = undercover_report_fixture.all_results[0]
+    mock_result_multi_line_branch_coverage = undercover_report_fixture.all_results[1]
     # TODO: not ideal, will need refactoring
     inst = Installation.create
     CoverageCheck.create!(
@@ -99,25 +123,42 @@ describe CheckRuns::Complete do
           coverage: 0.0,
           flagged: true,
           path: mock_result.file_path
+        ),
+        Node.new(
+          node_type: "instance method",
+          node_name: "method",
+          start_line: mock_result_multi_line_branch_coverage.first_line,
+          end_line: mock_result_multi_line_branch_coverage.last_line,
+          coverage: 0.0,
+          flagged: true,
+          path: mock_result_multi_line_branch_coverage.file_path
         )
       ]
     )
   end
 
   def undercover_report_fixture
-    mock_node = double(human_name: "instance method", name: "method", first_line: 1, last_line: 5)
+    mock_node = double(
+      human_name: "instance method", name: "method", first_line: 1, last_line: 6,
+      source_lines_with_numbers: (1..6).zip(Array.new(6, "test_line"))
+    )
     results = [
       Undercover::Result.new(
         mock_node,
-        [[2, 1], [3, 0], [4, 0]],
-        "app/models/application_record.rb"
+        [[2, 1], [3, 0], [4, 0], [5, 0], [4, 0, 1, 1], [4, 0, 2, 0], [5, 0, 1, 1], [5, 0, 2, 0]],
+        "spec/fixtures/application_record.rb"
       ),
       Undercover::Result.new(
         mock_node,
-        [[2, 1], [3, 0], [4, 0]],
-        "app/models/application_record.rb"
+        [[2, 1], [3, 0], [4, 0], [5, 0], [4, 0, 1, 1], [4, 0, 2, 0], [5, 0, 1, 1], [5, 0, 2, 1]],
+        "spec/fixtures/application_record.rb"
+      ),
+      Undercover::Result.new(
+        mock_node,
+        [[2, 1], [3, 0], [4, 0], [5, 0], [4, 0, 1, 1], [4, 0, 2, 0], [5, 0, 1, 1], [5, 0, 2, 0]],
+        "spec/fixtures/application_record.rb"
       )
     ]
-    instance_double(Undercover::Report, all_results: results, flagged_results: [results[0]])
+    instance_double(Undercover::Report, all_results: results, flagged_results: results[0..1])
   end
 end

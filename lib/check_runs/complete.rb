@@ -125,7 +125,6 @@ module CheckRuns
 
       branches = result.coverage.select { |cov| cov.size == 4 } # BRDA branch
       count_covered = branches.count { |cov| cov[3].positive? } # was that branch covered?
-      return if branches.size.zero?
 
       "#{count_covered}/#{branches.size}"
     end
