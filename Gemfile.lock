@@ -339,7 +339,7 @@ GEM
       thread_safe (~> 0.1)
     uglifier (4.2.0)
       execjs (>= 0.3.0, < 3)
-    undercover (0.4.0)
+    undercover (0.4.1)
       imagen (>= 0.1.8)
       rainbow (>= 2.1, < 4.0)
       rugged (>= 0.27, < 1.2)
