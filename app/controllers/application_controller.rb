@@ -9,7 +9,10 @@ class ApplicationController < ActionController::Base
   helper_method :current_user
 
   def check_current_user
-    redirect_to root_url if current_user.nil?
+    return if current_user
+
+    session[:redirect_post_sign_in_path] = request.path
+    redirect_to root_url
   end
 
   def validate_installations
