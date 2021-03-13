@@ -9,7 +9,7 @@ class ExpireCheckJob < ApplicationJob
 
   def perform(coverage_check_id)
     @coverage_check = CoverageCheck.find(coverage_check_id)
-    return if @coverage_check.state == :canceled
+    return if @coverage_check.state.in?(%i[canceled complete])
 
     transition_coverage_check
     notify_github_of_timed_out
