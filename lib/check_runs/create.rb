@@ -14,7 +14,7 @@ module CheckRuns
         external_id: run.external_id,
         output: {
           title: "Awaiting coverage data",
-          text: queued_text_for_run
+          summary: queued_text_for_run
         },
         accept: "application/vnd.github.antiope-preview+json"
       )
