@@ -103,16 +103,20 @@ describe Logic::StartCheckRun do
       )
     end
 
-    it "creates CoverageCheck in canceled state" do
-      expect(CreateCheckRunJob).not_to receive(:perform_later)
+    it "enqueues an immediate transition to canceled" do
+      expect(CreateCheckRunJob).to receive(:perform_later)
 
-      described_class.call(check_run_info)
+      Timecop.freeze do
+        described_class.call(check_run_info)
 
-      coverage_check = CoverageCheck.last
-      expect(coverage_check.state).to eq(:canceled)
-      expect(coverage_check.head_sha).to eq("b4c0n1")
-      expect(coverage_check.base_sha).to eq("c0mp4r3")
-      expect(coverage_check).to be_persisted
+        coverage_check = CoverageCheck.last
+        expect(coverage_check.state).to eq(:awaiting_coverage)
+        expect(coverage_check.head_sha).to eq("b4c0n1")
+        expect(coverage_check.base_sha).to eq("c0mp4r3")
+        expect(coverage_check).to be_persisted
+
+        expect(ExpireCheckJob).to have_been_enqueued.at(5.seconds.from_now).with(coverage_check.id)
+      end
     end
   end
 end

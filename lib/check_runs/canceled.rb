@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module CheckRuns
-  class TimedOut < Base
+  class Canceled < Base
     def post
       client = installation_api_client(run.installation_id)
       client.post(
@@ -15,12 +15,24 @@ module CheckRuns
         details_url: details_url,
         external_id: run.external_id,
         output: {
-          title: "Timed Out",
-          summary: "UndercoverCI did not receive coverage data for this check",
+          title: "Canceled",
+          text: text
         },
         accept: "application/vnd.github.antiope-preview+json"
       )
       log "#{run} response: #{client.last_response.status}"
+    end
+
+    def text
+      <<~TEXT
+        🤕 This check run was unsuccessful for one of the following reasons:
+        - your UndercoverCI subscription has expired
+        - no valid coverage data was uploaded within 90 minutes
+        - a system error occured
+
+        ⚙️ Visit [the settings page](https://undercover-ci.com/settings) to check your integration
+        status.
+      TEXT
     end
   end
 end

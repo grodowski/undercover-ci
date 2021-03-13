@@ -28,8 +28,11 @@ module Logic
       coverage_check.save!
 
       Logic::UpdateCoverageCheckState.new(coverage_check).await_coverage
-      ExpireCheckJob.set(wait: ExpireCheckJob::DEFAULT_WAIT).perform_later(coverage_check.id)
       CreateCheckRunJob.perform_later(coverage_check.id)
+
+      ExpireCheckJob.set(
+        wait: installation.active? ? ExpireCheckJob::DEFAULT_WAIT : ExpireCheckJob::INACTIVE_WAIT
+      ).perform_later(coverage_check.id)
     end
 
     private
@@ -45,7 +48,6 @@ module Logic
         head_sha: check_run_info.sha,
         base_sha: check_run_info.compare
       )
-      Logic::UpdateCoverageCheckState.new(coverage_check).cancel unless installation.active?
     end
   end
 end

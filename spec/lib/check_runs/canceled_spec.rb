@@ -3,7 +3,7 @@
 require "rails_helper"
 require "check_runs"
 
-describe CheckRuns::TimedOut do
+describe CheckRuns::Canceled do
   it "concludes the CheckRun with timed_out" do
     run = DataObjects::CheckRunInfo.new(
       "grodowski/undercover-ci",
@@ -34,8 +34,8 @@ describe CheckRuns::TimedOut do
         expect(payload[:completed_at]).to eq("2020-02-02T16:20:47Z")
         expect(payload[:details_url]).to eq("https://undercover-ci.com/checks/1337")
         expect(payload[:output]).to match(
-          title: "Timed Out",
-          summary: "UndercoverCI did not receive coverage data for this check"
+          title: "Canceled",
+          text: a_string_including("This check run was unsuccessful for one of the following reasons")
         )
       end
   end

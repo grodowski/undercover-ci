@@ -19,22 +19,28 @@ RSpec.describe ExpireCheckJob, type: :job do
     )
   end
 
-  before { allow_any_instance_of(CheckRuns::TimedOut).to receive(:post) }
+  before { allow_any_instance_of(CheckRuns::Canceled).to receive(:post) }
 
-  it "expires the check when it's awaiting_coverage" do
-    expect_any_instance_of(CheckRuns::TimedOut).to receive(:post).once
+  it "cancels the check when it's awaiting_coverage" do
+    expect_any_instance_of(CheckRuns::Canceled).to receive(:post).once
 
     described_class.perform_now(check.id)
 
     check.reload
-    expect(check.state).to eq(:expired)
+    expect(check.state).to eq(:canceled)
   end
 
-  it "expires the check when it's in_progress" do
+  it "cancels the check when it's in_progress" do
     check.update!(state: :in_progress)
     described_class.perform_now(check.id)
 
     check.reload
-    expect(check.state).to eq(:expired)
+    expect(check.state).to eq(:canceled)
+  end
+
+  it "is a no-op when a check is already canceled" do
+    check.update!(state: :canceled)
+
+    expect { described_class.perform_now(check.id) }.not_to(change { check.reload.state })
   end
 end

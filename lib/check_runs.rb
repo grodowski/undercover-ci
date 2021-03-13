@@ -30,4 +30,4 @@ end
 require "check_runs/create"
 require "check_runs/run"
 require "check_runs/complete"
-require "check_runs/timed_out"
+require "check_runs/canceled"
