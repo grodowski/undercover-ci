@@ -24,13 +24,10 @@ module Logic
     end
 
     def run_undercover
-      # TODO: this will blow up on retries
-      if coverage_check.state != :awaiting_coverage
-        log "exiting early, coverage_check #{coverage_check.id} is #{coverage_check.state}"
+      if coverage_check.state != :in_progress
+        log "exiting early, coverage_check #{coverage_check.id} is #{coverage_check.state}, but should be in_progress"
         return
       end
-
-      Logic::UpdateCoverageCheckState.new(coverage_check).start
 
       log "starting run #{run} job_id: #{coverage_check.id}"
       CheckRuns::Run.new(run).post

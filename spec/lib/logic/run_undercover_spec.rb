@@ -15,12 +15,12 @@ describe Logic::RunUndercover do
       installation: installation,
       head_sha: "b8f95245", # commit sha from fake_repo feature branch
       repo: {"full_name" => "author/repo", "default_branch" => "master"},
-      state: :awaiting_coverage
+      state: :in_progress
     )
   end
   subject { described_class.call(coverage_check) }
 
-  it "logs and returns when CoverageCheck is not in awaiting_coverage state" do
+  it "logs and returns when CoverageCheck is not in in_progress state" do
     coverage_check.coverage_reports.attach(
       io: File.open("spec/fixtures/coverage.lcov"),
       filename: "#{coverage_check.id}_b4c0n.lcov",
