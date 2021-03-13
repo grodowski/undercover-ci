@@ -16,11 +16,6 @@ describe Logic::StartCheckRun do
   end
   let(:installation) { Installation.create!(installation_id: "123123", users: [user]) }
 
-  before do
-    allow(ENV).to receive(:[]).and_call_original
-    allow(ENV).to receive(:[]).with("FF_SUBSCRIPTION") { "1" }
-  end
-
   it "fails if installation does not exist" do
     expect(CreateCheckRunJob).not_to receive(:perform_later)
 
