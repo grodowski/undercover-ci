@@ -37,6 +37,20 @@ describe Logic::RunUndercover do
     expect { subject }.to raise_error(Logic::RunUndercover::RunError, /coverage_reports can't be blank/)
   end
 
+  it "raises a CheckoutError when rugged fails to initialize to trigger a retry" do
+    coverage_check.coverage_reports.attach(
+      io: File.open("spec/fixtures/coverage.lcov"),
+      filename: "#{coverage_check.id}_b4c0n.lcov",
+      content_type: "text/plain"
+    )
+    stub_get_installation_token
+    stub_post_check_runs
+    allow(Imagen::Clone).to receive(:perform)
+    allow(Rugged::Repository).to receive(:new).and_raise(Rugged::OSError)
+
+    expect { subject }.to raise_error(Logic::RunUndercover::CheckoutError)
+  end
+
   it "clones the repository and runs the undercover command" do
     coverage_check.coverage_reports.attach(
       io: File.open("spec/fixtures/coverage.lcov"),
