@@ -7,6 +7,8 @@ module Logic
     end
 
     def unsubscribe(end_date)
+      return if record.state == :unsubscribed
+
       record.transaction do
         record.end_date = end_date
         transition(:subscribed, :unsubscribed)
