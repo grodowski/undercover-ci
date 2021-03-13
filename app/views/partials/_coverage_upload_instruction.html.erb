@@ -2,10 +2,10 @@
   <div class="card-header">
     <ul class="nav nav-tabs card-header-tabs" role="tablist">
       <li class="nav-item">
-        <a class="nav-link" id="actions-tab" data-toggle="tab" href="#actions" role="tab" aria-controls="actions" aria-selected="false">GitHub Actions</a>
+        <a class="nav-link active" id="actions-tab" data-toggle="tab" href="#actions" role="tab" aria-controls="actions" aria-selected="false">GitHub Actions</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link active" id="circleci-tab" data-toggle="tab" href="#circle-ci" role="tab" aria-controls="circle-ci" aria-selected="true">Circle CI</a>
+        <a class="nav-link" id="circleci-tab" data-toggle="tab" href="#circle-ci" role="tab" aria-controls="circle-ci" aria-selected="true">Circle CI</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" id="travis-tab" data-toggle="tab" href="#travis-ci" role="tab" aria-controls="travis-ci" aria-selected="false">Travis CI</a>
@@ -25,6 +25,7 @@
               SimpleCov.formatter = SimpleCov::Formatter::LcovFormatter
               SimpleCov.start do
                 add_filter(/^\/spec\//) # For RSpec, use `test` for MiniTest
+                enable_coverage(:branch)
               end
             </code></pre>
           </li>
@@ -54,6 +55,7 @@
               SimpleCov.formatter = SimpleCov::Formatter::LcovFormatter
               SimpleCov.start do
                 add_filter(/^\/spec\//) # For RSpec, use `test` for MiniTest
+                enable_coverage(:branch)
               end
             </code></pre>
           </li>

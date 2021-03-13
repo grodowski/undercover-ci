@@ -8,6 +8,7 @@
           <ul>
             <li class=""><a href="#installation">Installation</a>
             <li class=""><a href="#reporting">Report test coverage</a>
+            <li class=""><a href="#branch-cov">Branch coverage</a></li>
             <li class=""><a href="#verifying-setup">Verify your setup</a>
             <li class=""><a href="#undercover-cli">Bonus: shorten the feedback loop with local CLI</a>
           </ul>
@@ -43,12 +44,12 @@
 
       <h5>Failed</h5>
       <p>
-        When untested lines of code are found, a failed check will highlight them and ask you to add tests. Once tests are added, the comments will go away and the check status will turn to passed ✅.
+        When untested lines or branches are found, a failed check will highlight them and ask you to add tests. Once tests are added, the comments will go away and the check status will turn to passed ✅.
       </p>
 
       <figure class="text-center my-4">
         <%= image_tag("location-breakdown.png", class: "border docs-image") %>
-        <figcaption class="figure-caption text-center">A passed check can provide some coverage insights too.</figcaption>
+        <figcaption class="figure-caption text-center">Every check from UndercoverCI, no matter whether passed or failed, includes some general stats: a list of changed methods, classes and blocks, their filenames, line coverage and branch coverage values.</figcaption>
       </figure>
 
       <hr/>
@@ -62,7 +63,7 @@
       </p>
 
       <div class="alert alert-info" role="alert">
-        UndercoverCI is currently <b>free of charge</b> for all public repositories and individual GitHub accounts. <br/><br/> See the <%= link_to "pricing page", pricing_page_path, class: "alert-link" %> for more information on the Organization plan as well as self-hosted options that will remain free forever.
+        UndercoverCI is a subscription-based GitHub integration, although you can use it free of charge for public repositories, individual GitHub accounts and educational purposes.<br/><br/> For organizations, see the <%= link_to "pricing page", pricing_page_path, class: "alert-link" %> for more information as well as self-hosted options that will remain free forever.
       </div>
 
       <p>
@@ -93,6 +94,12 @@
       <p>
         If you made it here, it means your code review setup with UndercoverCI is ready!
       </p>
+
+      <h4 id="branch-cov" class="mt-5 mb-2">Branch coverage</h4>
+
+      <p>UndercoverCI and <code>undercover</code> CLI (starting with version <code>>= 0.4.0</code>) both accept coverage reports with branch coverage data.</p> The <a href="#reporting">configuration example</a> already shows how to enable branch coverage in SimpleCov, which is all you need to receive more fine-grained coverage checks.
+
+      <p>If you decide to enable branch coverage reporting, every changed line of code with at least one uncovered branch will be flagged and result in a GitHub annotation for the entire method. This is a more rigorous approach compared to just validating line-by-line test coverage.</p>
 
       <h4 id="undercover-cli" class="mt-5 mb-2">Bonus: shorten the feedback loop with the local CLI</h4>
 
