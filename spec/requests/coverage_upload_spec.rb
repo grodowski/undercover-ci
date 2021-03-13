@@ -42,7 +42,7 @@ describe "Coverage Upload" do
     expect(check.reload.coverage_reports.attached?).to eq(false)
   end
 
-  it "enqueues RunUndercover in 5 seconds" do
+  it "transitions the check to in_progress and enqueues RunUndercover in 5 seconds" do
     check = make_coverage_check
     contents = File.read("spec/fixtures/coverage.lcov")
 
@@ -52,12 +52,13 @@ describe "Coverage Upload" do
       end.to have_enqueued_job(RunnerJob).at(5.seconds.from_now)
     end
 
+    expect(check.reload.state).to eq(:in_progress)
     expect(response.status).to eq(201)
   end
 
   context "with inline jobs" do
     before do
-      # TODO: remove once https://github.com/rails/rails/issues/37270 is addressed in rails 6.0.2
+      # TODO: remove once https://github.com/rails/rails/issues/37270 is addressed in rails 6.1.next
       RunnerJob.itself # load it
       (ActiveJob::Base.descendants << ActiveJob::Base).each(&:disable_test_adapter)
       @prev_adapter = ActiveJob::Base.queue_adapter
@@ -93,6 +94,11 @@ describe "Coverage Upload" do
       name: "Foo Bar"
     )
     installation = Installation.create!(installation_id: "123123", users: [user])
-    CoverageCheck.create!(installation: installation, repo: {id: 1, full_name: "user/repository"}, head_sha: "b4c0n")
+    CoverageCheck.create!(
+      state: :awaiting_coverage,
+      installation: installation,
+      repo: {id: 1, full_name: "user/repository"},
+      head_sha: "b4c0n"
+    )
   end
 end

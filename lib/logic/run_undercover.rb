@@ -5,6 +5,7 @@ module Logic
     include ClassLoggable
 
     RunError = Class.new(StandardError)
+    CheckoutError = Class.new(RunError)
 
     def self.call(coverage_check)
       new(coverage_check).run_undercover
@@ -23,12 +24,10 @@ module Logic
     end
 
     def run_undercover
-      if coverage_check.state != :awaiting_coverage
-        log "exiting early, coverage_check #{coverage_check.id} is #{coverage_check.state}"
+      if coverage_check.state != :in_progress
+        log "exiting early, coverage_check #{coverage_check.id} is #{coverage_check.state}, but should be in_progress"
         return
       end
-
-      Logic::UpdateCoverageCheckState.new(coverage_check).start
 
       log "starting run #{run} job_id: #{coverage_check.id}"
       CheckRuns::Run.new(run).post
@@ -75,6 +74,9 @@ module Logic
       repo = Rugged::Repository.new(repo_path)
       branch = repo.create_branch("undercover-ci", run.sha)
       repo.checkout(branch)
+    rescue Rugged::OSError => e
+      log "checkout failed with #{e}"
+      raise CheckoutError
     end
 
     def teardown

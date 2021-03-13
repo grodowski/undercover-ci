@@ -15,12 +15,12 @@ describe Logic::RunUndercover do
       installation: installation,
       head_sha: "b8f95245", # commit sha from fake_repo feature branch
       repo: {"full_name" => "author/repo", "default_branch" => "master"},
-      state: :awaiting_coverage
+      state: :in_progress
     )
   end
   subject { described_class.call(coverage_check) }
 
-  it "logs and returns when CoverageCheck is not in awaiting_coverage state" do
+  it "logs and returns when CoverageCheck is not in in_progress state" do
     coverage_check.coverage_reports.attach(
       io: File.open("spec/fixtures/coverage.lcov"),
       filename: "#{coverage_check.id}_b4c0n.lcov",
@@ -35,6 +35,20 @@ describe Logic::RunUndercover do
 
   it "raises a RunError if CoverageCheck has zero attached coverage reports" do
     expect { subject }.to raise_error(Logic::RunUndercover::RunError, /coverage_reports can't be blank/)
+  end
+
+  it "raises a CheckoutError when rugged fails to initialize to trigger a retry" do
+    coverage_check.coverage_reports.attach(
+      io: File.open("spec/fixtures/coverage.lcov"),
+      filename: "#{coverage_check.id}_b4c0n.lcov",
+      content_type: "text/plain"
+    )
+    stub_get_installation_token
+    stub_post_check_runs
+    allow(Imagen::Clone).to receive(:perform)
+    allow(Rugged::Repository).to receive(:new).and_raise(Rugged::OSError)
+
+    expect { subject }.to raise_error(Logic::RunUndercover::CheckoutError)
   end
 
   it "clones the repository and runs the undercover command" do

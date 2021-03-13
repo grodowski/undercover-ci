@@ -19,6 +19,7 @@ module V1
 
         @coverage_check.transaction do
           attach_report(input_io)
+          Logic::UpdateCoverageCheckState.new(@coverage_check).start
           # Wait 5 seconds to let ActiveStorage process the attachment
           RunnerJob.set(wait: 5.seconds).perform_later(@coverage_check.id)
         end
