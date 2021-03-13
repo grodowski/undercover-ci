@@ -42,6 +42,20 @@ describe "Coverage Upload" do
     expect(check.reload.coverage_reports.attached?).to eq(false)
   end
 
+  it "returns an error when check has been canceled" do
+    check = make_coverage_check
+    check.update!(state: :canceled)
+
+    contents = ""
+    post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
+
+    expect(response.status).to eq(422)
+    expect(JSON.parse(response.body)).to eq(
+      "error" => "Attempted coverage upload for a canceled check"
+    )
+    expect(check.reload.coverage_reports.attached?).to eq(false)
+  end
+
   it "transitions the check to in_progress and enqueues RunUndercover in 5 seconds" do
     check = make_coverage_check
     contents = File.read("spec/fixtures/coverage.lcov")
