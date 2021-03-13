@@ -6,6 +6,7 @@ module Logic
 
     RunError = Class.new(StandardError)
     CheckoutError = Class.new(RunError)
+    CloneError = Class.new(RunError)
 
     def self.call(coverage_check)
       new(coverage_check).run_undercover
@@ -68,6 +69,9 @@ module Logic
         "https://x-access-token:#{i_token}@github.com/#{run.full_name}.git",
         repo_path
       )
+    rescue Imagen::GitError => e
+      log "clone_repo failed with #{e}"
+      raise CloneError
     end
 
     def checkout
