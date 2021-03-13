@@ -13,9 +13,8 @@ module CheckRuns
         details_url: details_url,
         external_id: run.external_id,
         output: {
-          title: "Queued",
-          summary: "Awaiting coverage data",
-          text: queued_text_for_run
+          title: "Awaiting coverage data",
+          summary: queued_text_for_run
         },
         accept: "application/vnd.github.antiope-preview+json"
       )
@@ -26,7 +25,7 @@ module CheckRuns
 
     def queued_text_for_run
       <<~TEXT
-        ⏳ A coverage check is queued and waiting for your CI to upload a coverage report... If this is
+        ⏳ A coverage check is waiting for your CI to upload a coverage report... If this is
         your first build, take a look at [UndercoverCI docs](https://undercover-ci.com/docs).
       TEXT
     end

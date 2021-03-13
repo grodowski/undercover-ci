@@ -2,6 +2,10 @@ export GITHUB_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEArjMo
 export GITHUB_APP_IDENTIFIER=bacon_app_id
 export GITHUB_WEBHOOK_SECRET=sekrit
 
+# Puma
+export WEB_CONCURRENCY=1
+export RAILS_MAX_THREADS=1
+
 # GitHub OAuth
 export GITHUB_AUTH_KEY=
 export GITHUB_AUTH_SECRET=
@@ -20,7 +24,6 @@ export AWS_ACTIVESTORAGE_BUCKET=
 
 # Feature toggles
 # export FF_TERMS_OF_SERVICE=
-# export FF_SUBSCRIPTION=
 
 # Gumroad
 export GUMROAD_SELLER_ID=

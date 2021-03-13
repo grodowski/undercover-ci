@@ -19,7 +19,7 @@ module Logic
     end
 
     def cancel
-      transition(:created, :canceled)
+      transition(%i[created awaiting_coverage in_progress], :canceled)
     end
   end
 end

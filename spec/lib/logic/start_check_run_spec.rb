@@ -16,11 +16,6 @@ describe Logic::StartCheckRun do
   end
   let(:installation) { Installation.create!(installation_id: "123123", users: [user]) }
 
-  before do
-    allow(ENV).to receive(:[]).and_call_original
-    allow(ENV).to receive(:[]).with("FF_SUBSCRIPTION") { "1" }
-  end
-
   it "fails if installation does not exist" do
     expect(CreateCheckRunJob).not_to receive(:perform_later)
 
@@ -64,11 +59,14 @@ describe Logic::StartCheckRun do
       installation.itself
       expect(CreateCheckRunJob).to receive(:perform_later).once
 
-      described_class.call(check_run_info)
+      Timecop.freeze do
+        described_class.call(check_run_info)
 
-      coverage_check = CoverageCheck.last
-      expect(coverage_check.check_suite).to eq("id" => "1234")
-      expect(coverage_check.repo).to eq("full_name" => "grodowski/undercover-ci")
+        coverage_check = CoverageCheck.last
+        expect(ExpireCheckJob).to have_been_enqueued.at(90.minutes.from_now).with(coverage_check.id)
+        expect(coverage_check.check_suite).to eq("id" => "1234")
+        expect(coverage_check.repo).to eq("full_name" => "grodowski/undercover-ci")
+      end
     end
   end
 
@@ -100,16 +98,20 @@ describe Logic::StartCheckRun do
       )
     end
 
-    it "creates CoverageCheck in canceled state" do
-      expect(CreateCheckRunJob).not_to receive(:perform_later)
+    it "enqueues an immediate transition to canceled" do
+      expect(CreateCheckRunJob).to receive(:perform_later)
 
-      described_class.call(check_run_info)
+      Timecop.freeze do
+        described_class.call(check_run_info)
 
-      coverage_check = CoverageCheck.last
-      expect(coverage_check.state).to eq(:canceled)
-      expect(coverage_check.head_sha).to eq("b4c0n1")
-      expect(coverage_check.base_sha).to eq("c0mp4r3")
-      expect(coverage_check).to be_persisted
+        coverage_check = CoverageCheck.last
+        expect(coverage_check.state).to eq(:awaiting_coverage)
+        expect(coverage_check.head_sha).to eq("b4c0n1")
+        expect(coverage_check.base_sha).to eq("c0mp4r3")
+        expect(coverage_check).to be_persisted
+
+        expect(ExpireCheckJob).to have_been_enqueued.at(5.seconds.from_now).with(coverage_check.id)
+      end
     end
   end
 end

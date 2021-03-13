@@ -21,6 +21,16 @@ describe Logic::UpdateCoverageCheckState do
     expect { svc.await_coverage }.to change { coverage_check.reload.state }.from(:created).to(:awaiting_coverage)
   end
 
+  it "updates state from awaiting_coverage to canceled" do
+    coverage_check.update!(state: :awaiting_coverage)
+    expect { svc.cancel }.to change { coverage_check.reload.state }.from(:awaiting_coverage).to(:canceled)
+  end
+
+  it "updates state from in_progress to canceled" do
+    coverage_check.update!(state: :in_progress)
+    expect { svc.cancel }.to change { coverage_check.reload.state }.from(:in_progress).to(:canceled)
+  end
+
   it "updates state to in_progress" do
     coverage_check.update!(state: :awaiting_coverage)
     expect { svc.start }.to change { coverage_check.reload.state }.from(:awaiting_coverage).to(:in_progress)

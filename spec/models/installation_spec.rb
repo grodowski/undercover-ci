@@ -3,11 +3,6 @@
 require "rails_helper"
 
 RSpec.describe Installation, type: :model do
-  before do
-    allow(ENV).to receive(:[]).and_call_original
-    allow(ENV).to receive(:[]).with("FF_SUBSCRIPTION") { "1" }
-  end
-
   describe "create" do
     it "ensures a trial subscription for orgs" do
       user = User.create!(uid: "1", email: "foo@bar.com", token: "sekrit", name: "Foo")

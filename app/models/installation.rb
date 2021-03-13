@@ -30,14 +30,12 @@ class Installation < ApplicationRecord
   end
 
   def active?
-    return true unless ENV["FF_SUBSCRIPTION"]
     return true unless subscription
 
     subscription.active?
   end
 
   def ensure_subscription
-    return unless ENV["FF_SUBSCRIPTION"]
     return if user? || subscription.present?
 
     subscriptions.create

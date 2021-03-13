@@ -58,8 +58,6 @@ module ApplicationHelper
   end
 
   def gumroad_subscribe_link(installation)
-    return unless ENV["FF_SUBSCRIPTION"]
-
     subscribe_link = link_to(
       "Subscribe",
       "https://gum.co/" \
