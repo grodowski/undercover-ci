@@ -14,8 +14,7 @@ SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new(
 )
 SimpleCov.start do
   add_filter(/^\/spec\//)
-  # TODO: uncomment once undercover 0.4.0 goes live on UndercoverCI
-  # enable_coverage(:branch)
+  enable_coverage(:branch)
 end
 
 system("source .envrc.example")
