@@ -7,7 +7,7 @@ module Logic
     end
 
     def start
-      transition(:awaiting_coverage, :in_progress)
+      transition(%i[awaiting_coverage in_progress], :in_progress)
     end
 
     def restart

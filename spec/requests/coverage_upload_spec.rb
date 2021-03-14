@@ -70,6 +70,21 @@ describe "Coverage Upload" do
     expect(response.status).to eq(201)
   end
 
+  it "restarts an in_progress check and enqueues RunUndercover in 5 seconds" do
+    check = make_coverage_check
+    check.update!(state: :in_progress)
+    contents = File.read("spec/fixtures/coverage.lcov")
+
+    Timecop.freeze do
+      expect do
+        post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
+      end.to have_enqueued_job(RunnerJob).at(5.seconds.from_now)
+    end
+
+    expect(check.reload.state).to eq(:in_progress)
+    expect(response.status).to eq(201)
+  end
+
   context "with inline jobs" do
     before do
       # TODO: remove once https://github.com/rails/rails/issues/37270 is addressed in rails 6.1.next
