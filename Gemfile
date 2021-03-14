@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-ruby "2.7.1"
+ruby "3.0.0"
 source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-gem "rails", "~> 6.0.0"
+gem "rails", "~> 6.1"
 
 gem "aws-sdk-s3", require: false
 gem "bcrypt", "~> 3.1.15"
@@ -20,8 +20,8 @@ gem "bootstrap"
 gem "bootstrap4-kaminari-views"
 gem "coffee-rails", "~> 5.0"
 gem "jquery-rails"
-gem "sass-rails", "~> 5.0"
-gem "turbolinks", "~> 5"
+gem "sassc-rails"
+gem "turbolinks"
 gem "uglifier", ">= 1.3.0"
 
 # Core
@@ -47,7 +47,7 @@ group :development, :test do
 end
 
 group :development do
-  gem "listen", ">= 3.0.5", "< 3.3"
+  gem "listen"
   gem "spring"
   gem "spring-watcher-listen", "~> 2.0.0"
   gem "web-console", ">= 3.3.0"
