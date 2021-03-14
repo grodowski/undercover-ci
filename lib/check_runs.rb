@@ -6,7 +6,7 @@ require "github_requests"
 # `Resource` suffix. E.g. CheckRuns -> CheckRunsResource
 module CheckRuns
   class Base
-    include GitHubRequests
+    include GithubRequests
     include ClassLoggable
 
     attr_reader :run

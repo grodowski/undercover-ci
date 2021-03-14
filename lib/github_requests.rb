@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module GitHubRequests
+module GithubRequests
   PRIVATE_KEY = OpenSSL::PKey::RSA.new(
     ENV.fetch("GITHUB_PRIVATE_KEY").gsub('\n', "\n")
   )
