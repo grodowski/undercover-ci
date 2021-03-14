@@ -28,14 +28,13 @@ class ApplicationController < ActionController::Base
   end
   helper_method :dash_installation_url
 
-  # TODO: refresh user installations should soft-delete unistalled installations
-  # TODO: currently they get stuck on the dashboard!
   def refresh_user_installations
     client = Octokit::Client.new(access_token: current_user.token)
     client.auto_paginate = true # TODO: move to bg sync?
     installations = client.find_user_installations(
       accept: "application/vnd.github.machine-man-preview+json"
     ).to_h
+    installations_to_keep = Set.new
     installations[:installations].each do |inst|
       repos = client.find_installation_repositories_for_user(
         inst[:id],
@@ -52,6 +51,12 @@ class ApplicationController < ActionController::Base
 
       # keep installations in sync with GitHub
       installation.update!(metadata: inst, repos: repos[:repositories])
+      installations_to_keep << installation
+    end
+
+    # remove user from outstanding installations w/o access
+    (current_user.installations - installations_to_keep.to_a).each do |installation_to_remove|
+      current_user.user_installations.find_by(installation: installation_to_remove).destroy
     end
   end
 end

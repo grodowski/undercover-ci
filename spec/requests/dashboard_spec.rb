@@ -12,7 +12,7 @@ describe "Dashboard spec" do
     )
   end
 
-  let(:github_installations) { [] }
+  let(:github_installations) { [{id: "1337"}] }
   before do
     stub_request(:get, "https://api.github.com/user/installations/1337/repositories?per_page=100")
       .to_return(
@@ -32,11 +32,26 @@ describe "Dashboard spec" do
   end
 
   describe "GET /app" do
-    it "renders dashboard#index for a signed in user" do
-      get("/auth/github/callback")
+    context "without any installations" do
+      let(:github_installations) { [] }
 
-      get("/app")
-      expect(response).to redirect_to("/settings/new")
+      it "renders dashboard#index for a signed in user" do
+        get("/auth/github/callback")
+
+        get("/app")
+        expect(response).to redirect_to("/settings/new")
+      end
+
+      it "removes outstanding UserInstallations for current user" do
+        inst = Installation.create!(installation_id: 1337, users: [user])
+
+        expect do
+          get("/auth/github/callback")
+          get("/app")
+        end.to change { inst.reload.users }.from([user]).to([])
+
+        expect(inst).to be_persisted
+      end
     end
 
     it "redirects to root url for an anonymous user" do
@@ -44,7 +59,7 @@ describe "Dashboard spec" do
     end
 
     it "renders checks/index when setup is complete" do
-      inst = Installation.create!(installation_id: 43_009_808, users: [user])
+      inst = Installation.create!(installation_id: 1337, users: [user])
       check = CoverageCheck.create!(head_sha: "1337SHA", installation: inst)
       check.nodes.create(
         path: "foo.rb",
@@ -98,7 +113,7 @@ describe "Dashboard spec" do
 
   describe "GET /checks/:id" do
     it "renders checks/show" do
-      inst = Installation.create!(installation_id: 43_009_808, users: [user])
+      inst = Installation.create!(installation_id: 1337, users: [user])
       check = CoverageCheck.create!(head_sha: "1337SHA", installation: inst)
       [[1.0, false], [0.8, false], [0.6, true]].each do |coverage, flagged|
         check.nodes.create!(
