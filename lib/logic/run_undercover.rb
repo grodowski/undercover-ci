@@ -62,9 +62,9 @@ module Logic
     # https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#http-based-git-access-by-an-installation
     def clone_repo
       FileUtils.mkdir_p(repo_path)
+      FileUtils.remove_entry(repo_path, true)
 
       i_token = CheckRuns::InstallationAccessToken.new(run).get
-      FileUtils.remove_entry(repo_path)
       Imagen::Clone.perform(
         "https://x-access-token:#{i_token}@github.com/#{run.full_name}.git",
         repo_path
