@@ -54,7 +54,7 @@ describe DataObjects::CheckRunInfo do
         }
       )
 
-      expect(described_class.find_base_sha(payload)).to eq("before_commit")
+      expect(described_class.find_base_sha(payload)).to eq("HEAD~1")
     end
   end
 end
