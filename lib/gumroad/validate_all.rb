@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Gumroad
-  class ValidateAll
+  module ValidateAll
     extend ClassLoggable
 
     def self.call
@@ -21,8 +21,10 @@ module Gumroad
           )
         end
         if validator.license.failed_at
-          Raven.capture_exception("#{subscription.gumroad_id} license validation" \
-            " - payment failed on #{validator.license.failed_at}")
+          Raven.capture_exception(
+            "#{subscription.gumroad_id} license validation" \
+                        " - payment failed on #{validator.license.failed_at}"
+          )
         end
       else
         log "key:#{subscription.license_key} installation:#{installation_id}, ok:#{status.success?}"

@@ -5,6 +5,7 @@ module ApplicationHelper
     repo = coverage_check.repo_full_name
     pr = coverage_check.check_suite&.dig("pull_requests", 0)
 
+    # rubocop:disable Style/StringConcatenation
     if pr
       pr_number = pr["number"]
       base_vs_compare = content_tag("code", "#{pr['head']['ref']} @ #{coverage_check.head_sha[0..7]}") + \
@@ -17,6 +18,7 @@ module ApplicationHelper
                         content_tag("code", (coverage_check.base_sha.try(:[], 0..7) || coverage_check.default_branch))
       url = "https://github.com/#{repo}/commit/#{coverage_check.head_sha}"
     end
+    # rubocop:enable Style/StringConcatenation
     link_to base_vs_compare, url
   end
 
@@ -37,7 +39,7 @@ module ApplicationHelper
 
   def format_node_coverage(node)
     # TODO: store coverage array to display lines?
-    color, text = if node.coverage == 1.0
+    color, text = if node.coverage == 1.0 # rubocop:disable Lint/FloatComparison
                     [:default, ""]
                   elsif node.flagged?
                     [:yellow, " (contains untested diff lines)"]

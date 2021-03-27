@@ -11,8 +11,8 @@ describe "GitHub Webhooks" do
 
   it "requires application/json" do
     invalid_headers = {
-      "CONTENT_TYPE": "text/html",
-      "ACCEPT": "text/html"
+      CONTENT_TYPE: "text/html",
+      ACCEPT: "text/html"
     }
 
     expect do
@@ -23,9 +23,9 @@ describe "GitHub Webhooks" do
   %w[invalid sha1=invalid asdf=invalid].each do |sig|
     it "is unauthorized when X_HUB_SIGNATURE is #{sig}" do
       invalid_headers = {
-        "CONTENT_TYPE": "application/json",
-        "ACCEPT": "application/json",
-        "HTTP_X_HUB_SIGNATURE": sig
+        CONTENT_TYPE: "application/json",
+        ACCEPT: "application/json",
+        HTTP_X_HUB_SIGNATURE: sig
       }
       post path, params: "{}", headers: invalid_headers
       expect(response).to be_unauthorized
@@ -35,9 +35,9 @@ describe "GitHub Webhooks" do
   it "returns ok for unhandled actions" do
     payload = {action: :start}.to_json
     valid_headers = {
-      "ACCEPT": "application/json",
-      "HTTP_X_HUB_SIGNATURE": sign_hook(payload),
-      "HTTP_X_GITHUB_EVENT": "partyhard"
+      ACCEPT: "application/json",
+      HTTP_X_HUB_SIGNATURE: sign_hook(payload),
+      HTTP_X_GITHUB_EVENT: "partyhard"
     }
 
     post path, params: payload, headers: valid_headers
@@ -69,9 +69,9 @@ describe "GitHub Webhooks" do
       "pull_requests" => []
     }
     valid_headers = {
-      "ACCEPT": "application/json",
-      "HTTP_X_HUB_SIGNATURE": sign_hook(payload.to_json),
-      "HTTP_X_GITHUB_EVENT": "check_suite"
+      ACCEPT: "application/json",
+      HTTP_X_HUB_SIGNATURE: sign_hook(payload.to_json),
+      HTTP_X_GITHUB_EVENT: "check_suite"
     }
     allow(CreateCheckRunJob).to receive(:perform_later)
 
