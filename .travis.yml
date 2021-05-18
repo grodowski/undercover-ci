@@ -1,4 +1,6 @@
 language: ruby
+os: linux
+dist: bionic
 cache: bundler
 rvm:
   - 3.0.1
@@ -12,12 +14,14 @@ env:
     - AWS_ACTIVESTORAGE_BUCKET=test-bucket
     - GUMROAD_SELLER_ID=53113R
     - GUMROAD_SUBSCRIPTION_PRODUCT_PERMALINK=undercover-ci
-addons:
-  postgresql: "9.6"
+services:
+  - postgresql
+before_install:
+  - nvm install 12
 script:
   - bundle exec rubocop
   - RAILS_ENV=test bundle exec rails db:setup
-  - bundle exec rake
+  - bundle exec rspec
   - |
       ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- \
         --repo grodowski/undercover-ci \

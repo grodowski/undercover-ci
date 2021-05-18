@@ -16,12 +16,12 @@ gem "puma", "~> 4.3"
 gem "sidekiq"
 
 # UI Gems
-gem "bootstrap"
+gem "bootstrap", "~> 4.6"
 gem "bootstrap4-kaminari-views"
 gem "coffee-rails", "~> 5.0"
 gem "jquery-rails"
-gem "mini_racer"
-gem "sassc-rails"
+gem "sass-rails"
+gem "sprockets", "3.7.2" # pin sprockets to avoid
 gem "turbolinks"
 gem "uglifier", ">= 1.3.0"
 
