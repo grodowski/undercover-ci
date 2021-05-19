@@ -16,7 +16,7 @@ gem "puma", "~> 4.3"
 gem "sidekiq"
 
 # UI Gems
-gem "bootstrap", "~> 4.6"
+gem "bootstrap", "~> 5.0"
 gem "bootstrap4-kaminari-views"
 gem "coffee-rails", "~> 5.0"
 gem "jquery-rails"
