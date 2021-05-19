@@ -16,7 +16,6 @@ module DataObjects
     nodes
   ].freeze
 
-  # rubocop:disable Metrics/BlockLength
   # TODO: consider refactoring into OpenStruct/Class with named attrs
   CheckRunInfo = Struct.new(*CHECK_RUN_INFO_ATTRIBUTES) do
     def self.from_webhook(payload)
@@ -66,5 +65,4 @@ module DataObjects
 
     alias_method :to_s, :inspect
   end
-  # rubocop:enable Metrics/BlockLength
 end

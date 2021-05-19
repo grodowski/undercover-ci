@@ -5,12 +5,17 @@ require "spec_helper"
 require "pry"
 require "webmock/rspec"
 require "simplecov"
+require "simplecov_json_formatter"
 require "simplecov-lcov"
 require "yaml"
 
 SimpleCov::Formatter::LcovFormatter.config.report_with_single_file = true
 SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new(
-  [SimpleCov::Formatter::LcovFormatter, SimpleCov::Formatter::HTMLFormatter]
+  [
+    SimpleCov::Formatter::LcovFormatter,
+    SimpleCov::Formatter::JSONFormatter,
+    SimpleCov::Formatter::HTMLFormatter
+  ]
 )
 SimpleCov.start do
   add_filter(/^\/spec\//)

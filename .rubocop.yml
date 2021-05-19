@@ -1,12 +1,21 @@
 AllCops:
   EnabledByDefault: true
-  TargetRubyVersion: 2.7.1
+  TargetRubyVersion: 3.0.1
   Exclude:
     - db/migrate/*
     - db/schema.rb
     - spec/fixtures/**/*
     - tmp/**/*
     - vendor/**/*
+
+Bundler/GemVersion:
+  Enabled: false
+
+Layout/RedundantLineBreak:
+  Enabled: false
+
+Layout/SingleLineBlockChain:
+  Enabled: false
 
 Lint/NumberConversion:
   Enabled: false

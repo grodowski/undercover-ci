@@ -26,7 +26,7 @@ module V1
 
         head(:created)
       else
-        render("shared/generic_error.json", status: :unprocessable_entity)
+        render "shared/generic_error", format: :json, status: :unprocessable_entity
       end
     end
 
@@ -60,7 +60,7 @@ module V1
       return unless @coverage_check.state == :canceled
 
       @error_message = "Attempted coverage upload for a canceled check"
-      render("shared/generic_error.json", status: :unprocessable_entity)
+      render "shared/generic_error", format: :json, status: :unprocessable_entity
     end
   end
 end
