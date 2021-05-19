@@ -212,7 +212,7 @@ GEM
     pry-rails (0.3.9)
       pry (>= 0.10.4)
     public_suffix (4.0.6)
-    puma (4.3.8)
+    puma (5.3.1)
       nio4r (~> 2.0)
     racc (1.5.2)
     rack (2.2.3)
@@ -385,7 +385,7 @@ DEPENDENCIES
   omniauth-rails_csrf_protection
   pg (>= 0.18, < 2.0)
   pry-rails
-  puma (~> 4.3)
+  puma (~> 5.3)
   rails (~> 6.1)
   rspec-rails
   rubocop

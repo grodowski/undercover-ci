@@ -12,7 +12,7 @@ gem "bootsnap", ">= 1.1.0", require: false
 gem "jbuilder", "~> 2.9"
 gem "kaminari"
 gem "pg", ">= 0.18", "< 2.0"
-gem "puma", "~> 4.3"
+gem "puma", "~> 5.3"
 gem "sidekiq"
 
 # UI Gems
