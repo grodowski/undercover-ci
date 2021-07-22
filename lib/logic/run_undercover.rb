@@ -69,6 +69,10 @@ module Logic
         "https://x-access-token:#{i_token}@github.com/#{run.full_name}.git",
         repo_path
       )
+
+      list_branches = `cd #{repo_path} && git branch -a`
+      crumb = Sentry::Breadcrumb.new(category: "clone_repo", message: list_branches.to_json, level: "info")
+      Sentry.add_breadcrumb(crumb)
     rescue Imagen::GitError => e
       log "clone_repo failed with #{e}"
       raise CloneError

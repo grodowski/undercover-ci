@@ -38,7 +38,7 @@ gem "omniauth-github"
 gem "omniauth-rails_csrf_protection"
 
 # Tooling
-gem "sentry-raven"
+gem "sentry-ruby"
 
 group :development, :test do
   gem "byebug", platforms: %i[mri mingw x64_mingw]

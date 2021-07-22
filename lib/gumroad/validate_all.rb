@@ -21,7 +21,7 @@ module Gumroad
           )
         end
         if validator.license.failed_at
-          Raven.capture_exception(
+          Sentry.capture_exception(
             "#{subscription.gumroad_id} license validation" \
                         " - payment failed on #{validator.license.failed_at}"
           )

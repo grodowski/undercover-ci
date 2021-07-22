@@ -47,10 +47,9 @@ describe Logic::ProcessSale do
       gumroad_id: "subxxx",
       license_key: "1337"
     )
-    expect(Raven)
-      .to receive(:capture_exception)
-      .with("1337SUB error: license key already used")
-      .once
+    expect(Sentry).to receive(:capture_exception) do |err|
+      expect(err.message).to eq("1337SUB error: license key already used")
+    end.once
 
     res = nil
     expect { res = subject.call }.not_to change(Subscription, :count)

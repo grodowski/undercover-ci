@@ -8,10 +8,14 @@ class RunnerJob < ApplicationJob
   include ClassLoggable
   queue_as :default
 
-  # defaults to 3s wait, 5 attempts
+  # default retry for uncaught exceptions
+  sidekiq_options retry: 2
+
+  # defaults to 3s wait, 2 attempts
   retry_on ActiveStorage::FileNotFoundError,
            Logic::RunUndercover::RunError,
-           Octokit::Error
+           Octokit::Error,
+           Rugged::ReferenceError
 
   def perform(coverage_check_id)
     coverage_check = CoverageCheck.find(coverage_check_id)

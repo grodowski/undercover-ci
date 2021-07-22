@@ -4,6 +4,8 @@ module Logic
   class ProcessSale
     include ClassLoggable
 
+    Error = Class.new(StandardError)
+
     def self.call(gumroad_sale)
       new(gumroad_sale).call
     end
@@ -19,7 +21,7 @@ module Logic
       Installation.transaction do
         error = check_subscription
         if error
-          Raven.capture_exception("#{sale.subscription_id} error: #{error}")
+          Sentry.capture_exception(Error.new("#{sale.subscription_id} error: #{error}"))
           return Status.new(error)
         end
 
