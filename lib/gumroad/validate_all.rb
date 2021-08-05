@@ -9,6 +9,8 @@ module Gumroad
     end
 
     def self.validate(subscription)
+      return if subscription.state == :beta
+
       validator = ValidateLicense.new(subscription.license_key)
       status = validator.call
       installation_id = subscription.installation.installation_id
