@@ -57,10 +57,6 @@ module V1
       check_params = params.require(%i[repo sha])
       @coverage_check = CoverageCheck.where("repo @> ?", {full_name: check_params[0]}.to_json)
                                      .where(head_sha: check_params[1]).first!
-      return unless @coverage_check.state == :canceled
-
-      @error_message = "Attempted coverage upload for a canceled check"
-      render "shared/generic_error", format: :json, status: :unprocessable_entity
     end
   end
 end
