@@ -17,9 +17,6 @@ describe "Coverage Upload" do
     check = make_coverage_check
     contents = File.read("spec/fixtures/coverage.lcov")
 
-    fake_run = class_spy(Logic::RunUndercover)
-    stub_const("Logic::RunUndercover", fake_run)
-
     post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
 
     check.reload
@@ -42,18 +39,17 @@ describe "Coverage Upload" do
     expect(check.reload.coverage_reports.attached?).to eq(false)
   end
 
-  it "returns an error when check has been canceled" do
+  it "accepts coverage even though the check has been canceled" do
     check = make_coverage_check
     check.update!(state: :canceled)
 
-    contents = ""
+    contents = File.read("spec/fixtures/coverage.lcov")
     post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
 
-    expect(response.status).to eq(422)
-    expect(JSON.parse(response.body)).to eq(
-      "error" => "Attempted coverage upload for a canceled check"
-    )
-    expect(check.reload.coverage_reports.attached?).to eq(false)
+    expect(response.status).to eq(201)
+
+    expect(check.reload.coverage_reports.attached?).to eq(true)
+    expect(check.reload.state).to eq(:in_progress)
   end
 
   it "transitions the check to in_progress and enqueues RunUndercover in 5 seconds" do
