@@ -38,6 +38,7 @@ gem "omniauth-github"
 gem "omniauth-rails_csrf_protection"
 
 # Tooling
+gem "sentry-rails"
 gem "sentry-ruby"
 
 group :development, :test do
