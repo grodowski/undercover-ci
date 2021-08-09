@@ -5,7 +5,7 @@ class User < ApplicationRecord
   has_many :installations, through: :user_installations
   has_many :coverage_checks, through: :installations
 
-  validates :uid, :email, :name, :token, presence: true
+  validates :uid, :name, :token, presence: true
 
   def self.from_omniauth(auth_hash)
     user = find_or_initialize_by(uid: auth_hash[:uid])
