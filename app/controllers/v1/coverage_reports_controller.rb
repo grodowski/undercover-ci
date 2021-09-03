@@ -7,6 +7,7 @@ module V1
   class CoverageReportsController < ApplicationController
     protect_from_forgery with: :null_session
     before_action :find_coverage_check
+    before_action :check_subscription
 
     def create
       decoded = Base64.decode64(lcov_base64)
@@ -57,6 +58,13 @@ module V1
       check_params = params.require(%i[repo sha])
       @coverage_check = CoverageCheck.where("repo @> ?", {full_name: check_params[0]}.to_json)
                                      .where(head_sha: check_params[1]).first!
+    end
+
+    def check_subscription
+      return if @coverage_check.installation.active?
+
+      @error_message = "Your UndercoverCI license has expired, visit https://undercover-ci.com/settings to subscribe."
+      render "shared/generic_error", format: :json, status: :unprocessable_entity
     end
   end
 end

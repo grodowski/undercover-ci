@@ -81,6 +81,27 @@ describe "Coverage Upload" do
     expect(response.status).to eq(201)
   end
 
+  it "fails when installation is inactive" do
+    check = make_coverage_check
+    check.update!(state: :in_progress)
+    Subscription.create!(
+      installation: check.installation,
+      state: :unsubscribed,
+      end_date: 1.day.ago,
+      gumroad_id: "subxxx",
+      license_key: "1337"
+    )
+
+    contents = File.read("spec/fixtures/coverage.lcov")
+    post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
+
+    expect(check.reload.state).to eq(:in_progress) # canceled?
+    expect(response.status).to eq(422)
+    expect(JSON.parse(response.body)).to eq(
+      "error" => "Your UndercoverCI license has expired, visit https://undercover-ci.com/settings to subscribe."
+    )
+  end
+
   context "with inline jobs" do
     before do
       # TODO: remove once https://github.com/rails/rails/issues/37270 is addressed in rails 6.1.next
