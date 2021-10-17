@@ -1,7 +1,13 @@
 <% content_for(:title) { "Docs" } %>
 
 <div class="container">
-  <h4>Table of contents</h4>
+  <div class="row">
+    <div class="col-12 mb-3">
+      <h1 class="display-4">Documentation</h1>
+      <p class="lead">Learn how to install UndercoverCI for your repos, report coverage data and use the local CLI.</p>
+    </div>
+    <div class="col-lg-4 col-md-3 px-3 docs-table-of-contents">
+      <h6>Table of contents</h6>
       <ul class="list-unstyled">
         <li class=""><a href="#how-it-works">How it works</a></li>
         <li class=""><a href="#getting-started">Getting started</a>
@@ -22,8 +28,10 @@
         <li class=""><a href="https://github.com/grodowski/undercover-ci/blob/master/CHANGELOG.md">Changelog and release notes</a>
         <li class=""><a href="#development">Development</a>
       </ul>
+    </div>
 
-      <h2 id="how-it-works" class="mt-5 py-1">How it works</h2>
+    <div class="col-lg-8 col-md-9">
+      <h2 id="how-it-works">How it works</h2>
 
       <p>
         UndercoverCI is a robot who protects your Ruby codebase from untested code changes. It works with every Ruby project that can report test coverage with SimpleCov. Chances are, you're already doing that while running tests on a CI server.
@@ -54,7 +62,7 @@
       </figure>
 
       <hr/>
-      <h2 id="getting-started" class="mt-5 py-1">Getting started</h2>
+      <h2 id="getting-started" class="mt-5">Getting started</h2>
 
       Follow these 3 steps to get started with UndercoverCI and receive automated test coverage comments.
 
@@ -120,79 +128,80 @@
       <p>
         Visit the <a href="https://github.com/grodowski/undercover">undercover</a> GitHub page to see more examples including integrations with Overcommit and Pronto hooks.
       </p>
-    </div>
 
-    <hr/>
-    <h2 id="configuration" class="mt-5">Configuration</h2>
-    <h4 id="undercover-uploader" class="mt-5 mb-2">UndercoverCI uploader</h4>
+      <hr/>
+      <h2 id="configuration" class="mt-5">Configuration</h2>
+      <h4 id="undercover-uploader" class="mt-5 mb-2">UndercoverCI uploader</h4>
 
-    <p>
-      The uploader script runs in your CI build environment and uploads coverage reports to UndercoverCI. This way the coverage files are processed against a git diff and generate a commit check. A sample call for the <code>grodowski/undercover</code> repository built on CircleCI could look like this:
+      <p>
+        The uploader script runs in your CI build environment and uploads coverage reports to UndercoverCI. This way the coverage files are processed against a git diff and generate a commit check. A sample call for the <code>grodowski/undercover</code> repository built on CircleCI could look like this:
 
-      <pre><code>
-        ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- \
-                  --repo grodowski/undercover \
-                  --commit $CIRCLE_SHA1 \
-                  --lcov coverage/lcov/undercover.lcov
-      </code></pre>
+        <pre><code>
+          ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- \
+                    --repo grodowski/undercover \
+                    --commit $CIRCLE_SHA1 \
+                    --lcov coverage/lcov/undercover.lcov
+        </code></pre>
 
-      The <code>uploader.rb</code> script is securely downloaded and evaluated with the required command-line options:
-    </p>
-    <p>
-      <h6 class="mb-2 mt-3"><code>--repo</code></h6>
-      The <code>$org/$repo</code> formatted name matching exactly how your repository appears on GitHub.
+        The <code>uploader.rb</code> script is securely downloaded and evaluated with the required command-line options:
+      </p>
+      <p>
+        <h6 class="mb-2 mt-3"><code>--repo</code></h6>
+        The <code>$org/$repo</code> formatted name matching exactly how your repository appears on GitHub.
 
-      <h6 class="mb-2 mt-3"><code>--commit</code></h6>
-      Current build commit SHA to identify on GitHub. This value will be provided by the CI build environment, e.g. <code>$CIRCLE_SHA1</code> for CircleCI, <code>$GITHUB_SHA</code> for GitHub Actions or <code>$TRAVIS_COMMIT</code> for TravisCI.</li>
+        <h6 class="mb-2 mt-3"><code>--commit</code></h6>
+        Current build commit SHA to identify on GitHub. This value will be provided by the CI build environment, e.g. <code>$CIRCLE_SHA1</code> for CircleCI, <code>$GITHUB_SHA</code> for GitHub Actions or <code>$TRAVIS_COMMIT</code> for TravisCI.</li>
 
-      <h6 class="mb-2 mt-3"><code>--lcov</code></h6>
-      A relative path to the coverage report, will look like <code>coverage/lcov/$reponame.lcov</code> unless SimpleCov's config defaults were changed.
-    </p>
+        <h6 class="mb-2 mt-3"><code>--lcov</code></h6>
+        A relative path to the coverage report, will look like <code>coverage/lcov/$reponame.lcov</code> unless SimpleCov's config defaults were changed.
+      </p>
 
-    <h4 id="parallel-tests" class="mt-5 mb-2">Parallel tests</h4>
-    <p>
-      If your CI build runs tests in parallel, there's an extra merge step to be performed before uploading coverage results, because the uploader script only accepts a single file at the time of writing this document. While partial coverage results might be supported in a future release, this Ruby snippet should get you started with merging multiple coverage reports:
+      <h4 id="parallel-tests" class="mt-5 mb-2">Parallel tests</h4>
+      <p>
+        If your CI build runs tests in parallel, there's an extra merge step to be performed before uploading coverage results, because the uploader script only accepts a single file at the time of writing this document. While partial coverage results might be supported in a future release, this Ruby snippet should get you started with merging multiple coverage reports:
 
-      <pre><code>
-        #!/usr/bin/env ruby
-        # frozen_string_literal: true
+        <pre><code>
+          #!/usr/bin/env ruby
+          # frozen_string_literal: true
 
-        require 'simplecov'
-        require 'simplecov-lcov'
+          require 'simplecov'
+          require 'simplecov-lcov'
 
-        puts('Merging coverage results from parallel CircleCI tests containers into a single LCOV report...')
+          puts('Merging coverage results from parallel CircleCI tests containers into a single LCOV report...')
 
-        results = []
-        Dir['/home/circleci/rspec/*.resultset.json'].each do |path|
-          resultset = JSON.parse(File.read(path))
-          resultset.each do |_, data|
-            cmd = File.basename(path)
-            results << SimpleCov::Result.from_hash(cmd => data)
+          results = []
+          Dir['/home/circleci/rspec/*.resultset.json'].each do |path|
+            resultset = JSON.parse(File.read(path))
+            resultset.each do |_, data|
+              cmd = File.basename(path)
+              results << SimpleCov::Result.from_hash(cmd => data)
+            end
+            print '.'
           end
-          print '.'
-        end
-        puts
+          puts
 
-        merged_result = SimpleCov::ResultMerger.merge_results(*results)
+          merged_result = SimpleCov::ResultMerger.merge_results(*results)
 
-        SimpleCov::Formatter::LcovFormatter.config.report_with_single_file = true
-        SimpleCov::Formatter::LcovFormatter.config.single_report_path = ARGV[0] || 'coverage.lcov'
-        SimpleCov::Formatter::LcovFormatter.new.format(merged_result)
+          SimpleCov::Formatter::LcovFormatter.config.report_with_single_file = true
+          SimpleCov::Formatter::LcovFormatter.config.single_report_path = ARGV[0] || 'coverage.lcov'
+          SimpleCov::Formatter::LcovFormatter.new.format(merged_result)
 
-        puts("Done! LCOV saved to #{SimpleCov::Formatter::LcovFormatter.config.single_report_path}")
-      </code></pre>
-    </p>
+          puts("Done! LCOV saved to #{SimpleCov::Formatter::LcovFormatter.config.single_report_path}")
+        </code></pre>
+      </p>
 
-    <hr/>
-    <h2 id="development" class="mt-5">Development</h2>
-    <p>
-      The UndercoverCI Github App and the underlying undercover gem are developed and available on GitHub under a standard MIT license. Your contributions are welcome!
+      <hr/>
+      <h2 id="development" class="mt-5">Development</h2>
+      <p>
+        The UndercoverCI Github App and the underlying undercover gem are developed and available on GitHub under a standard MIT license. Your contributions are welcome!
 
-      <ul>
-        <li><a href="https://github.com/grodowski/undercover-ci">grodowski/undercover-ci</a></li>
-        <li><a href="https://github.com/grodowski/undercover">grodowski/undercover</a></li>
-      </ul>
-    </p>
-    <br/>
-    <hr/>
+        <ul>
+          <li><a href="https://github.com/grodowski/undercover-ci">grodowski/undercover-ci</a></li>
+          <li><a href="https://github.com/grodowski/undercover">grodowski/undercover</a></li>
+        </ul>
+      </p>
+      <br/>
+      <hr/>
+    </div>
+  </div>
 </div>

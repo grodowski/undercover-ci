@@ -146,14 +146,20 @@ a.lead { line-height: 1.2; }
 }
 
 .docs-image {
-  max-width: 500px;
-  @include media-breakpoint-up(lg) {
-    max-width: 800px;
-  }
+  max-width: 100%;
 }
 
 .docs-image-sm {
-  max-width: 250px;
+  max-width: 220px;
+}
+
+.docs-table-of-contents {
+  @include media-breakpoint-up(md) {
+    align-self: flex-start;
+    position: sticky;
+    top: $spacer;
+    z-index: 1020;
+  }
 }
 
 .row-href {
