@@ -56,7 +56,7 @@ module CheckRuns
         end.compact.uniq
         if lines_missing_branch_cov.any?
           message += "\nMissing branch coverage found in line#{'s' if lines_missing_branch_cov.size > 1} " \
-            "#{format_lines(lines_missing_branch_cov).join(',')}."
+                     "#{format_lines(lines_missing_branch_cov).join(',')}."
         end
         {
           path: result.file_path,
@@ -82,7 +82,7 @@ module CheckRuns
 
     def text_for_run
       text = "Revision `#{run.sha[0..6]}` has modified the following " \
-        "#{ActionController::Base.helpers.pluralize(@undercover_report.all_results.size, 'code location')}."
+             "#{ActionController::Base.helpers.pluralize(@undercover_report.all_results.size, 'code location')}."
       if @run.nodes.select(&:flagged?).any?
         text += " Results marked with ⚠️ have untested lines added or changed in this commit, " \
                 "look into them!"

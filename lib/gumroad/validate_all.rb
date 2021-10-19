@@ -25,7 +25,7 @@ module Gumroad
         if validator.license.failed_at
           Sentry.capture_exception(
             "#{subscription.gumroad_id} license validation" \
-                        " - payment failed on #{validator.license.failed_at}"
+            " - payment failed on #{validator.license.failed_at}"
           )
         end
       else

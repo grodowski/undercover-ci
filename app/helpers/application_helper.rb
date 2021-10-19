@@ -63,8 +63,8 @@ module ApplicationHelper
     subscribe_link = link_to(
       "Subscribe",
       "https://gum.co/" \
-        "#{Gumroad::SUBSCRIPTION_PRODUCT_PERMALINK}" \
-        "?installation_id=#{installation.installation_id}",
+      "#{Gumroad::SUBSCRIPTION_PRODUCT_PERMALINK}" \
+      "?installation_id=#{installation.installation_id}",
       data: {"gumroad-single-product" => "true"},
       class: "btn btn-primary gumroad-subscribe", target: "_blank"
     )

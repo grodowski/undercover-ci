@@ -29,6 +29,9 @@ Bundler/GemComment:
 Style/MethodCallWithArgsParentheses:
   Enabled: false
 
+Style/TopLevelMethodDefinition:
+  Enabled: false
+
 Style/StringHashKeys:
   Enabled: false
 

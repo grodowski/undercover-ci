@@ -57,13 +57,13 @@ describe CheckRuns::Complete do
           annotation_level: "warning",
           title: "Untested instance method",
           message: "Instance method `method` is missing coverage for lines 3..5 (node coverage: 0.25)." \
-            "\nMissing branch coverage found in lines 4..5.",
+                   "\nMissing branch coverage found in lines 4..5.",
           raw_details: "1: test_line hits: n/a\n" \
-            "2: test_line hits: 1\n" \
-            "3: test_line hits: 0\n" \
-            "4: test_line hits: 0 branches: 1/2\n" \
-            "5: test_line hits: 0 branches: 1/2\n" \
-            "6: test_line hits: n/a"
+                       "2: test_line hits: 1\n" \
+                       "3: test_line hits: 0\n" \
+                       "4: test_line hits: 0 branches: 1/2\n" \
+                       "5: test_line hits: 0 branches: 1/2\n" \
+                       "6: test_line hits: n/a"
         },
         {
           path: "spec/fixtures/application_record.rb",
@@ -72,13 +72,13 @@ describe CheckRuns::Complete do
           annotation_level: "warning",
           title: "Untested instance method",
           message: "Instance method `method` is missing coverage for lines 3..5 (node coverage: 0.25)." \
-            "\nMissing branch coverage found in line 4.",
+                   "\nMissing branch coverage found in line 4.",
           raw_details: "1: test_line hits: n/a\n" \
-            "2: test_line hits: 1\n" \
-            "3: test_line hits: 0\n" \
-            "4: test_line hits: 0 branches: 1/2\n" \
-            "5: test_line hits: 0 branches: 2/2\n" \
-            "6: test_line hits: n/a"
+                       "2: test_line hits: 1\n" \
+                       "3: test_line hits: 0\n" \
+                       "4: test_line hits: 0 branches: 1/2\n" \
+                       "5: test_line hits: 0 branches: 2/2\n" \
+                       "6: test_line hits: n/a"
         }
       ]
     )
