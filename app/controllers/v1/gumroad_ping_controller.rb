@@ -10,7 +10,7 @@ module V1
         head :forbidden
         return
       end
-      Logic::ProcessSale.call(sale)
+      Logic::ProcessSale.call(sale) if sale.installation_id
       head :ok
     end
   end

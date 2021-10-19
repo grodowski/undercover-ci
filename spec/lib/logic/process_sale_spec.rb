@@ -96,6 +96,6 @@ describe Logic::ProcessSale do
   it "fails if Gumroad doesn't deliver the installation_id" do
     gumroad_ping_params["url_params"].delete("installation_id")
 
-    expect { subject.call }.to raise_error(KeyError)
+    expect { subject.call }.to raise_error(ActiveRecord::RecordNotFound)
   end
 end
