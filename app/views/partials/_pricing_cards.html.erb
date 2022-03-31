@@ -1,0 +1,44 @@
+<div class="card-deck mb-5">
+  <div class="card mb-4 shadow-lg">
+    <div class="card-header text-center">
+      <h4>GitHub App</h4>
+    </div>
+    <div class="card-body text-left">
+      <div class="mb-4">
+        <h4>$49 per month</h4>
+        <span class="text-muted">VAT not included, try it free for 14 days</span>
+      </div>
+      <p>Fully-featured GitHub App code review integration with quick setup for your organization. Included features:</p>
+      <p>👉 Coverage warnings as GitHub annotations (via GitHub Checks)</p>
+      <p>👉 Diff coverage summary view for each commit</p>
+      <p>👉 Branch coverage support</p>
+      <p>👉 Unlimited builds for private and public repos</p>
+      <p>👉 Unlimited users</p>
+      <br/>
+      <% if current_user.nil? %>
+        <p class="text-center">
+          <%= link_to "Sign Up with GitHub", "/auth/github", class: "btn btn-md btn-primary", method: :post %>
+        </p>
+      <% else %>
+        <p class="text-center">
+          <%= link_to "Start subscription", settings_path, class: "btn btn-md btn-primary" %>
+        </p>
+      <% end %>
+    </div>
+  </div>
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header text-center">
+      <h4>Open Source</h4>
+    </div>
+    <div class="card-body text-left">
+      <p>The UndercoverCI project and related Ruby gems are <b>entirely open-source and free to use</b> locally and in your CI/CD workflows.</p>
+      <p>If a hosted and convenient GitHub App integration is not for you, check out these links to get started:</p>
+      <ul>
+        <p>🔗 <a href="https://medium.com/@mrgrodo/improve-your-ruby-code-reviews-with-actionable-code-coverage-and-undercover-c4480575ea69">Improve your Ruby code reviews with actionable code coverage and Undercover</a>
+        <p>🔗 <a href="https://github.com/grodowski/undercover">grodowski/undercover</a></p>
+        <p>🔗 <a href="https://github.com/grodowski/pronto-undercover">grodowski/pronto-undercover</a></p>
+        <p>🔗 <a href="https://github.com/nimblehq/danger-undercover">nimblehq/danger-undercover</a></p>
+      </ul>
+    </div>
+  </div>
+</div>

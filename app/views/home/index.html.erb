@@ -29,30 +29,36 @@ Stop focusing on getting to 100% test coverage. Reduce pull request defects by t
   </div>
 
   <div class="container how-it-works-container">
-    <p class="lead">These companies review pull request test coverage with UndercoverCI</p>
+    <p class="lead">Leading Ruby engineering teams review test coverage with undercover</p>
     <div class="row">
-      <div class="col-md-4 pb-5">
+      <div class="col-md-3 pb-5">
         <picture>
-          <source srcset="<%= image_path("fieldly_black.png") %>" />
-          <img class="img-fluid trusted-by-img" alt="Rainforest QA" />
+          <source srcset="<%= image_path("gitlab-logo-default-rgb.png") %>" />
+          <img class="img-fluid trusted-by-img" alt="GitLab" />
         </picture>
       </div>
-      <div class="col-md-4 pb-5">
+      <div class="col-md-3 pb-5">
+        <picture>
+          <source srcset="<%= image_path("fieldly_black.png") %>" />
+          <img class="img-fluid trusted-by-img" alt="Fieldly" />
+        </picture>
+      </div>
+      <div class="col-md-3 pb-5">
         <picture>
           <source srcset="<%= image_path("rfqa.png") %>" />
           <img class="img-fluid trusted-by-img" alt="Rainforest QA" />
         </picture>
       </div>
-      <div class="col-md-4 pb-5">
+      <div class="col-md-3 pb-5">
         <picture>
           <source srcset="<%= image_path("rhino.jpg") %>" />
-          <img class="img-fluid trusted-by-img rhino" alt="Rainforest QA" />
+          <img class="img-fluid trusted-by-img rhino" alt="Rhino" />
         </picture>
       </div>
     </div>
   </div>
 
-  <div class="container how-it-works-container">
+  <div id="how-it-works" class="container how-it-works-container">
     <h3 class="mb-3 top-space">How it works</h3>
     <p class="lead mb-5">Stop focusing on getting to 100% test coverage.<br/>Reduce pull request defects by telling when changed code is untested before it's deployed to production.</p>
 
@@ -86,6 +92,10 @@ Stop focusing on getting to 100% test coverage. Reduce pull request defects by t
       </div>
     </div>
   </div>
+
+  <h3 class="mb-3 top-space">Choose your setup</h3>
+  <p class="lead mb-5">Install UndercoverCI's hosted GitHub App or explore the Ruby gems family</p>
+  <%= render partial: 'partials/pricing_cards' %>
 
   <h3 class="mb-3 top-space">Why UndercoverCI</h3>
   <p class="lead mb-5">Read more about Ruby code coverage and unit testing strategy</p>
@@ -129,6 +139,7 @@ Stop focusing on getting to 100% test coverage. Reduce pull request defects by t
       </div>
     </div>
   </div>
+
   <div class="jumbotron text-center mt-5 py-5">
     <div class="container py-5">
       <h1 class="display-4 dispay-condensed">Detect untested methods in your PRs</h1>
