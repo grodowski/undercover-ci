@@ -32,7 +32,7 @@ h3 {
   font-size: 2.5rem;
   &.top-space {
     @include media-breakpoint-up(sm) {
-      margin-top: 8rem;
+      margin-top: 4rem;
     }
   }
 }
@@ -51,10 +51,6 @@ a.lead { line-height: 1.2; }
 
 .shadow-lg {
   box-shadow: 0 1rem 2.2rem rgba(0, 0, 0, 0.08) !important;
-}
-
-.starter-template {
-  text-align: center;
 }
 
 // custom styles
@@ -80,12 +76,6 @@ a.lead { line-height: 1.2; }
   height: 28px;
 }
 
-.hero-img {
-  @include media-breakpoint-up(lg) {
-    width: 70%;
-  }
-}
-
 .trusted-by-img {
   max-height: 60px;
   &.rhino {
@@ -107,7 +97,7 @@ a.lead { line-height: 1.2; }
 }
 
 .how-it-works-container {
-  margin-top: 5rem;
+  margin-top: 1rem;
   strong {
     font-weight: 600;
   }

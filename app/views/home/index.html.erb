@@ -3,33 +3,31 @@
 Stop focusing on getting to 100% test coverage. Reduce pull request defects by telling when changed code is untested before it's deployed to production.
 <% end %>
 
-<div class="starter-template">
-  <div class="container">
-    <h1 class="display-4 header-title">Actionable test coverage for Ruby and GitHub</h1>
-    <p class="lead mt-4">Checks and insights to help your team <strong class="lead-highlight">ship healthy code</strong> while <strong class="lead-highlight">saving time</strong> on PR reviews.</p>
-    <div class="card-deck mt-5">
-      <div class="card shadow-lg">
+<div class="text-center">
+  <div class="container pb-4">
+    <div class="row">
+      <div class="col-md-5 mt-3 text-left">
+        <h1 class="display-4 header-title">Actionable test coverage for Ruby and GitHub</h1>
+        <p class="lead mt-4">Checks and insights to help your team <strong class="lead-highlight">ship healthy code</strong> while <strong class="lead-highlight">saving time</strong> on PR reviews.</p>
+        <div class="pt-3">
+          <% if current_user.nil? %>
+            <%= link_to "Sign Up with GitHub", "/auth/github", class: "btn btn-lg btn-primary", method: :post %>
+          <% else %>
+            <%= link_to "Go to Dashboard", dashboard_path, class: "btn btn-lg btn-light" %>
+          <% end %>
+        </div>
+      </div>
+      <div class="col-md-7 pl-1">
         <picture>
           <source srcset="<%= image_path("check_screenshot.png") %>">
-          <img class="img-fluid hero-img mt-4 mb-5" alt="UndercoverCI GitHub comments">
+          <img class="img-fluid mt-3 mb-3" alt="UndercoverCI GitHub comments">
         </picture>
-
-        <div class="container pb-3">
-          <div class="container">
-            <% if current_user.nil? %>
-              <%= link_to "Sign Up with GitHub", "/auth/github", class: "btn btn-lg btn-primary", method: :post %>
-            <% else %>
-              <%= link_to "Go to Dashboard", dashboard_path, class: "btn btn-lg btn-light" %>
-            <% end %>
-            <p class="text-muted mt-3">Free for individuals and open-source repositories.<br/>Organization plans start at $49 per month with a <strong>free 14-day trial</strong>.</p>
-          </div>
-        </div>
       </div>
     </div>
   </div>
 
-  <div class="container how-it-works-container">
-    <p class="lead">Leading Ruby engineering teams review test coverage with undercover</p>
+  <div class="container how-it-works-container mt-5">
+    <p class="lead">These leading <strong>Ruby engineering teams</strong> review test coverage with undercover</p>
     <div class="row">
       <div class="col-md-3 pb-5">
         <picture>
