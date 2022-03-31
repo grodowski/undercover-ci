@@ -26,6 +26,7 @@ Learn how to install UndercoverCI for your repos, report coverage data and use t
           <ul>
             <li class=""><a href="#undercover-uploader">UndercoverCI uploader</a>
             <li class=""><a href="#parallel-tests">Parallel tests</a>
+            <li class=""><a href="#ignoring-test-coverage-checks">Ignoring/skipping coverage</a></li>
           </ul>
         </li>
         <li class=""><a href="https://github.com/grodowski/undercover-ci/blob/master/CHANGELOG.md">Changelog and release notes</a>
@@ -191,6 +192,25 @@ Learn how to install UndercoverCI for your repos, report coverage data and use t
 
           puts("Done! LCOV saved to #{SimpleCov::Formatter::LcovFormatter.config.single_report_path}")
         </code></pre>
+      </p>
+
+      <h4 id="ignoring-test-coverage-checks" class="mt-5 mb-2">Ignoring/skipping coverage</h4>
+      <p>
+        Pull requests in projects with low or nonexistent test coverage are likely to generate large numbers of check warnings. While the default workflow would be to address them before the PR approval, your strategy might be different.
+      </p>
+
+      <p>
+        In order to acknowledge an untested change and remove the UndercoverCI warning with the intention to improve later (or never), you can wrap the code block with the <code>:nocov:</code> syntax, e.g.
+
+        <pre><code>
+          # :nocov:
+          def skip_this_method
+            never_reached
+          end
+          # :nocov:
+        </code></pre>
+
+        Read more about the <code>:nocov:</code> syntax in <a href="https://github.com/simplecov-ruby/simplecov#ignoringskipping-code" target="_blank">SimpleCov's readme</a>.
       </p>
 
       <hr/>
