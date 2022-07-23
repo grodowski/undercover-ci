@@ -83,7 +83,7 @@
                       bundle exec rails test
                       ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- \
                         --repo <b>$your-username/$repository-name</b> \
-                        --commit <b>$GITHUB_SHA</b> \
+                        --commit <b>${{ github.event.pull_request.head.sha }}</b> \
                         --lcov <b>coverage/lcov/$repository-name.lcov</b>
             </code></pre>
           </li>
