@@ -15,6 +15,11 @@ gem "pg", ">= 0.18", "< 2.0"
 gem "puma", "~> 5.3"
 gem "sidekiq"
 
+# Required for Ruby 3.1+ until the mail gem gets an update
+gem "net-imap", require: false
+gem "net-pop", require: false
+gem "net-smtp", require: false
+
 # UI Gems
 gem "bootstrap", "~> 4.6"
 gem "bootstrap4-kaminari-views"
