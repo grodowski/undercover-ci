@@ -26,7 +26,7 @@ gem "bootstrap4-kaminari-views"
 gem "coffee-rails", "~> 5.0"
 gem "jquery-rails"
 gem "sass-rails"
-gem "sprockets", "3.7.2" # pin sprockets to avoid
+gem "sprockets", "4.1.1" # pin sprockets to avoid
 gem "turbolinks"
 gem "uglifier", ">= 1.3.0"
 
