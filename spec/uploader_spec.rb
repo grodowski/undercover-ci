@@ -69,5 +69,16 @@ describe "uploader.rb" do
       uploader.upload
       expect(uploader.exitcode).to eq(0)
     end.to output("Uploaded! 201\n").to_stdout
+
+    expect(
+      a_request(:post, "https://undercover-ci.com/v1/coverage")
+      .with(
+        body: JSON.generate(
+          repo: "alice/bob",
+          sha: "1fffbb",
+          lcov_base64: Base64.strict_encode64(File.read("spec/fixtures/coverage.lcov"))
+        )
+      )
+    ).to have_been_made
   end
 end
