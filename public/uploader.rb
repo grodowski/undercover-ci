@@ -85,6 +85,7 @@ class UndercoverCiCoverageUpload
       error "Error #{resp.code}, #{resp.body}. " \
             "Visit https://undercover-ci.com/docs or get support at jan@undercover-ci.com."
     end
+    self
   end
 
   private
@@ -96,6 +97,6 @@ class UndercoverCiCoverageUpload
 end
 
 if __FILE__ == $PROGRAM_NAME
-  exitcode = UndercoverCiCoverageUpload.new.upload
-  exit(exitcode) unless exitcode.zero?
+  uploader = UndercoverCiCoverageUpload.new.upload
+  exit(uploader.exitcode)
 end
