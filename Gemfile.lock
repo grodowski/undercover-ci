@@ -338,9 +338,8 @@ GEM
     sentry-rails (5.0.2)
       railties (>= 5.0)
       sentry-ruby-core (~> 5.0.2)
-    sentry-ruby (5.0.2)
+    sentry-ruby (5.4.2)
       concurrent-ruby (~> 1.0, >= 1.0.2)
-      sentry-ruby-core (= 5.0.2)
     sentry-ruby-core (5.0.2)
       concurrent-ruby
     sidekiq (6.4.0)
