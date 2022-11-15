@@ -5,24 +5,29 @@ Stop focusing on getting to 100% test coverage. Reduce pull request defects by t
 
 <div class="text-center">
   <div class="container pb-4 mt-md-5">
-    <div class="row">
-      <div class="col-md-5 mt-3 mt-lg-5 text-left">
-        <h1 class="display-4 header-title">Actionable test coverage for Ruby and GitHub</h1>
-        <p class="lead mt-4">Checks and insights to help your team <strong class="lead-highlight">ship healthy code</strong> while <strong class="lead-highlight">saving time</strong> on PR reviews.</p>
-        <div class="pt-3">
-          <% if current_user.nil? %>
-            <%= link_to "Sign Up with GitHub", "/auth/github", class: "btn btn-lg btn-primary", method: :post %>
-          <% else %>
-            <%= link_to "Go to Dashboard", dashboard_path, class: "btn btn-lg btn-light" %>
-          <% end %>
-        </div>
+    <div class="row justify-content-center">
+      <div class="col-lg-5 mt-3 text-left">
+        <h1 class="display-4 header-title">Actionable test coverage bot</h1>
+        <p class="lead my-5">
+          Reviewing test coverage impact of every PR requires effort. Untested lines and branches can slip through percentage checks and reviewer's eyes. Undercover examines PR diffs and warns on <strong class="lead-highlight">all methods, classes and blocks that were changed without tests</strong> before they are shipped.
+        </p>
       </div>
-      <div class="col-md-7 pl-1">
+      <div class="col-lg-7 pl-1">
         <picture>
           <source srcset="<%= image_path("check_screenshot.png") %>">
           <img class="img-fluid mt-3 mb-3" alt="UndercoverCI GitHub comments">
         </picture>
       </div>
+    </div>
+    <div class="row">
+      <div class="col text-center my-3">
+          <% if current_user.nil? %>
+            <%= link_to "Sign Up with GitHub", "/auth/github", class: "btn btn-lg btn-primary", method: :post %>
+            <p class="lead small mt-2">Get a free account and a 14-day trial for private repositories</p>
+          <% else %>
+            <%= link_to "Go to Dashboard", dashboard_path, class: "btn btn-lg btn-light" %>
+          <% end %>
+        </div>
     </div>
   </div>
 
@@ -87,6 +92,60 @@ Stop focusing on getting to 100% test coverage. Reduce pull request defects by t
           <p class="lead"><strong>3️⃣ Fix or ack review comments</strong></p>
           <p>Reveal untested methods and blocks, find unused code paths and improve your test suite.</p>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="features" class="container how-it-works-container text-left">
+    <div class="row">
+      <div class="col">
+        <p class="lead"><strong>Pull request status checks</strong></p>
+      </div>
+      <div class="col">
+
+        <picture>
+          <source srcset="<%= image_path("feature-status-check.png") %>">
+          <img class="img-fluid shadow mt-5 mb-5" alt="Commit status check from UndercoverCI">
+        </picture>
+
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <picture>
+          <source srcset="<%= image_path("feature-inline-comment.png") %>">
+          <img class="img-fluid shadow mt-5 mb-5" alt="UndercoverCI GitHub comment">
+        </picture>
+      </div>
+
+      <div class="col">
+        <p class="lead"><strong>Actionable review comments</strong></p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <p class="lead"><strong>Pull request test coverage summary</strong></p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+
+        <picture>
+          <source srcset="<%= image_path("feature-check-summary-fail.png") %>">
+          <img class="img-fluid shadow mt-5 mb-5" alt="Check summary when coverage fails">
+        </picture>
+
+      </div>
+
+      <div class="col">
+
+        <picture>
+          <source srcset="<%= image_path("feature-check-summary-success.png") %>">
+          <img class="img-fluid shadow mt-5 mb-5" alt="Check summary when coverage is successful">
+        </picture>
+
       </div>
     </div>
   </div>

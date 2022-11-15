@@ -56,7 +56,7 @@ a.lead { line-height: 1.2; }
 // custom styles
 .header-title {
   display: inline;
-  font-size: 2.5rem;
+  font-size: 3rem;
   font-weight: 800;
   letter-spacing: -0.8px;
   @include media-breakpoint-down(sm) {
