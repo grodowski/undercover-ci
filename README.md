@@ -1,6 +1,6 @@
 # UndercoverCI
 
-[![Build Status](https://travis-ci.org/grodowski/undercover-ci.svg?branch=master)](https://travis-ci.org/grodowski/undercover-ci)
+[![Build Status](https://github.com/grodowski/undercover-ci/actions/workflows/ruby.yml/badge.svg)](https://github.com/grodowski/undercover-ci/actions/workflows/ruby.yml)
 
 GitHub Checks with code coverage warnings from [undercover](https://github.com/grodowski/undercover), detecting when code being changed is untested.
 
