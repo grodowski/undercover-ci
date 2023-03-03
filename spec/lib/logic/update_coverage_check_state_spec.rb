@@ -11,7 +11,7 @@ describe Logic::UpdateCoverageCheckState do
       name: "Foo Bar"
     )
     installation = Installation.create!(installation_id: "123123", users: [user])
-    CoverageCheck.create!(installation: installation, repo: {id: 1, full_name: "user/repository"}, head_sha: "b4c0n")
+    CoverageCheck.create!(installation:, repo: {id: 1, full_name: "user/repository"}, head_sha: "b4c0n")
   end
   let(:svc) do
     described_class.new(coverage_check)
@@ -55,10 +55,10 @@ describe Logic::UpdateCoverageCheckState do
 
   def expect_state_log(from, to, time, via)
     expect(coverage_check.state_log.map(&:symbolize_keys)).to include(
-      from: from,
-      to: to,
+      from:,
+      to:,
       ts: time.utc.iso8601,
-      via: via
+      via:
     )
   end
 end

@@ -10,7 +10,7 @@ module CheckRuns
         name: "coverage",
         status: "in_progress",
         started_at: run.created_at,
-        details_url: details_url,
+        details_url:,
         external_id: run.external_id,
         output: {
           title: "In progress",

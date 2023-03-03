@@ -142,7 +142,7 @@ describe "Coverage Upload" do
     installation = Installation.create!(installation_id: "123123", users: [user])
     CoverageCheck.create!(
       state: :awaiting_coverage,
-      installation: installation,
+      installation:,
       repo: {id: 1, full_name: "user/repository"},
       head_sha: "b4c0n"
     )

@@ -25,7 +25,7 @@ module Logic
         ts: Time.now.utc.iso8601,
         from: old_state,
         to: new_state,
-        via: via
+        via:
       }
       record.save!
     end

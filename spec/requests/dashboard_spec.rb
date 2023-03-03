@@ -122,8 +122,8 @@ describe "Dashboard spec" do
           node_type: "instance method",
           start_line: 1,
           end_line: 3,
-          coverage: coverage,
-          flagged: flagged
+          coverage:,
+          flagged:
         )
       end
 

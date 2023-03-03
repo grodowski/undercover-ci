@@ -13,7 +13,7 @@ describe CheckRuns::Canceled do
     )
     installation = Installation.create!(installation_id: "123123", users: [user])
     CoverageCheck.create!(
-      installation: installation,
+      installation:,
       head_sha: "b8f95245", # commit sha from fake_repo feature branch
       repo: {"full_name" => "author/repo", "default_branch" => "master"},
       state: :in_progress

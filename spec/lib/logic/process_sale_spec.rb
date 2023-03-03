@@ -43,7 +43,7 @@ describe Logic::ProcessSale do
     installation = Installation.create!(installation_id: "123123")
     Subscription.create!(
       state: :subscribed,
-      installation: installation,
+      installation:,
       gumroad_id: "subxxx",
       license_key: "1337"
     )

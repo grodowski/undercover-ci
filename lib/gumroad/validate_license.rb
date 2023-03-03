@@ -18,7 +18,7 @@ module Gumroad
     def call
       @res = Net::HTTP.post(
         URI("https://api.gumroad.com/v2/licenses/verify"),
-        {product_permalink: Gumroad::SUBSCRIPTION_PRODUCT_PERMALINK, license_key: license_key}.to_query
+        {product_permalink: Gumroad::SUBSCRIPTION_PRODUCT_PERMALINK, license_key:}.to_query
       )
       case @res.code.to_i
       when 200

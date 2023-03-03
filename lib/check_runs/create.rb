@@ -10,7 +10,7 @@ module CheckRuns
         name: "coverage",
         status: "queued",
         started_at: run.created_at,
-        details_url: details_url,
+        details_url:,
         external_id: run.external_id,
         output: {
           title: "Awaiting coverage data",

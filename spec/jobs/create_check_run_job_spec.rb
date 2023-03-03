@@ -12,7 +12,7 @@ describe CreateCheckRunJob do
     )
     installation = Installation.create!(installation_id: "123123", users: [user])
     check = CoverageCheck.create!(
-      installation: installation,
+      installation:,
       head_sha: "953a804",
       repo: {"full_name" => "author/repo", "default_branch" => "master"}
     )

@@ -12,7 +12,7 @@ RSpec.describe ExpireCheckJob, type: :job do
     )
     installation = Installation.create!(installation_id: "123123", users: [user])
     CoverageCheck.create!(
-      installation: installation,
+      installation:,
       repo: {id: 1, full_name: "user/repository"},
       head_sha: "1a2b3c",
       state: :awaiting_coverage

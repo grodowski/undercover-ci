@@ -81,7 +81,7 @@ describe Gumroad::ValidateLicense do
     WebMock
       .stub_request(:post, "https://api.gumroad.com/v2/licenses/verify")
       .to_return(
-        status: status,
+        status:,
         body: payload.to_json,
         headers: {"Content-Type" => "application/json"}
       )

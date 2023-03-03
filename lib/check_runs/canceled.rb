@@ -12,11 +12,11 @@ module CheckRuns
         started_at: run.created_at, # TODO: update that in this PR
         completed_at: run.last_ts,
         conclusion: "cancelled",
-        details_url: details_url,
+        details_url:,
         external_id: run.external_id,
         output: {
-          title: title,
-          summary: summary
+          title:,
+          summary:
         },
         accept: "application/vnd.github.antiope-preview+json"
       )

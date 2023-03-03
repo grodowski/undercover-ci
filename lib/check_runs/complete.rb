@@ -14,7 +14,7 @@ module CheckRuns
         started_at: run.created_at,
         completed_at: run.last_ts,
         conclusion: conclusion_for_run,
-        details_url: details_url,
+        details_url:,
         external_id: run.external_id,
         output: {
           title: "Complete",
@@ -64,7 +64,7 @@ module CheckRuns
           end_line: result.last_line,
           annotation_level: "warning",
           title: "Untested #{result.node.human_name}",
-          message: message,
+          message:,
           raw_details: result.pretty_print
         }
       end

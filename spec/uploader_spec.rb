@@ -12,7 +12,7 @@ describe "uploader.rb" do
     WebMock
       .stub_request(:post, "https://undercover-ci.com/v1/coverage")
       .to_return(
-        status: status,
+        status:,
         body: JSON.generate(payload), # do not escape utf-8 with to_json
         headers: {"Content-Type" => "application/json"}
       )

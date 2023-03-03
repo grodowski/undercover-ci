@@ -12,7 +12,7 @@ RSpec.describe Subscription, type: :model do
       installation = Installation.create!(installation_id: "123123", metadata: {target_type: "Organization"})
       subscription = Subscription.create!(
         state: :unsubscribed,
-        installation: installation,
+        installation:,
         gumroad_id: "subxxx",
         license_key: "1337"
       )
