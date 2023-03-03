@@ -1,6 +1,8 @@
 <p class="lead">UndercoverCI will send coverage checks to the following accounts and repositories</p>
 
-<!-- TODO: add pagination -->
+<!-- include gumroad conditionally -->
+<%= javascript_include_tag 'https://gumroad.com/js/gumroad.js' %>
+
 <% @installations.each do |inst| %>
   <div class="card bg-light my-2">
     <div class="card-header">

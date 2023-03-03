@@ -1,28 +1,37 @@
 <% content_for(:title) { "Actionable test coverage checks for Ruby and Github" } %>
 <% content_for(:meta_description) do %>
-Stop focusing on getting to 100% test coverage. Reduce pull request defects by telling when changed code is untested before it's deployed to production.
+Stop focusing on getting to 100% test coverage. Detect when changed code is untested before it's deployed.
 <% end %>
 
 <div class="text-center">
   <div class="container pb-4 mt-md-5">
-    <div class="row">
-      <div class="col-md-5 mt-3 mt-lg-5 text-left">
-        <h1 class="display-4 header-title">Actionable test coverage for Ruby and GitHub</h1>
-        <p class="lead mt-4">Checks and insights to help your team <strong class="lead-highlight">ship healthy code</strong> while <strong class="lead-highlight">saving time</strong> on PR reviews.</p>
-        <div class="pt-3">
-          <% if current_user.nil? %>
-            <%= link_to "Sign Up with GitHub", "/auth/github", class: "btn btn-lg btn-primary", method: :post %>
-          <% else %>
-            <%= link_to "Go to Dashboard", dashboard_path, class: "btn btn-lg btn-light" %>
-          <% end %>
-        </div>
+    <div class="row justify-content-center">
+      <div class="col-lg-5 mt-3 text-left">
+        <!-- <h1 class="display-4 header-title">Forget about 100% test coverage</h1> -->
+        <h1 class="display-4 header-title">❌ Total coverage reduced by 0.03%?</h1>
+        <p class="lead my-5">
+          Untested code slips through percentage checks and reviewer's eyes. Pull request pass CI without tests. Missed edge cases and bugs ship to prod. Sounds familiar?
+        </p>
+        <p class="lead my-5">
+           ✅ UndercoverCI integrates with your CI/CD pipeline and warns on all <strong class="lead-highlight">methods, classes and blocks that were changed without test coverage</strong>. Catch them before they cause issues and ship with confidence.
+        </p>
       </div>
-      <div class="col-md-7 pl-1">
+      <div class="col-lg-7 pl-1">
         <picture>
           <source srcset="<%= image_path("check_screenshot.png") %>">
           <img class="img-fluid mt-3 mb-3" alt="UndercoverCI GitHub comments">
         </picture>
       </div>
+    </div>
+    <div class="row">
+      <div class="col text-center my-3">
+          <% if current_user.nil? %>
+            <%= link_to "Sign Up with GitHub", "/auth/github", class: "btn btn-lg btn-primary", method: :post %>
+            <p class="lead small mt-2">Get a free account and a 14-day trial for private repositories. Supports Ruby and GitHub.</p>
+          <% else %>
+            <%= link_to "Go to Dashboard", dashboard_path, class: "btn btn-lg btn-light" %>
+          <% end %>
+        </div>
     </div>
   </div>
 
@@ -30,63 +39,93 @@ Stop focusing on getting to 100% test coverage. Reduce pull request defects by t
     <p class="lead">These leading <strong>Ruby engineering teams</strong> review test coverage with undercover</p>
     <div class="row">
       <div class="col-md-3 pb-5">
-        <picture>
-          <source srcset="<%= image_path("gitlab-logo-default-rgb.png") %>" />
-          <img class="img-fluid trusted-by-img" alt="GitLab" />
-        </picture>
+        <a href="https://gitlab.com" target="_blank">
+          <picture>
+            <source srcset="<%= image_path("gitlab-logo-default-rgb.png") %>" />
+            <img class="img-fluid trusted-by-img" alt="GitLab" />
+          </picture>
+        </a>
       </div>
       <div class="col-md-3 pb-5">
-        <picture>
-          <source srcset="<%= image_path("fieldly_black.png") %>" />
-          <img class="img-fluid trusted-by-img" alt="Fieldly" />
-        </picture>
+        <a href="https://fieldly.com" target="_blank">
+          <picture>
+            <source srcset="<%= image_path("fieldly_black.png") %>" />
+            <img class="img-fluid trusted-by-img" alt="Fieldly" />
+          </picture>
+        </a>
       </div>
       <div class="col-md-3 pb-5">
-        <picture>
-          <source srcset="<%= image_path("rfqa.png") %>" />
-          <img class="img-fluid trusted-by-img" alt="Rainforest QA" />
-        </picture>
+        <a href="https://rainforestqa.com" target="_blank">
+          <picture>
+            <source srcset="<%= image_path("rfqa.png") %>" />
+            <img class="img-fluid trusted-by-img" alt="Rainforest QA" />
+          </picture>
+        </a>
       </div>
       <div class="col-md-3 pb-5">
-        <picture>
-          <source srcset="<%= image_path("rhino.jpg") %>" />
-          <img class="img-fluid trusted-by-img rhino" alt="Rhino" />
-        </picture>
+        <a href="https://www.sayrhino.com" target="_blank">
+          <picture>
+            <source srcset="<%= image_path("rhino.jpg") %>" />
+            <img class="img-fluid trusted-by-img rhino" alt="Rhino" />
+          </picture>
+        </a>
       </div>
     </div>
   </div>
 
   <div id="how-it-works" class="container how-it-works-container">
     <h3 class="mb-3 top-space">How it works</h3>
-    <p class="lead mb-5">Stop focusing on getting to 100% test coverage.<br/>Reduce pull request defects by telling when changed code is untested before it's deployed to production.</p>
+    <p class="lead mb-5">Stop focusing on getting to 100% test coverage.<br/>Detect when changed code is untested before it's deployed.</p>
+  </div>
 
-    <div class="card-deck mb-5">
-      <div class="card card-noborder mb-4">
-        <div class="card-body">
-          <div class="text-center">
-            <i class="how-it-works-icon icon-flow-merge"></i>
-          </div>
-          <p class="lead"><strong>1️⃣ Open a pull request</strong></p>
-          <p>The CI server runs tests and uploads coverage data to UndercoverCI. That's the only required post-install setup step!</p>
-        </div>
+  <div id="features" class="container how-it-works-container text-left">
+    <div class="row my-5">
+      <div class="col">
+        <picture>
+          <source srcset="<%= image_path("feature-inline-comment.png") %>">
+          <img class="img-fluid shadow mt-5 mb-5" alt="UndercoverCI GitHub comment">
+        </picture>
       </div>
-      <div class="card card-noborder mb-4">
-        <div class="card-body">
-          <div class="text-center">
-            <i class="how-it-works-icon icon-search-outline"></i>
-          </div>
-          <p class="lead"><strong>2️⃣ Find missing test coverage</strong></p>
-          <p>We scan the PR diff and verify local test coverage for each updated class, method and block, because an absolute percentage check is not enough.</p>
-        </div>
+
+      <div class="col py-5">
+        <h4>Actionable review comments</h4>
+        <p>Each class, method or block that's been changed without tests receives a check annotation including detailed information about what's missing and where: line coverage or branch coverage, plus respective line numbers and number of hits.</p>
+        <p><strong>Worried about too many comments?</strong> You won't receive more than one comment per method, because UndercoverCI understands code structure and only works with the current diff.</p>
       </div>
-      <div class="card card-noborder mb-4">
-        <div class="card-body">
-          <div class="text-center">
-            <i class="how-it-works-icon icon-chat-alt"></i>
-          </div>
-          <p class="lead"><strong>3️⃣ Fix or ack review comments</strong></p>
-          <p>Reveal untested methods and blocks, find unused code paths and improve your test suite.</p>
-        </div>
+    </div>
+
+    <div class="row my-5">
+      <div class="col py-5">
+        <h4>Pull request status checks</h4>
+        <p>No untested changes in the diff? Merge away. Otherwise, it's up to you to configure whether a passing check is required to merge. If you decide to make it required, selected annotations can still be muted with SimpleCov's <code>:nocov:</code> comment syntax to go green and fix coverage later.</p>
+      </div>
+      <div class="col">
+        <picture>
+          <source srcset="<%= image_path("feature-status-check.png") %>">
+          <img class="img-fluid shadow mt-5 mb-5" alt="Commit status check from UndercoverCI">
+        </picture>
+      </div>
+    </div>
+
+    <div class="row mt-5">
+      <div class="col">
+        <h4>Pull request test coverage summary</h4>
+        <p>The Check Details Breakdown includes file names, class/method names and coverage information. Methods that cause the check to fail are flagged with a warning emoji (⚠️) - one or more line or branch appears in the PR diff and has to be fixed. All others provide a refactoring opportunity for you to improve the test coverage if it's low somewhere outside of the diff.
+      </div>
+    </div>
+    <div class="row mb-5">
+      <div class="col">
+        <picture>
+          <source srcset="<%= image_path("feature-check-summary-fail.png") %>">
+          <img class="img-fluid shadow mt-5 mb-5" alt="Check summary when coverage fails">
+        </picture>
+      </div>
+
+      <div class="col">
+        <picture>
+          <source srcset="<%= image_path("feature-check-summary-success.png") %>">
+          <img class="img-fluid shadow mt-5 mb-5" alt="Check summary when coverage is successful">
+        </picture>
       </div>
     </div>
   </div>
