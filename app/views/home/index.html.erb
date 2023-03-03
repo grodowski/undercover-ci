@@ -13,7 +13,7 @@ Stop focusing on getting to 100% test coverage. Detect when changed code is unte
           Untested code slips through percentage checks and reviewer's eyes. Pull request pass CI without tests. Missed edge cases and bugs ship to prod. Sounds familiar?
         </p>
         <p class="lead my-5">
-           ✅ UndercoverCI status checks warn on all <strong class="lead-highlight">methods, classes and blocks that were changed without test coverage</strong>. Catch them before they cause issues and ship on green
+           ✅ UndercoverCI integrates with your CI/CD pipeline and warns on all <strong class="lead-highlight">methods, classes and blocks that were changed without test coverage</strong>. Catch them before they cause issues and ship with confidence.
         </p>
       </div>
       <div class="col-lg-7 pl-1">
@@ -88,7 +88,7 @@ Stop focusing on getting to 100% test coverage. Detect when changed code is unte
       </div>
 
       <div class="col py-5">
-        <p class="lead"><strong>Actionable review comments</strong></p>
+        <h4>Actionable review comments</h4>
         <p>Each class, method or block that's been changed without tests receives a check annotation including detailed information about what's missing and where: line coverage or branch coverage, plus respective line numbers and number of hits.</p>
         <p><strong>Worried about too many comments?</strong> You won't receive more than one comment per method, because UndercoverCI understands code structure and only works with the current diff.</p>
       </div>
@@ -96,7 +96,7 @@ Stop focusing on getting to 100% test coverage. Detect when changed code is unte
 
     <div class="row my-5">
       <div class="col py-5">
-        <p class="lead"><strong>Pull request status checks</strong></p>
+        <h4>Pull request status checks</h4>
         <p>No untested changes in the diff? Merge away. Otherwise, it's up to you to configure whether a passing check is required to merge. If you decide to make it required, selected annotations can still be muted with SimpleCov's <code>:nocov:</code> comment syntax to go green and fix coverage later.</p>
       </div>
       <div class="col">
@@ -109,7 +109,7 @@ Stop focusing on getting to 100% test coverage. Detect when changed code is unte
 
     <div class="row mt-5">
       <div class="col">
-        <p class="lead"><strong>Pull request test coverage summary</strong></p>
+        <h4>Pull request test coverage summary</h4>
         <p>The Check Details Breakdown includes file names, class/method names and coverage information. Methods that cause the check to fail are flagged with a warning emoji (⚠️) - one or more line or branch appears in the PR diff and has to be fixed. All others provide a refactoring opportunity for you to improve the test coverage if it's low somewhere outside of the diff.
       </div>
     </div>
