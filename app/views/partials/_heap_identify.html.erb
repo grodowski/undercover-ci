@@ -1,0 +1,5 @@
+<% if current_user %>
+  <%= javascript_tag do %>
+    heap.identify("<%= current_user.analytics_id %>");
+  <% end %>
+<% end %>
