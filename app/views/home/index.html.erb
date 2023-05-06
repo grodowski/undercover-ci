@@ -26,7 +26,7 @@ Stop focusing on getting to 100% test coverage. Detect when changed code is unte
     <div class="row">
       <div class="col text-center my-3">
           <% if current_user.nil? %>
-            <%= link_to "Sign Up with GitHub", "/auth/github", class: "btn btn-lg btn-primary", method: :post %>
+            <%= link_to "Sign Up with GitHub", "/auth/github?r=sign_up", class: "btn btn-lg btn-primary", method: :post %>
             <p class="lead small mt-2">Get a free account and a 14-day trial for private repositories. Supports Ruby and GitHub.</p>
           <% else %>
             <%= link_to "Go to Dashboard", dashboard_path, class: "btn btn-lg btn-light" %>
@@ -183,7 +183,7 @@ Stop focusing on getting to 100% test coverage. Detect when changed code is unte
       <p class="text-muted mb-5">Free for individuals and open-source repositories. Organization plans start at $49 per month with a <strong>free 14-day trial</strong>.</p>
 
       <% if current_user.nil? %>
-        <%= link_to "Sign Up with GitHub", "/auth/github", class: "btn btn-lg btn-primary", method: :post %>
+        <%= link_to "Sign Up with GitHub", "/auth/github?r=sign_up", class: "btn btn-lg btn-primary", method: :post %>
       <% else %>
         <%= link_to "Go to Dashboard", dashboard_path, class: "btn btn-lg btn-light" %>
       <% end %>

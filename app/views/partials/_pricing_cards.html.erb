@@ -17,7 +17,7 @@
       <br/>
       <% if current_user.nil? %>
         <p class="text-center">
-          <%= link_to "Sign Up with GitHub", "/auth/github", class: "btn btn-md btn-primary", method: :post %>
+          <%= link_to "Sign Up with GitHub", "/auth/github?r=sign_up", class: "btn btn-md btn-primary", method: :post %>
         </p>
       <% else %>
         <p class="text-center">

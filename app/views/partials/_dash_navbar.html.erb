@@ -17,7 +17,7 @@
       <% if current_user %>
         <%= link_to "Sign out", "/auth/logout", class: "btn btn-light", method: :delete %>
       <% else %>
-        <%= link_to "Sign in", "/auth/github", class: "btn btn-light", method: :post %>
+        <%= link_to "Sign in", "/auth/github?r=sign_in", class: "btn btn-light", method: :post %>
       <% end %>
     </div>
   </div>
