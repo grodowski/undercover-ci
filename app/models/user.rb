@@ -36,4 +36,8 @@ class User < ApplicationRecord
     cipher.iv = decoded_base64[0..15]
     cipher.update(decoded_base64[16..]) + cipher.final
   end
+
+  def analytics_id
+    "U#{id}"
+  end
 end
