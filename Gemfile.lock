@@ -113,7 +113,7 @@ GEM
       execjs
     coffee-script-source (1.12.2)
     concurrent-ruby (1.2.2)
-    connection_pool (2.4.0)
+    connection_pool (2.4.1)
     crack (0.4.5)
       rexml
     crass (1.0.6)
@@ -345,7 +345,7 @@ GEM
       sentry-ruby (~> 5.9.0)
     sentry-ruby (5.9.0)
       concurrent-ruby (~> 1.0, >= 1.0.2)
-    sidekiq (7.1.0)
+    sidekiq (7.1.2)
       concurrent-ruby (< 2)
       connection_pool (>= 2.3.0)
       rack (>= 2.2.4)
