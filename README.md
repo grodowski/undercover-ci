@@ -1,3 +1,4 @@
+![logo](https://github.com/grodowski/undercover-ci/assets/4991698/49b55d6b-47d5-4e9d-b650-676cb8c6a357)
 # UndercoverCI
 
 [![Build Status](https://github.com/grodowski/undercover-ci/actions/workflows/ruby.yml/badge.svg)](https://github.com/grodowski/undercover-ci/actions/workflows/ruby.yml)
