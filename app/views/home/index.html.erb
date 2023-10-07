@@ -9,18 +9,19 @@ Stop focusing on getting to 100% test coverage. Detect when changed code is unte
       <div class="col-lg-5 mt-3 text-left">
         <!-- <h1 class="display-4 header-title">Forget about 100% test coverage</h1> -->
         <!-- <h1 class="display-4 header-title">❌ Total coverage reduced by 0.03%?</h1> -->
-        <h1 class="display-4 header-title">Healthy test suite, commit by commit</h1>
+        <%# <h1 class="display-4 header-title">Healthy test suite, commit by commit</h1> %>
+        <h1 class="display-4 header-title">Code coverage,<br/> made useful</h1>
         <p class="lead my-5">
-          ❌ Untested code slips through percentage test coverage thresholds. Reviewers miss untested code changes. Post-factum test additions cost more and miss the context.
+          ❌ Coverage percentage targets let untested code slip through code review. Post-factum test additions cost you more and miss the context.
         </p>
         <p class="lead my-5">
-           ✅ UndercoverCI integrates with your CI or local workflow and warns on all <strong class="lead-highlight">methods, classes, blocks and branches that were changed without test coverage</strong>. Catch them early and ship with confidence.
+           ✅ Undercover integrates with your CI and local workflow to warn on all <strong class="lead-highlight">methods, classes, blocks and branches</strong> that were <strong class="lead-highlight">changed</strong> without test coverage. Catch them early and ship with confidence.
         </p>
       </div>
       <div class="col-lg-7 pl-1">
         <picture>
           <source srcset="<%= image_path("check_screenshot.png") %>">
-          <img class="img-fluid mt-3 mb-3" alt="UndercoverCI GitHub comments">
+          <img class="img-fluid mt-3 mb-3" alt="Undercover GitHub comments">
         </picture>
       </div>
     </div>
@@ -84,14 +85,14 @@ Stop focusing on getting to 100% test coverage. Detect when changed code is unte
       <div class="col">
         <picture>
           <source srcset="<%= image_path("feature-inline-comment.png") %>">
-          <img class="img-fluid shadow mt-5 mb-5" alt="UndercoverCI GitHub comment">
+          <img class="img-fluid shadow mt-5 mb-5" alt="Undercover GitHub comment">
         </picture>
       </div>
 
       <div class="col py-5">
         <h4>Actionable review comments</h4>
         <p>Each class, method or block that's been changed without tests receives a check annotation including detailed information about what's missing and where: line coverage or branch coverage, plus respective line numbers and number of hits.</p>
-        <p><strong>Worried about too many comments?</strong> You won't receive more than one comment per method, because UndercoverCI understands code structure and only works with the current diff.</p>
+        <p><strong>Worried about too many comments?</strong> You won't receive more than one comment per method, because Undercover understands code structure and only works with the current diff.</p>
       </div>
     </div>
 
@@ -103,7 +104,7 @@ Stop focusing on getting to 100% test coverage. Detect when changed code is unte
       <div class="col">
         <picture>
           <source srcset="<%= image_path("feature-status-check.png") %>">
-          <img class="img-fluid shadow mt-5 mb-5" alt="Commit status check from UndercoverCI">
+          <img class="img-fluid shadow mt-5 mb-5" alt="Commit status check from Undercover">
         </picture>
       </div>
     </div>
@@ -132,10 +133,10 @@ Stop focusing on getting to 100% test coverage. Detect when changed code is unte
   </div>
 
   <h3 class="mb-3 top-space">Choose your setup</h3>
-  <p class="lead mb-5">Install UndercoverCI's hosted GitHub App or explore the Ruby gems family</p>
+  <p class="lead mb-5">Install Undercover's hosted GitHub App or explore the Ruby gems family</p>
   <%= render partial: 'partials/pricing_cards' %>
 
-  <h3 class="mb-3 top-space">Why UndercoverCI</h3>
+  <h3 class="mb-3 top-space">Why Undercover</h3>
   <p class="lead mb-5">Read more about Ruby code coverage and unit testing strategy</p>
 
   <div class="card-deck">
@@ -180,7 +181,8 @@ Stop focusing on getting to 100% test coverage. Detect when changed code is unte
 
   <div class="jumbotron text-center mt-5 py-5">
     <div class="container py-5">
-      <h1 class="display-4 dispay-condensed">Detect untested methods in your PRs</h1>
+      <%= image_tag "logo/Logo_Asset_1@3x-8.png", class: 'mb-5 footer-cta-img' %>
+      <h1 class="dispay-condensed">Find untested code in your PRs</h1>
       <p class="text-muted mb-5">Free for individuals and open-source repositories. Organization plans start at $49 per month with a <strong>free 14-day trial</strong>.</p>
 
       <% if current_user.nil? %>
