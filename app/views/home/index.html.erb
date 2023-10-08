@@ -82,54 +82,43 @@ Stop focusing on getting to 100% test coverage. Detect when changed code is unte
 
   <div id="features" class="container how-it-works-container text-left">
     <div class="row my-5">
-      <div class="col">
-        <picture>
-          <source srcset="<%= image_path("feature-inline-comment.png") %>">
-          <img class="img-fluid shadow mt-5 mb-5" alt="Undercover GitHub comment">
-        </picture>
-      </div>
-
-      <div class="col py-5">
+      <div class="col-lg py-5-lg">
         <h4>Actionable review comments</h4>
         <p>Each class, method or block that's been changed without tests receives a check annotation including detailed information about what's missing and where: line coverage or branch coverage, plus respective line numbers and number of hits.</p>
         <p><strong>Worried about too many comments?</strong> You won't receive more than one comment per method, because Undercover understands code structure and only works with the current diff.</p>
       </div>
+      <div class="col-lg">
+        <picture>
+          <source srcset="<%= image_path("feature-inline-comment.png") %>">
+          <img class="img-fluid shadow mb-5" alt="Undercover GitHub comment">
+        </picture>
+      </div>
     </div>
 
     <div class="row my-5">
-      <div class="col py-5">
-        <h4>Pull request status checks</h4>
+      <div class="col-lg py-5-lg">
+        <h4>Status checks</h4>
         <p>No untested changes in the diff? Merge away. Otherwise, it's up to you to configure whether a passing check is required to merge. If you decide to make it required, selected annotations can still be muted with SimpleCov's <code>:nocov:</code> comment syntax to go green and fix coverage later.</p>
       </div>
-      <div class="col">
+      <div class="col-lg">
         <picture>
           <source srcset="<%= image_path("feature-status-check.png") %>">
-          <img class="img-fluid shadow mt-5 mb-5" alt="Commit status check from Undercover">
+          <img class="img-fluid shadow mb-5" alt="Commit status check from Undercover">
         </picture>
       </div>
     </div>
 
     <div class="row mt-5">
-      <div class="col">
-        <h4>Pull request test coverage summary</h4>
-        <p>The Check Details Breakdown includes file names, class/method names and coverage information. Methods that cause the check to fail are flagged with a warning emoji (⚠️) - one or more line or branch appears in the PR diff and has to be fixed. All others provide a refactoring opportunity for you to improve the test coverage if it's low somewhere outside of the diff.
+      <div class="col-lg">
+        <h4>Test coverage summary</h4>
+        <p>Lists file names, class/method names and coverage information for a commit or pull request. Methods that cause the check to fail are flagged with a warning emoji (⚠️) - one or more line or branch appears in the PR diff and has to be fixed. All others provide a refactoring opportunity for you to improve the test coverage if it's low somewhere outside of the diff.
       </div>
-    </div>
-    <div class="row mb-5">
-      <div class="col">
+      <div class="col-lg">
         <picture>
-          <source srcset="<%= image_path("feature-check-summary-fail.png") %>">
-          <img class="img-fluid shadow mt-5 mb-5" alt="Check summary when coverage fails">
+          <source srcset="<%= image_path("location-breakdown.png") %>">
+          <img class="img-fluid shadow mb-5" alt="Check summary when coverage fails">
         </picture>
       </div>
-
-      <div class="col">
-        <picture>
-          <source srcset="<%= image_path("feature-check-summary-success.png") %>">
-          <img class="img-fluid shadow mt-5 mb-5" alt="Check summary when coverage is successful">
-        </picture>
-      </div>
-    </div>
   </div>
 
   <h3 class="mb-3 top-space">Choose your setup</h3>
