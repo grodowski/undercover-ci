@@ -14,9 +14,9 @@
         <%= nav_link_with_state("Documentation", docs_page_path, target: "_blank") %>
       </ul>
       <% if current_user %>
-        <%= link_to "Sign out", "/auth/logout", class: "btn btn-light", method: :delete %>
+        <%= link_to "Sign out", "/auth/logout", class: "btn btn-dark", method: :delete %>
       <% else %>
-        <%= link_to "Sign in", "/auth/github?r=sign_in", class: "btn btn-light", method: :post %>
+        <%= link_to "Sign in", "/auth/github?r=sign_in", class: "btn btn-dark", method: :post %>
       <% end %>
     </div>
   </div>

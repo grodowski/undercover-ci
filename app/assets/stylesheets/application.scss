@@ -11,17 +11,23 @@
  * It is generally better to create a new file per style scope.
  *
  */
-@import "bootstrap";
-@import "fontello";
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,700;0,900;1,400;1,700&display=swap');
 
-:root {
-  --shark-blue: #212529;
+ :root {
+  --shark-blue: #212944;
   --pattens-blue: #DBEDFF;
   --info-blue: #17A2B8;
   --warning-yellow: #FFC107;
   --fafa-white: #FAFAFA;
+  --undercover-blue: rgb(78,78,242);
+  --undercover-blue-2: rgba(72,129,255,1);
 }
+
+ // override bootstrap bg-dark class
+$dark: #212944;
+
+@import "bootstrap";
+@import "fontello";
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,700;0,900;1,400;1,700&display=swap');
 
 * {
   font-family: 'Roboto', sans-serif;
@@ -39,6 +45,13 @@ h3 {
 
 a.lead { line-height: 1.2; }
 
+.dark-bg {
+  background: var(--undercover-blue);
+  background: linear-gradient(135deg, var(--undercover-blue) 0%, var(--undercover-blue-2) 100%);
+  color: var(--fafa-white);
+  .card-deck { color: var(--shark-blue) }
+}
+
 // bootstrap overrides
 .display-4 {
   font-size: 2.5rem;
@@ -50,7 +63,7 @@ a.lead { line-height: 1.2; }
 }
 
 .shadow-lg {
-  box-shadow: 0 1rem 2.2rem rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 1rem 2.2rem rgba(0, 0, 0, 0.16) !important;
 }
 
 // custom styles
@@ -61,9 +74,6 @@ a.lead { line-height: 1.2; }
   letter-spacing: -0.8px;
   @include media-breakpoint-down(sm) {
     font-size: 2.5rem;
-  }
-  @include media-breakpoint-up(lg) {
-    border-bottom: 6px solid var(--pattens-blue);
   }
 }
 
@@ -96,7 +106,7 @@ a.lead { line-height: 1.2; }
 
 .lead-highlight {
   font-weight: bold;
-  background: var(--pattens-blue);
+  background: var(--undercover-blue);
 }
 
 .how-it-works-container {
@@ -169,4 +179,9 @@ a.lead { line-height: 1.2; }
 
 .node-coverage-default {
   color: inherit;
+}
+
+.header-screenshot {
+  border-radius: 10px;
+  border: 20px solid white;
 }

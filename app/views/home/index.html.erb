@@ -4,36 +4,39 @@ Stop focusing on getting to 100% test coverage. Detect when changed code is unte
 <% end %>
 
 <div class="text-center">
-  <div class="container pb-4 mt-md-5">
-    <div class="row justify-content-center">
-      <div class="col-lg-5 mt-3 text-left">
-        <!-- <h1 class="display-4 header-title">Forget about 100% test coverage</h1> -->
-        <!-- <h1 class="display-4 header-title">❌ Total coverage reduced by 0.03%?</h1> -->
-        <%# <h1 class="display-4 header-title">Healthy test suite, commit by commit</h1> %>
-        <h1 class="display-4 header-title">Code coverage,<br/> made useful</h1>
-        <p class="lead my-5">
-          ❌ Coverage percentage targets let untested code slip through code review. Post-factum test additions cost you more and miss the context.
-        </p>
-        <p class="lead my-5">
-           ✅ Undercover integrates with your CI and local workflow to warn on all <strong class="lead-highlight">methods, classes, blocks and branches</strong> that were <strong class="lead-highlight">changed</strong> without test coverage. Catch them early and ship with confidence.
-        </p>
-      </div>
-      <div class="col-lg-7 pl-1">
-        <picture>
-          <source srcset="<%= image_path("check_screenshot.png") %>">
-          <img class="img-fluid mt-3 mb-3" alt="Undercover GitHub comments">
-        </picture>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col text-center my-3">
-          <% if current_user.nil? %>
-            <%= link_to "Sign Up with GitHub", "/auth/github?r=sign_up", class: "btn btn-lg btn-primary", method: :post %>
-            <p class="lead small mt-2">Get a free account and a 14-day trial for private repositories. Supports Ruby and GitHub.</p>
-          <% else %>
-            <%= link_to "Go to Dashboard", dashboard_path, class: "btn btn-lg btn-light" %>
-          <% end %>
+  <div class="dark-bg">
+    <div class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-5 mt-3 text-left">
+          <!-- <h1 class="display-4 header-title">Forget about 100% test coverage</h1> -->
+          <!-- <h1 class="display-4 header-title">❌ Total coverage reduced by 0.03%?</h1> -->
+          <%# <h1 class="display-4 header-title">Healthy test suite, commit by commit</h1> %>
+          <%# <h1 class="display-4 header-title">Code coverage,<br/> made useful</h1> %>
+          <h1 class="display-4 header-title">Find missing tests<br/> instantly</h1>
+          <p class="lead my-5">
+            ❌ Coverage percentage targets let untested code slip through code review. Post-factum test additions cost you more and miss the context.
+          </p>
+          <p class="lead my-5">
+            ✅ Undercover integrates with your CI and local workflow to warn on all <strong class="lead-highlight">methods, classes, blocks and branches</strong> that were <strong class="lead-highlight">changed</strong> without test coverage. Catch them early, prevent bugs and ship&nbsp;with&nbsp;confidence.
+          </p>
         </div>
+        <div class="col-lg-7 pl-3 pt-lg-3 my-lg-5">
+          <picture>
+            <source srcset="<%= image_path("check_screenshot.png") %>">
+            <img class="img-fluid shadow-lg header-screenshot mt-3 mb-3" alt="Undercover GitHub comments">
+          </picture>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col text-center my-3">
+            <% if current_user.nil? %>
+              <%= link_to "Sign Up with GitHub", "/auth/github?r=sign_up", class: "btn btn-lg btn-light font-weight-bold", method: :post %>
+              <p class="lead small mt-2">Get a free account and a 14-day trial for private repositories. Supports Ruby and GitHub.</p>
+            <% else %>
+              <%= link_to "Go to Dashboard", dashboard_path, class: "btn btn-lg btn-light" %>
+            <% end %>
+          </div>
+      </div>
     </div>
   </div>
 
@@ -120,12 +123,18 @@ Stop focusing on getting to 100% test coverage. Detect when changed code is unte
         </picture>
       </div>
   </div>
+</div>
 
-  <h3 class="mb-3 top-space">Choose your setup</h3>
-  <p class="lead mb-5">Install Undercover's hosted GitHub App or explore the Ruby gems family</p>
-  <%= render partial: 'partials/pricing_cards' %>
+<div class="dark-bg">
+  <div class="container py-5">
+    <h3 class="mb-3 top-space">Choose your setup</h3>
+    <p class="lead mb-5">Install Undercover's hosted GitHub App or explore the Ruby gems family</p>
+    <%= render partial: 'partials/pricing_cards' %>
+  </div>
+</div>
 
-  <h3 class="mb-3 top-space">Why Undercover</h3>
+<div class="container">
+  <h3 class="mt-5 mb-3 top-space">Why Undercover</h3>
   <p class="lead mb-5">Read more about Ruby code coverage and unit testing strategy</p>
 
   <div class="card-deck">
@@ -158,11 +167,11 @@ Stop focusing on getting to 100% test coverage. Detect when changed code is unte
     <div class="card mb-4 shadow-lg pt-3">
       <div  class="text-left card-body">
         <div class="mb-2">
-          <a class="lead" href="https://www.codementor.io/@theundefined/ruby-the-misconceptions-of-100-code-coverage-keituk3qc" target="_blank">The misconceptions of 100% Code Coverage</a>
+          <a class="lead" href="https://martinfowler.com/bliki/TestCoverage.html" target="_blank">Test Coverage</a>
         </div>
         <blockquote>
-          <i class="mb-0">For existing projects, because of the sheer workload of having to write the tests to cover code that you have not written to fill the gaps, it is much harder to get to the confidence level that having 100% coverage brings, but at least by using code coverage reports you can make informed decisions on how risky a change is going to be.</i>
-          <footer class="blockquote-footer mt-4"><a href="https://github.com/the-undefined">@the-undefined</a> in <a href="https://www.codementor.io/@theundefined/ruby-the-misconceptions-of-100-code-coverage-keituk3qc" target="_blank"><cite title="Ruby: The misconceptions of 100% Code Coverage">Ruby: The misconceptions of 100% Code Coverage</cite></a></footer>
+          <i class="mb-0">So what is the value of coverage analysis again? Well it helps you find which bits of your code aren't being tested. It's worth running coverage tools every so often and looking at these bits of untested code. Do they worry you that they aren't being tested?</i>
+          <footer class="blockquote-footer mt-4"><a href="https://martinfowler.com">Martin Fowler</a> in <a href="https://martinfowler.com/bliki/TestCoverage.html" target="_blank"><cite title="TestCoverage">TestCoverage (2012)</cite></a></footer>
         </blockquote>
       </div>
     </div>
@@ -175,7 +184,7 @@ Stop focusing on getting to 100% test coverage. Detect when changed code is unte
       <p class="text-muted mb-5">Free for individuals and open-source repositories. Organization plans start at $49 per month with a <strong>free 14-day trial</strong>.</p>
 
       <% if current_user.nil? %>
-        <%= link_to "Sign Up with GitHub", "/auth/github?r=sign_up", class: "btn btn-lg btn-primary", method: :post %>
+        <%= link_to "Sign Up with GitHub", "/auth/github?r=sign_up", class: "btn btn-lg btn-primary font-weight-bold", method: :post %>
       <% else %>
         <%= link_to "Go to Dashboard", dashboard_path, class: "btn btn-lg btn-light" %>
       <% end %>

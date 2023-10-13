@@ -1,7 +1,7 @@
-<nav class="navbar navbar-expand-md navbar-light bg-light">
+<nav class="navbar navbar-expand-md navbar-dark bg-dark">
   <div class="container">
     <a class="navbar-brand d-flex align-items-center" href="<%= root_path %>">
-      <%= image_tag "logo/Logo_Asset_1@3x-8.png", class: 'logo-img' %>
+      <%= image_tag "logo/Logo_Asset_2@3x-8.png", class: 'logo-img' %>
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-top" aria-controls="navbar-top" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -14,8 +14,8 @@
         <%= nav_link_with_state("Documentation", docs_page_path) %>
       </ul>
       <% if current_user %>
-        <%= link_to "Dashboard", "/app", class: "btn btn-light" %>
-        <%= link_to "Sign out", "/auth/logout", class: "btn btn-light", method: :delete %>
+        <%= link_to "Dashboard", "/app", class: "btn btn-dark" %>
+        <%= link_to "Sign out", "/auth/logout", class: "btn btn-dark", method: :delete %>
       <% else %>
         <%= link_to "Sign in", "/auth/github?r=sign_in", class: "btn btn-light", method: :post %>
       <% end %>
