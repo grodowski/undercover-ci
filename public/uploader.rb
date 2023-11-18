@@ -54,7 +54,7 @@ class UndercoverCiCoverageUpload
   def upload
     unless @options.valid?
       error(@opts_parser)
-      return
+      return self
     end
 
     @options.url ||= URI("https://undercover-ci.com/v1/coverage")
@@ -62,7 +62,7 @@ class UndercoverCiCoverageUpload
 
     unless data.size.positive?
       error("#{@options.lcov} is an empty file, is that the correct path?")
-      return
+      return self
     end
 
     coverage_data_base64 = Base64.strict_encode64(data)
