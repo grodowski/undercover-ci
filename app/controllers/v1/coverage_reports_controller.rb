@@ -23,6 +23,11 @@ module V1
           Logic::UpdateCoverageCheckState.new(@coverage_check).start
           # Wait 5 seconds to let ActiveStorage process the attachment
           RunnerJob.set(wait: 5.seconds).perform_later(@coverage_check.id)
+        rescue Logic::StateTransisionError => _e
+          @error_message = "Coverage check #{@coverage_check.id} has already completed. " \
+                           "Please push a new commit to restart."
+          render "shared/generic_error", format: :json, status: :unprocessable_entity
+          return
         end
 
         head(:created)

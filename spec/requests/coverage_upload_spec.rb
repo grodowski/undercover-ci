@@ -102,6 +102,19 @@ describe "Coverage Upload" do
     )
   end
 
+  it "raises a state machine error when check is complete" do
+    check = make_coverage_check
+    check.update!(state: :complete)
+    contents = "SF:./foo.rb\nDA:1,1"
+
+    post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
+
+    expect(response.status).to eq(422)
+    expect(JSON.parse(response.body)).to eq(
+      "error" => "Coverage check #{check.id} has already completed. Please push a new commit to restart."
+    )
+  end
+
   context "with inline jobs" do
     before do
       # TODO: remove once https://github.com/rails/rails/issues/37270 is addressed in rails 6.1.next
