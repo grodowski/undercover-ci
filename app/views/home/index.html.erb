@@ -23,7 +23,7 @@ Stop focusing on getting to 100% test coverage. Detect when changed code is unte
         <div class="col-lg-7 pl-3 pt-lg-3 my-lg-5">
           <picture>
             <source srcset="<%= image_path("check_screenshot.png") %>">
-            <img class="img-fluid shadow-lg header-screenshot mt-3 mb-3" alt="Undercover GitHub comments">
+            <img class="img-fluid shadow-lg screenshot-with-border-radius mt-3 mb-3" alt="Undercover GitHub comments">
           </picture>
         </div>
       </div>
@@ -31,7 +31,10 @@ Stop focusing on getting to 100% test coverage. Detect when changed code is unte
         <div class="col text-center my-3">
             <% if current_user.nil? %>
               <%= link_to "Sign Up with GitHub", "/auth/github?r=sign_up", class: "btn btn-lg btn-light font-weight-bold", method: :post %>
-              <p class="lead small mt-2">Get a free account and a 14-day trial for private repositories. Supports Ruby and GitHub.</p>
+              <p class="lead small mt-2">
+                Free forever for open-source repos.<br/>
+                14-day free trial for private repos. Supports Ruby and GitHub.
+              </p>
             <% else %>
               <%= link_to "Go to Dashboard", dashboard_path, class: "btn btn-lg btn-light" %>
             <% end %>
@@ -93,7 +96,7 @@ Stop focusing on getting to 100% test coverage. Detect when changed code is unte
       <div class="col-lg">
         <picture>
           <source srcset="<%= image_path("feature-inline-comment.png") %>">
-          <img class="img-fluid shadow mb-5" alt="Undercover GitHub comment">
+          <img class="img-fluid screenshot-with-border-radius shadow mb-5" alt="Undercover GitHub comment">
         </picture>
       </div>
     </div>
@@ -106,7 +109,7 @@ Stop focusing on getting to 100% test coverage. Detect when changed code is unte
       <div class="col-lg">
         <picture>
           <source srcset="<%= image_path("feature-status-check.png") %>">
-          <img class="img-fluid shadow mb-5" alt="Commit status check from Undercover">
+          <img class="img-fluid screenshot-with-border-radius shadow mb-5" alt="Commit status check from Undercover">
         </picture>
       </div>
     </div>
@@ -119,7 +122,7 @@ Stop focusing on getting to 100% test coverage. Detect when changed code is unte
       <div class="col-lg">
         <picture>
           <source srcset="<%= image_path("location-breakdown.png") %>">
-          <img class="img-fluid shadow mb-5" alt="Check summary when coverage fails">
+          <img class="img-fluid screenshot-with-border-radius shadow mb-5" alt="Check summary when coverage fails">
         </picture>
       </div>
   </div>
@@ -181,7 +184,7 @@ Stop focusing on getting to 100% test coverage. Detect when changed code is unte
     <div class="container py-5">
       <%= image_tag "logo/Logo_Asset_1@3x-8.png", class: 'mb-5 footer-cta-img' %>
       <h4>Find untested code in your PRs</h1>
-      <p class="text-muted mb-5">Free for individuals and open-source repositories. Organization plans start at $49 per month with a <strong>free 14-day trial</strong>.</p>
+      <p class="text-muted mb-5">Free for open-source repositories. Organization plans start at $49 per month with a <strong>free 14-day trial</strong>.</p>
 
       <% if current_user.nil? %>
         <%= link_to "Sign Up with GitHub", "/auth/github?r=sign_up", class: "btn btn-lg btn-primary font-weight-bold", method: :post %>
