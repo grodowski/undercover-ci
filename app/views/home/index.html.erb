@@ -3,154 +3,159 @@
 Stop focusing on getting to 100% test coverage. Detect when changed code is untested before it's deployed.
 <% end %>
 
-<div class="text-center">
-  <div class="dark-bg">
-    <div class="container py-5">
-      <div class="row justify-content-center">
-        <div class="col-lg-5 mt-3 text-left">
-          <!-- <h1 class="display-4 header-title">Forget about 100% test coverage</h1> -->
-          <!-- <h1 class="display-4 header-title">❌ Total coverage reduced by 0.03%?</h1> -->
-          <%# <h1 class="display-4 header-title">Healthy test suite, commit by commit</h1> %>
-          <%# <h1 class="display-4 header-title">Code coverage,<br/> made useful</h1> %>
-          <h1 class="display-4 header-title">Find missing tests<br/> instantly</h1>
-          <p class="lead my-5">
-            ❌ Coverage percentage targets let untested code slip through code review. Post-factum test additions cost you more and miss the context.
-          </p>
-          <p class="lead my-5">
-            ✅ Undercover integrates with your CI and local workflow to warn on all <strong class="lead-highlight">methods, classes, blocks and branches</strong> that were <strong class="lead-highlight">changed</strong> without test coverage. Catch them early, prevent bugs and ship&nbsp;with&nbsp;confidence.
-          </p>
-        </div>
-        <div class="col-lg-7 pl-3 pt-lg-3 my-lg-5">
-          <picture>
-            <source srcset="<%= image_path("check_screenshot.png") %>">
-            <img class="img-fluid shadow-lg screenshot-with-border-radius mt-3 mb-3" alt="Undercover GitHub comments">
-          </picture>
-        </div>
+
+<div class="dark-bg">
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-5 mt-3 text-left">
+        <!-- <h1 class="display-4 header-title">Forget about 100% test coverage</h1> -->
+        <!-- <h1 class="display-4 header-title">❌ Total coverage reduced by 0.03%?</h1> -->
+        <%# <h1 class="display-4 header-title">Healthy test suite, commit by commit</h1> %>
+        <%# <h1 class="display-4 header-title">Code coverage,<br/> made useful</h1> %>
+        <h1 class="display-4 header-title">Find missing tests<br/> instantly</h1>
+        <p class="lead my-5">
+          ❌ Coverage percentage targets let untested code slip through code review. Post-factum test additions cost you more and miss the context.
+        </p>
+        <p class="lead my-5">
+          ✅ Undercover integrates with your CI and local workflow to warn on all <strong class="lead-highlight">methods, classes, blocks and branches</strong> that were <strong class="lead-highlight">changed</strong> without test coverage. Catch them early, prevent bugs and ship&nbsp;with&nbsp;confidence.
+        </p>
       </div>
-      <div class="row">
-        <div class="col text-center my-3">
-            <% if current_user.nil? %>
-              <%= link_to "Sign Up with GitHub", "/auth/github?r=sign_up", class: "btn btn-lg btn-light font-weight-bold", method: :post %>
-              <p class="lead small mt-2">
-                Free forever for open-source repos.<br/>
-                14-day free trial for private repos. Supports Ruby and GitHub.
-              </p>
-            <% else %>
-              <%= link_to "Go to Dashboard", dashboard_path, class: "btn btn-lg btn-light" %>
-            <% end %>
-          </div>
+      <div class="col-lg-7 pl-3 pt-lg-3 my-lg-3">
+        <picture>
+          <source srcset="<%= image_path("check_screenshot.png") %>">
+          <img class="img-fluid shadow-lg screenshot-with-border-radius mt-3 mb-3" alt="Undercover GitHub comments">
+        </picture>
       </div>
     </div>
-  </div>
-
-  <div class="container how-it-works-container mt-5">
-    <p class="lead">These leading <strong>Ruby engineering teams</strong> review test coverage with undercover</p>
     <div class="row">
-      <div class="col-md-3 pb-5">
-        <a href="https://gitlab.com" target="_blank">
-          <picture>
-            <source srcset="<%= image_path("gitlab-logo-default-rgb.png") %>" />
-            <img class="img-fluid trusted-by-img" alt="GitLab" />
-          </picture>
-        </a>
-      </div>
-      <div class="col-md-3 pb-5">
-        <a href="https://fieldly.com" target="_blank">
-          <picture>
-            <source srcset="<%= image_path("fieldly_black.png") %>" />
-            <img class="img-fluid trusted-by-img" alt="Fieldly" />
-          </picture>
-        </a>
-      </div>
-      <div class="col-md-3 pb-5">
-        <a href="https://rainforestqa.com" target="_blank">
-          <picture>
-            <source srcset="<%= image_path("rfqa.png") %>" />
-            <img class="img-fluid trusted-by-img" alt="Rainforest QA" />
-          </picture>
-        </a>
-      </div>
-      <div class="col-md-3 pb-5">
-        <a href="https://www.sayrhino.com" target="_blank">
-          <picture>
-            <source srcset="<%= image_path("rhino.jpg") %>" />
-            <img class="img-fluid trusted-by-img rhino" alt="Rhino" />
-          </picture>
-        </a>
+      <div class="col text-center my-3">
+        <% if current_user.nil? %>
+          <%= link_to "Sign Up with GitHub", "/auth/github?r=sign_up", class: "btn btn-lg btn-light font-weight-bold", method: :post %>
+          <p class="small mt-2">
+            Free forever for open-source repos.<br/>
+            14-day free trial for private repos. Supports Ruby and GitHub.
+          </p>
+        <% else %>
+          <%= link_to "Go to Dashboard", dashboard_path, class: "btn btn-lg btn-light" %>
+        <% end %>
       </div>
     </div>
   </div>
+</div>
 
-  <div id="how-it-works" class="container how-it-works-container">
-    <h3 class="mb-3 top-space">How it works</h3>
-    <p class="lead mb-5">Stop focusing on getting to 100% test coverage.<br/>Detect when changed code is untested before it's deployed.</p>
+<div class="container how-it-works-container text-center mt-5">
+  <p class="lead">Leading <strong>Ruby engineering teams</strong> review test coverage with undercover</p>
+  <div class="row">
+    <div class="col-md-3 pb-5">
+      <a href="https://gitlab.com" target="_blank">
+        <picture>
+          <source srcset="<%= image_path("gitlab-logo-default-rgb.png") %>" />
+          <img class="img-fluid trusted-by-img" alt="GitLab" />
+        </picture>
+      </a>
+    </div>
+    <div class="col-md-3 pb-5">
+      <a href="https://fieldly.com" target="_blank">
+        <picture>
+          <source srcset="<%= image_path("fieldly_black.png") %>" />
+          <img class="img-fluid trusted-by-img" alt="Fieldly" />
+        </picture>
+      </a>
+    </div>
+    <div class="col-md-3 pb-5">
+      <a href="https://rainforestqa.com" target="_blank">
+        <picture>
+          <source srcset="<%= image_path("rfqa.png") %>" />
+          <img class="img-fluid trusted-by-img" alt="Rainforest QA" />
+        </picture>
+      </a>
+    </div>
+    <div class="col-md-3 pb-5">
+      <a href="https://www.sayrhino.com" target="_blank">
+        <picture>
+          <source srcset="<%= image_path("rhino.jpg") %>" />
+          <img class="img-fluid trusted-by-img rhino" alt="Rhino" />
+        </picture>
+      </a>
+    </div>
+  </div>
+  <div id="testimonials" class="row my-5">
+    <div class="col-lg-4 py-3 d-flex justify-content-center">
+      <!-- https://github.com/saurabhnemade/react-twitter-embed/issues/21 -->
+      <blockquote data-cards="hidden" class="twitter-tweet"><p lang="en" dir="ltr">Integrating good tools into your code review flow simplifies everything 😌. A great example is <a href="https://t.co/nJOemX8oh7">https://t.co/nJOemX8oh7</a>, ensuring each change is well-tested 🛠️. Kudos to <a href="https://twitter.com/mrgrodo?ref_src=twsrc%5Etfw">@mrgrodo</a> for creating it and offering fantastic support for any queries!</p>&mdash; Magda (@MagdaEriruos) <a href="https://twitter.com/MagdaEriruos/status/1733117075193844156?ref_src=twsrc%5Etfw">December 8, 2023</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    </div>
+    <div class="col-lg-4 d-flex justify-content-center">
+      <blockquote data-cards="hidden" class="twitter-tweet"><p lang="en" dir="ltr">Shoutout to <a href="https://twitter.com/mrgrodo?ref_src=twsrc%5Etfw">@mrgrodo</a>&#39;s (still underappreciated) work on <a href="https://t.co/IsSyc2lz0s">https://t.co/IsSyc2lz0s</a>! This little gem helped me keep 99% code coverage in one of of my Open Source Ruby gems: <a href="https://t.co/wkGVV6WSfL">https://t.co/wkGVV6WSfL</a>.<br><br>Totally recommend it if you care about the quality of your open source work!</p>&mdash; Bajena (@Bajena) <a href="https://twitter.com/Bajena/status/1725881690466173076?ref_src=twsrc%5Etfw">November 18, 2023</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    </div>
+    <div class="col-lg-4 py-3">
+      <iframe src="https://ruby.social/@hschne/111422104536735524/embed" class="mastodon-embed" style="max-width: 100%; border: 0" width="400" allowfullscreen="allowfullscreen"></iframe><script src="https://ruby.social/embed.js" async="async"></script>
+    </div>
+  </div>
+</div>
+
+<div id="how-it-works" class="container how-it-works-container text-center pb-3">
+  <h2 class="mb-3 top-space">How it works</h2>
+  <p class="lead">Stop focusing on getting to 100% test coverage.<br/>Detect when changed code is untested before it's deployed.</p>
+</div>
+
+<div id="features" class="container how-it-works-container text-left mt-5">
+  <div class="row my-5">
+    <div class="col-lg py-5-lg">
+      <h3>Find untested code blocks</h3>
+      <p>Each class, method or block that's been changed without tests receives a check annotation including detailed information about what's missing and where: line coverage or branch coverage, plus respective line numbers and number of hits.</p>
+      <p><strong>Worried about too many comments?</strong> You won't receive more than one comment per method, because Undercover understands code structure and only works with the current diff.</p>
+    </div>
+    <div class="col-lg">
+      <picture>
+        <source srcset="<%= image_path("feature-inline-comment.png") %>">
+        <img class="img-fluid screenshot-with-border-radius shadow mb-5" alt="Undercover GitHub comment">
+      </picture>
+    </div>
   </div>
 
-  <div id="features" class="container how-it-works-container text-left">
-    <div class="row my-5">
-      <div class="col-lg py-5-lg">
-        <h4>Actionable review comments</h4>
-        <p>Each class, method or block that's been changed without tests receives a check annotation including detailed information about what's missing and where: line coverage or branch coverage, plus respective line numbers and number of hits.</p>
-        <p><strong>Worried about too many comments?</strong> You won't receive more than one comment per method, because Undercover understands code structure and only works with the current diff.</p>
-      </div>
-      <div class="col-lg">
-        <picture>
-          <source srcset="<%= image_path("feature-inline-comment.png") %>">
-          <img class="img-fluid screenshot-with-border-radius shadow mb-5" alt="Undercover GitHub comment">
-        </picture>
-      </div>
+  <div class="row my-5">
+    <div class="col-lg py-5-lg">
+      <h3>Ship on green</h3>
+      <p>No untested changes in the diff? Merge away.</p>
+      <p>Otherwise, it's up to you to configure whether a passing check is required to merge. If you decide to make it required, selected annotations can still be muted with SimpleCov's <code>:nocov:</code> comment syntax to go green and fix coverage later.</p>
     </div>
-
-    <div class="row my-5">
-      <div class="col-lg py-5-lg">
-        <h4>Status checks</h4>
-        <p>No untested changes in the diff? Merge away. Otherwise, it's up to you to configure whether a passing check is required to merge. If you decide to make it required, selected annotations can still be muted with SimpleCov's <code>:nocov:</code> comment syntax to go green and fix coverage later.</p>
-      </div>
-      <div class="col-lg">
-        <picture>
-          <source srcset="<%= image_path("feature-status-check.png") %>">
-          <img class="img-fluid screenshot-with-border-radius shadow mb-5" alt="Commit status check from Undercover">
-        </picture>
-      </div>
+    <div class="col-lg">
+      <picture>
+        <source srcset="<%= image_path("feature-status-check.png") %>">
+        <img class="img-fluid screenshot-with-border-radius shadow mb-5" alt="Commit status check from Undercover">
+      </picture>
     </div>
+  </div>
 
-    <div class="row mt-5">
-      <div class="col-lg">
-        <h4>Test coverage summary</h4>
-        <p>Lists file names, class/method names and coverage information for a commit or pull request. Methods that cause the check to fail are flagged with a warning emoji (⚠️) - one or more line or branch appears in the PR diff and has to be fixed. All others provide a refactoring opportunity for you to improve the test coverage if it's low somewhere outside of the diff.
-      </div>
-      <div class="col-lg">
-        <picture>
-          <source srcset="<%= image_path("location-breakdown.png") %>">
-          <img class="img-fluid screenshot-with-border-radius shadow mb-5" alt="Check summary when coverage fails">
-        </picture>
-      </div>
+  <div class="row mt-5">
+    <div class="col-lg">
+      <h3>Monitor your test suite health</h3>
+      <p>Lists file names, class/method names and coverage information for a commit or pull request. Methods that cause the check to fail are flagged with a warning emoji (⚠️) - one or more line or branch appears in the PR diff and has to be fixed.</p>
+      <p>All others provide a refactoring opportunity for you to improve the test coverage if it's low somewhere outside of the diff.
+    </div>
+    <div class="col-lg">
+      <picture>
+        <source srcset="<%= image_path("location-breakdown.png") %>">
+        <img class="img-fluid screenshot-with-border-radius shadow mb-5" alt="Check summary when coverage fails">
+      </picture>
+    </div>
   </div>
 </div>
 
 <div class="dark-bg">
-  <div class="container py-5">
-    <h3 class="mb-3 top-space">Choose your setup</h3>
-    <p class="lead mb-5">Install Undercover's hosted GitHub App or explore the Ruby gems family</p>
+  <div class="py-5">
+    <div class="text-center">
+      <h2 class="top-space">Choose your setup</h2>
+      <p class="lead mb-5">Install the Undercover GitHub App or explore the Ruby gems family</p>
+    </div>
     <%= render partial: 'partials/pricing_cards' %>
   </div>
 </div>
 
 <div class="container">
-  <h3 class="mt-5 mb-3 top-space">Why Undercover?</h3>
-  <p class="lead mb-5">Happy user quotes and stuff to read about Ruby test coverage strategy</p>
-
-  <div id="testimonials" class="row my-5">
-    <div class="col-md-4 py-3">
-      <!-- https://github.com/saurabhnemade/react-twitter-embed/issues/21 -->
-      <blockquote data-cards="hidden" class="twitter-tweet"><p lang="en" dir="ltr">Integrating good tools into your code review flow simplifies everything 😌. A great example is <a href="https://t.co/nJOemX8oh7">https://t.co/nJOemX8oh7</a>, ensuring each change is well-tested 🛠️. Kudos to <a href="https://twitter.com/mrgrodo?ref_src=twsrc%5Etfw">@mrgrodo</a> for creating it and offering fantastic support for any queries!</p>&mdash; Magda (@MagdaEriruos) <a href="https://twitter.com/MagdaEriruos/status/1733117075193844156?ref_src=twsrc%5Etfw">December 8, 2023</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-    </div>
-    <div class="col-md-4">
-      <blockquote data-cards="hidden" class="twitter-tweet"><p lang="en" dir="ltr">Shoutout to <a href="https://twitter.com/mrgrodo?ref_src=twsrc%5Etfw">@mrgrodo</a>&#39;s (still underappreciated) work on <a href="https://t.co/IsSyc2lz0s">https://t.co/IsSyc2lz0s</a>! This little gem helped me keep 99% code coverage in one of of my Open Source Ruby gems: <a href="https://t.co/wkGVV6WSfL">https://t.co/wkGVV6WSfL</a>.<br><br>Totally recommend it if you care about the quality of your open source work!</p>&mdash; Bajena (@Bajena) <a href="https://twitter.com/Bajena/status/1725881690466173076?ref_src=twsrc%5Etfw">November 18, 2023</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-    </div>
-    <div class="col-md-4 py-3">
-      <iframe src="https://ruby.social/@hschne/111422104536735524/embed" class="mastodon-embed" style="max-width: 100%; border: 0" width="400" allowfullscreen="allowfullscreen"></iframe><script src="https://ruby.social/embed.js" async="async"></script>
-    </div>
+  <div class="text-center">
+    <h2 class="mt-5 mb-3 top-space">Why Undercover?</h2>
+    <p class="lead mb-5">Updates and links to read about Ruby test coverage strategy</p>
   </div>
 
   <div class="card-deck">
@@ -196,7 +201,7 @@ Stop focusing on getting to 100% test coverage. Detect when changed code is unte
   <div class="jumbotron text-center mt-5 py-5">
     <div class="container py-5">
       <%= image_tag "logo/Logo_Asset_1@3x-8.png", class: 'mb-5 footer-cta-img' %>
-      <h4>Find untested code in your PRs</h1>
+      <h2>Find untested code in your PRs</h2>
       <p class="text-muted mb-5">Free for open-source repositories. Organization plans start at $49 per month with a <strong>free 14-day trial</strong>.</p>
 
       <% if current_user.nil? %>

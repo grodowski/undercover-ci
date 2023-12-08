@@ -21,8 +21,8 @@ gem "net-pop", require: false
 gem "net-smtp", require: false
 
 # UI Gems
-gem "bootstrap", "~> 4.6"
-gem "bootstrap4-kaminari-views"
+gem "bootstrap"
+gem "bootstrap5-kaminari-views"
 gem "coffee-rails", "~> 5.0"
 gem "jquery-rails"
 gem "sass-rails"

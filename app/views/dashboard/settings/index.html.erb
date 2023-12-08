@@ -8,7 +8,7 @@
     <div class="card-header">
       <%= inst.metadata.dig("account", "login") %>
       <% if inst.metadata.dig("target_type").downcase == 'organization' %>
-        <%= content_tag("span", "organization", class: 'badge badge-info') %>
+        <%= content_tag("span", "organization", class: 'badge rounded-pill text-bg-info') %>
       <% end %>
     </div>
 

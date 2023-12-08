@@ -24,15 +24,15 @@ module ApplicationHelper
 
   def coverage_result_badge(check)
     warn_count = check.flagged_nodes_count
-    badge_type = warn_count.zero? ? "badge-success" : "badge-warning"
-    content_tag(:span, class: "badge #{badge_type}") do
+    badge_type = warn_count.zero? ? "text-bg-success" : "text-bg-warning"
+    content_tag(:span, class: "badge rounded-pill #{badge_type}") do
       "#{warn_count} #{'warning'.pluralize(warn_count)}"
     end
   end
 
   def badge_label_for_node(node)
     flag = node.flagged? ? "warning" : "info"
-    content_tag(:span, class: "badge badge-#{flag}") do
+    content_tag(:span, class: "badge rounded-pill text-bg-#{flag}") do
       flag
     end
   end
