@@ -18,6 +18,9 @@
 //= require bootstrap-sprockets
 //= require popper
 
+//= require chartkick
+//= require Chart.bundle
+
 //= require_tree .
 
 $(document).on("turbolinks:load", function() {

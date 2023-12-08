@@ -4,6 +4,16 @@
 <% end %>
 
 <div class="mb-5">
+  <%=
+    # TODO: move to an async controller
+    line_chart(
+      # TODO: add options (scope to installations, date range etc)
+      CoverageCheck.to_chartkick,
+      xmin: "2023-11-17",
+      xmax: "2023-11-26",
+      xtitle: "date", ytitle: "total checks"
+    )
+  %>
   <p class="lead">Recently analysed commits</p>
   <table class="table table-hover">
     <thead>

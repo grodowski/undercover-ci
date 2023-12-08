@@ -43,6 +43,28 @@ class CoverageCheck < ApplicationRecord
     installation.active?
   end
 
+  RESULT_COLORS = {
+    passed: "green",
+    failed: "red",
+    no_result: "gray"
+  }.freeze
+  # rubocop:disable Style/MultilineBlockChain
+  # TODO: store `result` in db and use group(:result)
+  def self.to_chartkick
+    with_counts.group_by do |coverage_check|
+      next :no_result if coverage_check.state != :complete
+
+      coverage_check.flagged_nodes_count.zero? ? :passed : :failed
+    end.map do |result, checks|
+      {
+        name: result,
+        data: checks.group_by_day(&:created_at).transform_values(&:count),
+        color: RESULT_COLORS[result]
+      }
+    end
+  end
+  # rubocop:enable Style/MultilineBlockChain
+
   def state
     super&.to_sym
   end
