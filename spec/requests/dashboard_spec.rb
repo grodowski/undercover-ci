@@ -70,13 +70,24 @@ describe "Dashboard spec" do
         coverage: 0.6,
         flagged: true
       )
+      passed_check = CoverageCheck.create!(head_sha: "2337SHA", installation: inst)
+      passed_check.nodes.create(
+        path: "foo.rb",
+        node_name: "hello",
+        node_type: "instance method",
+        start_line: 1,
+        end_line: 3,
+        coverage: 1.0,
+        flagged: false
+      )
 
       get("/auth/github/callback")
       get("/app")
       expect(response.body).to include(
         "<a href=\"https://github.com//commit/1337SHA\"><code>1337SHA</code> 👉 <code></code></a>"
       )
-      expect(response.body).to include("<span class=\"badge badge-warning\">1 warning</span>")
+      expect(response.body).to include("<span class=\"badge rounded-pill text-bg-warning\">1 warning</span>")
+      expect(response.body).to include("<span class=\"badge rounded-pill text-bg-success\">0 warnings</span>")
     end
 
     context "with a github installation" do
@@ -129,7 +140,7 @@ describe "Dashboard spec" do
 
       get("/auth/github/callback")
       get("/checks/#{check.id}")
-      expect(response.body).to include("<span class=\"badge badge-warning\">warning</span>")
+      expect(response.body).to include("<span class=\"badge rounded-pill text-bg-warning\">warning</span>")
       expect(response.body).to include(
         "Instance method <code>hello</code>. " \
         "Coverage: <span class=\"node-coverage-yellow\">60.0%</span><span> (contains untested " \

@@ -33,7 +33,7 @@ $dark: #212944;
   font-family: 'Roboto', sans-serif;
 }
 
-h3 {
+h2 {
   font-weight: 800;
   font-size: 2.5rem;
   &.top-space {
@@ -41,6 +41,11 @@ h3 {
       margin-top: 4rem;
     }
   }
+}
+
+h3 {
+  font-weight: 600;
+  font-size: 2rem;
 }
 
 a.lead { line-height: 1.2; }
