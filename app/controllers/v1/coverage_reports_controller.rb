@@ -26,11 +26,13 @@ module V1
         rescue Logic::StateTransisionError => _e
           @error_message = "Coverage check #{@coverage_check.id} has already completed. " \
                            "Please push a new commit to restart."
-          render "shared/generic_error", format: :json, status: :unprocessable_entity
-          return
         end
 
-        head(:created)
+        if @error_message
+          render "shared/generic_error", format: :json, status: :unprocessable_entity
+        else
+          head(:created)
+        end
       else
         render "shared/generic_error", format: :json, status: :unprocessable_entity
       end
