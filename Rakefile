@@ -12,10 +12,7 @@ if Rails.env.development? || Rails.env.test?
   desc "Run RuboCop"
   RuboCop::RakeTask.new(:rubocop)
 
-  desc "Run Tests"
-  RSpec::Core::RakeTask.new(:spec)
-
-  task default: %i[rubocop spec]
+  task default: %i[rubocop]
 end
 
 Rails.application.load_tasks
