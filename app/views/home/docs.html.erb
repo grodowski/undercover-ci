@@ -173,23 +173,22 @@ Learn how to install UndercoverCI for your repos, report coverage data and use t
 
           puts('Merging coverage results from parallel CircleCI tests containers into a single LCOV report...')
 
-          results = []
-          Dir['/home/circleci/rspec/*.resultset.json'].each do |path|
-            resultset = JSON.parse(File.read(path))
-            resultset.each do |_, data|
-              cmd = File.basename(path)
-              results << SimpleCov::Result.from_hash(cmd => data)
-            end
-            print '.'
+          SimpleCov.collate(Dir['/home/circleci/rspec/*.resultset.json']) do
+            enable_coverage(:branch)
           end
-          puts
 
-          merged_result = SimpleCov::ResultMerger.merge_results(*results)
-
+          report_path = ARGV[0] || 'coverage.lcov'
+          SimpleCov.formatter = SimpleCov::Formatter::LcovFormatter
           SimpleCov::Formatter::LcovFormatter.config.report_with_single_file = true
-          SimpleCov::Formatter::LcovFormatter.config.single_report_path = ARGV[0] || 'coverage.lcov'
-          SimpleCov::Formatter::LcovFormatter.new.format(merged_result)
+          SimpleCov::Formatter::LcovFormatter.config.single_report_path = report_path
 
+          merged_result = SimpleCov.result
+          merged_result.format!
+
+          if File.size(report_path).zero?
+            puts('Written report has 0 bytes')
+            exit 1
+          end
           puts("Done! LCOV saved to #{SimpleCov::Formatter::LcovFormatter.config.single_report_path}")
         </code></pre>
       </p>
