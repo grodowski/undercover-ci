@@ -23,6 +23,7 @@ class CoverageCheck < ApplicationRecord
   scope :in_progress_for_installation, (lambda do |installation_id|
     where(installation_id:, state: :in_progress)
   end)
+  scope :last_30d, -> { where("coverage_checks.created_at > ?", 30.days.ago) }
 
   validates :state, inclusion: {
     in: %i[created awaiting_coverage queued in_progress complete canceled]
@@ -37,32 +38,33 @@ class CoverageCheck < ApplicationRecord
 
   delegate :max_concurrent_checks, to: :installation
 
+  RESULT_COLORS = {
+    passed: "green",
+    failed: "orange"
+    # no_result: "gray"
+  }.freeze
+
+  # rubocop:disable Style/MultilineBlockChain
+  # TODO: store `result` in db and use group(:result)
+  def self.to_chartkick
+    # last_30d
+    with_counts.select { _1.state == :complete }.group_by do |coverage_check|
+      coverage_check.flagged_nodes_count.zero? ? :passed : :failed
+    end.map do |result, checks|
+      {
+        name: result,
+        data: checks.group_by_day(&:created_at).transform_values(&:count),
+        color: RESULT_COLORS[result&.to_sym]
+      }
+    end
+  end
+
   def installation_active?
     return true if repo_public?
 
     installation.active?
   end
 
-  RESULT_COLORS = {
-    passed: "green",
-    failed: "red",
-    no_result: "gray"
-  }.freeze
-  # rubocop:disable Style/MultilineBlockChain
-  # TODO: store `result` in db and use group(:result)
-  def self.to_chartkick
-    with_counts.group_by do |coverage_check|
-      next :no_result if coverage_check.state != :complete
-
-      coverage_check.flagged_nodes_count.zero? ? :passed : :failed
-    end.map do |result, checks|
-      {
-        name: result,
-        data: checks.group_by_day(&:created_at).transform_values(&:count),
-        color: RESULT_COLORS[result]
-      }
-    end
-  end
   # rubocop:enable Style/MultilineBlockChain
 
   def state
