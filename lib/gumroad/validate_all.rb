@@ -16,7 +16,8 @@ module Gumroad
       installation_id = subscription.installation.installation_id
 
       if status.error?
-        log "key:#{subscription.license_key} installation:#{installation_id} error:#{status.error} license:#{validator.license}"
+        log "key:#{subscription.license_key} installation:#{installation_id} " \
+            "error:#{status.error} license:#{validator.license}"
         if validator.license.cancelled_at
           log("cancelled_at: #{validator.license.failed_at}")
           Logic::UpdateSubscriptionState.new(subscription).unsubscribe(validator.license.failed_at)
