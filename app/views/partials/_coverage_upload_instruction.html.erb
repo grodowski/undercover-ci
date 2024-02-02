@@ -80,7 +80,7 @@
                       bundle exec rake test
                       ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- \
                         --repo <b>${{ github.repository }}</b> \
-                        --commit <b>${{ github.workflow_sha }}</b> \
+                        --commit <b>${{ github.sha }}</b> \
                         --lcov <b>coverage/lcov/$repository-name.lcov</b>
             </code></pre>
           </li>
