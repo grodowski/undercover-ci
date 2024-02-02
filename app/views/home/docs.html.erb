@@ -154,7 +154,10 @@ Learn how to install UndercoverCI for your repos, report coverage data and use t
         The <code>$org/$repo</code> formatted name matching exactly how your repository appears on GitHub.
 
         <h6 class="mb-2 mt-3"><code>--commit</code></h6>
-        Current build commit SHA to identify on GitHub. This value will be provided by the CI build environment, e.g. <code>$CIRCLE_SHA1</code> for CircleCI, <code>${{ github.event.pull_request.head.sha }}</code> for GitHub Actions or <code>$TRAVIS_COMMIT</code> for TravisCI.</li>.
+        Current build commit SHA to identify on GitHub. This value will be provided by the CI build environment, e.g.
+        <code>$CIRCLE_SHA1</code> for CircleCI, <code>${{ github.event.pull_request.head.sha || github.sha }}</code> for
+        GitHub Actions or <code>$TRAVIS_COMMIT</code> for TravisCI.</li> Consult your CI service documentation to get the
+        right head SHA value for your build environment.
 
         <h6 class="mb-2 mt-3"><code>--lcov</code></h6>
         A relative path to the coverage report, will look like <code>coverage/lcov/$reponame.lcov</code> unless SimpleCov's config defaults were changed.
