@@ -41,5 +41,5 @@ jobs:
           git fetch origin master:master
           ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- \
             --repo grodowski/undercover-ci \
-            --commit $GITHUB_SHA \
+            --commit ${{ github.event.pull_request.head.sha || github.sha }} \
             --lcov coverage/lcov/undercover-ci.lcov
