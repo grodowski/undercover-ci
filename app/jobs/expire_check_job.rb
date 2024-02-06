@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ExpireCheckJob < ApplicationJob
-  DEFAULT_WAIT = 90.minutes
+  DEFAULT_WAIT = ENV.fetch("DEFAULT_WAIT", 120.minutes)
   INACTIVE_WAIT = 5.seconds
 
   queue_as :default
