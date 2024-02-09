@@ -79,15 +79,16 @@ module Logic
     end
 
     def checkout
-      repo = Rugged::Repository.new(repo_path)
-      branch = repo.create_branch("undercover-ci", run.sha)
-      repo.checkout(branch)
+      @repo = Rugged::Repository.new(repo_path)
+      branch = @repo.create_branch("undercover-ci", run.sha)
+      @repo.checkout(branch)
     rescue Rugged::OSError => e
       log "checkout failed with #{e}"
       raise CheckoutError
     end
 
     def teardown
+      @repo.close
       @lcov_tmpfile.close
     end
 
