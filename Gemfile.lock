@@ -112,7 +112,7 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.12.2)
-    concurrent-ruby (1.2.2)
+    concurrent-ruby (1.2.3)
     connection_pool (2.4.0)
     crack (0.4.5)
       rexml
@@ -191,7 +191,7 @@ GEM
     method_source (1.0.0)
     mini_mime (1.1.2)
     mini_portile2 (2.8.5)
-    minitest (5.20.0)
+    minitest (5.21.2)
     msgpack (1.7.0)
     multi_json (1.15.0)
     multi_xml (0.6.0)
@@ -206,7 +206,7 @@ GEM
     net-smtp (0.4.0.1)
       net-protocol
     nio4r (2.5.9)
-    nokogiri (1.15.5)
+    nokogiri (1.16.0)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
     oauth2 (1.4.7)
@@ -337,10 +337,10 @@ GEM
       childprocess (>= 0.5, < 5.0)
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2)
-    sentry-rails (5.9.0)
+    sentry-rails (5.16.1)
       railties (>= 5.0)
-      sentry-ruby (~> 5.9.0)
-    sentry-ruby (5.9.0)
+      sentry-ruby (~> 5.16.1)
+    sentry-ruby (5.16.1)
       concurrent-ruby (~> 1.0, >= 1.0.2)
     sidekiq (7.1.0)
       concurrent-ruby (< 2)
