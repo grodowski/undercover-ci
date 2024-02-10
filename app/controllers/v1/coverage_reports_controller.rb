@@ -4,7 +4,7 @@ require "base64"
 require "securerandom"
 
 module V1
-  class CoverageReportsController < ApplicationController
+  class CoverageReportsController < ApiController
     protect_from_forgery with: :null_session
     before_action :find_coverage_check
     before_action :check_subscription

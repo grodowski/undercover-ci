@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module V1
-  class GumroadPingController < ApplicationController
+  class GumroadPingController < ApiController
     skip_before_action :verify_authenticity_token
 
     def create

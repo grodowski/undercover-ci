@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module V1
-  class GithubWebhooksController < ApplicationController
+  class GithubWebhooksController < ApiController
     skip_before_action :verify_authenticity_token
 
     WEBHOOK_SECRET = ENV.fetch("GITHUB_WEBHOOK_SECRET")
