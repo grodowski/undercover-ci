@@ -91,6 +91,7 @@ module Logic
     def teardown
       @repo.close
       @lcov_tmpfile.close
+      FileUtils.remove_entry(repo_path, true)
     end
 
     def repo_path

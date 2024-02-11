@@ -21,5 +21,7 @@ class RunnerJob < ApplicationJob
     coverage_check = CoverageCheck.find(coverage_check_id)
 
     Logic::RunUndercover.call(coverage_check)
+    log("coverage_check #{coverage_check_id}: #{GC.stat}")
+    GC.start
   end
 end
