@@ -67,8 +67,7 @@ module Logic
       i_token = CheckRuns::InstallationAccessToken.new(run).get
       Rugged::Repository.clone_at(
         "https://x-access-token:#{i_token}@github.com/#{run.full_name}.git",
-        repo_path,
-        progress: ->(progress) { log("clone_repo: #{progress}") }
+        repo_path
       )
 
       list_branches = `cd #{repo_path} && git branch -a`

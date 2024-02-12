@@ -77,8 +77,7 @@ describe Logic::RunUndercover do
     repo_path = "tmp/job/#{coverage_check.id}"
     allow(Rugged::Repository).to receive(:clone_at).with(
       "https://x-access-token:token@github.com/author/repo.git",
-      repo_path,
-      progress: instance_of(Proc)
+      repo_path
     ) do
       FileUtils.cp_r("spec/fixtures/fake_repo/", repo_path) # fake clone, yay!
       # need to replace the git dir with a default name, since RunUndercover#run_undercover_cmd
