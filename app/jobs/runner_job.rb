@@ -6,7 +6,7 @@ require "check_runs"
 # the Clone, Analyse and Publish operations in sync.
 class RunnerJob < ApplicationJob
   include ClassLoggable
-  queue_as :default
+  queue_as :runner
 
   # default retry for uncaught exceptions
   sidekiq_options retry: 2
