@@ -45,7 +45,7 @@ describe Logic::RunUndercover do
     )
     stub_get_installation_token
     stub_post_check_runs
-    allow(Rugged::Repository).to receive(:clone_at).and_raise(Rugged::Error)
+    allow(Imagen::Clone).to receive(:perform).and_raise(Imagen::GitError)
 
     expect { subject }.to raise_error(Logic::RunUndercover::CloneError)
   end
@@ -58,7 +58,7 @@ describe Logic::RunUndercover do
     )
     stub_get_installation_token
     stub_post_check_runs
-    allow(Rugged::Repository).to receive(:clone_at)
+    allow(Imagen::Clone).to receive(:perform)
     allow(Rugged::Repository).to receive(:new).and_raise(Rugged::OSError)
 
     expect { subject }.to raise_error(Logic::RunUndercover::CheckoutError)
@@ -75,7 +75,7 @@ describe Logic::RunUndercover do
     check_runs_stub = stub_post_check_runs
 
     repo_path = "tmp/job/#{coverage_check.id}"
-    allow(Rugged::Repository).to receive(:clone_at).with(
+    expect(Imagen::Clone).to receive(:perform).with(
       "https://x-access-token:token@github.com/author/repo.git",
       repo_path
     ) do
