@@ -115,34 +115,20 @@ describe "Coverage Upload" do
     )
   end
 
-  context "with inline jobs" do
-    before do
-      # TODO: remove once https://github.com/rails/rails/issues/37270 is addressed in rails 6.1.next
-      RunnerJob.itself # load it
-      (ActiveJob::Base.descendants << ActiveJob::Base).each(&:disable_test_adapter)
-      @prev_adapter = ActiveJob::Base.queue_adapter
-      ActiveJob::Base.queue_adapter = :inline
-    end
+  it "kicks off RunUndercover", :with_inline_jobs do
+    # can't test set(wait: 5.seconds) with inline adapter
+    allow(RunnerJob).to receive(:set) { RunnerJob }
 
-    after do
-      ActiveJob::Base.queue_adapter = @prev_adapter
-    end
+    check = make_coverage_check
+    contents = File.read("spec/fixtures/coverage.lcov")
 
-    it "kicks off RunUndercover" do
-      # can't test set(wait: 5.seconds) with inline adapter
-      allow(RunnerJob).to receive(:set) { RunnerJob }
+    fake_run = class_spy(Logic::RunUndercover)
+    stub_const("Logic::RunUndercover", fake_run)
 
-      check = make_coverage_check
-      contents = File.read("spec/fixtures/coverage.lcov")
+    post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
 
-      fake_run = class_spy(Logic::RunUndercover)
-      stub_const("Logic::RunUndercover", fake_run)
-
-      post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
-
-      expect(response.status).to eq(201)
-      expect(fake_run).to have_received(:call)
-    end
+    expect(response.status).to eq(201)
+    expect(fake_run).to have_received(:call)
   end
 
   def make_coverage_check
