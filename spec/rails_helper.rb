@@ -34,7 +34,7 @@ RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
   config.filter_rails_from_backtrace!
 
-  config.before(:each, with_inline_jobs: true) do
+  config.before(with_inline_jobs: true) do
     # TODO: remove once https://github.com/rails/rails/issues/37270 is addressed in rails 6.1.next
     RunnerJob.itself # load it
     (ActiveJob::Base.descendants << ActiveJob::Base).each(&:disable_test_adapter)
@@ -42,7 +42,7 @@ RSpec.configure do |config|
     ActiveJob::Base.queue_adapter = :inline
   end
 
-  config.after(:each, with_inline_jobs: true) do
+  config.after(with_inline_jobs: true) do
     ActiveJob::Base.queue_adapter = @prev_adapter
   end
 end

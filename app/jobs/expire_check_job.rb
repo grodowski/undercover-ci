@@ -7,8 +7,9 @@ class ExpireCheckJob < ApplicationJob
   queue_as :default
   retry_on Octokit::Error # defaults to 3s wait, 5 attempts
 
-  def perform(coverage_check_id)
+  def perform(coverage_check_id, error_message = "")
     @coverage_check = CoverageCheck.find(coverage_check_id)
+    @error_message = error_message
     return if @coverage_check.state.in?(%i[canceled complete])
 
     transition_coverage_check
@@ -18,7 +19,7 @@ class ExpireCheckJob < ApplicationJob
   private
 
   def transition_coverage_check
-    Logic::UpdateCoverageCheckState.new(@coverage_check).cancel
+    Logic::UpdateCoverageCheckState.new(@coverage_check).cancel(@error_message)
   end
 
   def notify_github_of_timed_out

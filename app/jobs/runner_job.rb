@@ -15,7 +15,6 @@ class RunnerJob < ApplicationJob
   retry_on ActiveStorage::FileNotFoundError,
            Logic::RunUndercover::RunError,
            Octokit::Error,
-           Rugged::ReferenceError,
            Rugged::OSError
 
   def perform(coverage_check_id)

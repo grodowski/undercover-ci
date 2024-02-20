@@ -56,7 +56,7 @@ describe "Coverage Upload" do
     check = make_coverage_check
     contents = File.read("spec/fixtures/coverage.lcov")
 
-    Timecop.freeze do
+    Timecop.freeze(Date.today) do
       expect do
         post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
       end.to have_enqueued_job(RunnerJob).at(5.seconds.from_now)
@@ -71,7 +71,7 @@ describe "Coverage Upload" do
     check.update!(state: :in_progress)
     contents = File.read("spec/fixtures/coverage.lcov")
 
-    Timecop.freeze do
+    Timecop.freeze(Date.today) do
       expect do
         post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
       end.to have_enqueued_job(RunnerJob).at(5.seconds.from_now)

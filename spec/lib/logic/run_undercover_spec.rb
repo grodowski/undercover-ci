@@ -46,6 +46,7 @@ describe Logic::RunUndercover do
     stub_get_installation_token
     stub_post_check_runs
     allow(Imagen::Clone).to receive(:perform).and_raise(Imagen::GitError)
+    expect_any_instance_of(described_class).to receive(:teardown).once
 
     expect { subject }.to raise_error(Logic::RunUndercover::CloneError)
   end
@@ -59,6 +60,7 @@ describe Logic::RunUndercover do
     stub_get_installation_token
     stub_post_check_runs
     allow(Imagen::Clone).to receive(:perform)
+    expect_any_instance_of(described_class).to receive(:teardown).once
     allow(Rugged::Repository).to receive(:new).and_raise(Rugged::OSError)
 
     expect { subject }.to raise_error(Logic::RunUndercover::CheckoutError)
@@ -122,6 +124,30 @@ describe Logic::RunUndercover do
     )
 
     expect(check_runs_stub).to have_been_requested.twice
+  end
+
+  it "cancels the check on ReferenceError and returns a helpful error message", :with_inline_jobs do
+    allow(Rugged::Repository).to receive(:new)
+      .and_raise(Rugged::ReferenceError, "revspec 'main' not found")
+
+    coverage_check.coverage_reports.attach(
+      io: File.open("spec/fixtures/coverage.lcov"),
+      filename: "#{coverage_check.id}_b4c0n.lcov",
+      content_type: "text/plain"
+    )
+
+    stub_get_installation_token
+    check_runs_stub = stub_post_check_runs
+    expect_any_instance_of(described_class).to receive(:clone_repo).once
+    expect_any_instance_of(described_class).to receive(:teardown).once
+
+    subject
+
+    expect(coverage_check.reload.state).to eq(:canceled)
+    expect(check_runs_stub).to have_been_requested.twice
+
+    expect(WebMock).to have_requested(:post, "https://api.github.com/repos/author/repo/check-runs")
+      .with(body: /revspec 'main' not found/).times(1)
   end
 
   def stub_get_installation_token
