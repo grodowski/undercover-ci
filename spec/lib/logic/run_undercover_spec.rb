@@ -3,6 +3,8 @@
 require "rails_helper"
 
 describe Logic::RunUndercover do
+  include ActiveJob::TestHelper
+
   let(:coverage_check) do
     user = User.create!(
       uid: "1337",
@@ -126,7 +128,7 @@ describe Logic::RunUndercover do
     expect(check_runs_stub).to have_been_requested.twice
   end
 
-  it "cancels the check on ReferenceError and returns a helpful error message", :with_inline_jobs do
+  it "cancels the check on ReferenceError and returns a helpful error message" do
     allow(Rugged::Repository).to receive(:new)
       .and_raise(Rugged::ReferenceError, "revspec 'main' not found")
 
@@ -141,7 +143,7 @@ describe Logic::RunUndercover do
     expect_any_instance_of(described_class).to receive(:clone_repo).once
     expect_any_instance_of(described_class).to receive(:teardown).once
 
-    subject
+    perform_enqueued_jobs { subject }
 
     expect(coverage_check.reload.state).to eq(:canceled)
     expect(check_runs_stub).to have_been_requested.twice
