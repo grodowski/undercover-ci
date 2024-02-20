@@ -37,15 +37,26 @@ module CheckRuns
       db_check.coverage_reports.empty?
     end
 
+    def error?
+      run.error_message.present?
+    end
+
     def title
       return "License expired" if license_expired?
+      return "Service error" if error?
       return "Timed out waiting for coverage data" if no_coverage?
 
       "Check run unsuccessful"
     end
 
     def summary
+      return text_error if error?
+
       license_expired? ? text_expired : text_generic
+    end
+
+    def text_error
+      "🤕 An error occured while processing this commit: `#{run.error_message}`."
     end
 
     def text_expired

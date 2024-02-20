@@ -14,6 +14,7 @@ module DataObjects
     external_id
     last_ts
     nodes
+    state_log
   ].freeze
 
   # TODO: consider refactoring into OpenStruct/Class with named attrs
@@ -38,7 +39,8 @@ module DataObjects
         db_check.state,
         db_check.id.to_s,
         db_check.state_log.last&.fetch("ts"),
-        db_check.nodes # TODO: wrap AR models with a dedicated read model
+        db_check.nodes, # TODO: wrap AR models with a dedicated read model
+        db_check.state_log
       )
     end
 
@@ -61,6 +63,13 @@ module DataObjects
 
     def num_warnings
       @num_warnings ||= nodes.flagged.size
+    end
+
+    def error_message
+      return unless state == :canceled
+
+      failed_transition = state_log.find { _1["to"] == "canceled" }
+      failed_transition["via"] if failed_transition
     end
 
     alias_method :to_s, :inspect

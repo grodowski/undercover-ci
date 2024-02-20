@@ -18,8 +18,8 @@ module Logic
       transition(:in_progress, :complete)
     end
 
-    def cancel
-      transition(%i[created awaiting_coverage in_progress], :canceled)
+    def cancel(message = nil)
+      transition(%i[created awaiting_coverage in_progress], :canceled, message)
     end
   end
 end

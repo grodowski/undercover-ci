@@ -47,6 +47,9 @@ module Logic
       run_with_results = DataObjects::CheckRunInfo.from_coverage_check(coverage_check)
       CheckRuns::Complete.new(run_with_results).post(report)
       Logic::UpdateCoverageCheckState.new(coverage_check).complete
+    rescue Rugged::ReferenceError => e
+      cancel_check_and_update_github(e.message)
+    ensure
       teardown
       log "teardown complete #{run} job_id: #{coverage_check.id}"
     end
@@ -88,7 +91,7 @@ module Logic
     end
 
     def teardown
-      @repo.close
+      @repo&.close
       @lcov_tmpfile.close
       FileUtils.remove_entry(repo_path, true)
     end
@@ -104,6 +107,10 @@ module Logic
       end
       changeset = Undercover::Changeset.new("#{repo_path}/.git", @run.compare)
       Undercover::Report.new(changeset, opts).build
+    end
+
+    def cancel_check_and_update_github(message)
+      ExpireCheckJob.perform_later(coverage_check.id, message)
     end
   end
 end
