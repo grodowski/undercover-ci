@@ -13,6 +13,7 @@ gem "jbuilder", "~> 2.9"
 gem "kaminari"
 gem "pg", ">= 0.18", "< 2.0"
 gem "puma", "~> 5.3"
+gem "redis-client"
 gem "sidekiq"
 
 # Required for Ruby 3.1+ until the mail gem gets an update
