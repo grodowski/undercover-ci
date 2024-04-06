@@ -16,7 +16,7 @@ module V1
     end
 
     def download_report
-      redirect_to url_for(@coverage_check.coverage_reports.last)
+      redirect_to rails_blob_path(@coverage_check.coverage_reports.last)
     end
 
     private
