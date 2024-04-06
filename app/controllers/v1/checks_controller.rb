@@ -16,7 +16,11 @@ module V1
     end
 
     def download_report
-      redirect_to rails_blob_path(@coverage_check.coverage_reports.last)
+      if Rails.application.config.active_storage.service.in? %i[local test]
+        redirect_to url_for(@coverage_check.coverage_reports.last)
+      else
+        redirect_to @coverage_check.coverage_reports.last.url
+      end
     end
 
     private
