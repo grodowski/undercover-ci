@@ -428,6 +428,7 @@ DEPENDENCIES
   pry-rails
   puma (~> 5.3)
   rails (~> 6.1)
+  redis-client
   rspec-rails
   rubocop
   sass-rails

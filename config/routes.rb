@@ -2,11 +2,14 @@
 
 API_MIME_TYPES = %w[*/* application/json].freeze
 
+# rubocop:disable Metrics/BlockLength
 Rails.application.routes.draw do
   namespace :v1, constraints: ->(req) { req.format.to_s.in?(API_MIME_TYPES) } do
     post "/hooks", to: "github_webhooks#create"
     post "/coverage", to: "coverage_reports#create"
     post "/sale", to: "gumroad_ping#create"
+    get "/checks/:sha", to: "checks#show"
+    get "/checks/:sha/coverage", to: "checks#download_report"
   end
 
   get "/auth/github/callback", to: "sessions#create"
@@ -24,8 +27,13 @@ Rails.application.routes.draw do
     get "/app", controller: "checks", action: "index", as: :dashboard
     resources :checks, only: :show
 
-    resources :settings, only: %i[new index]
+    resources :settings, only: %i[new index] do
+      collection do
+        post :access_token
+      end
+    end
   end
 
   root to: "home#index"
 end
+# rubocop:enable Metrics/BlockLength
