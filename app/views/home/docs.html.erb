@@ -216,9 +216,60 @@ Learn how to install UndercoverCI for your repos, report coverage data and use t
         Read more about the <code>:nocov:</code> syntax in <a href="https://github.com/simplecov-ruby/simplecov#ignoringskipping-code" target="_blank">SimpleCov's readme</a>.
       </p>
 
-      <h4 id="api" class="mt-5 mb-2">API</h4>
+      <h4 id="api" class="mt-5 mb-2">API V1</h4>
+
       <p>
-        TODO
+        To access Undercover HTTP API, configure your per-user auth token using the API section of the Settings page.
+      </p>
+
+      <h5>GET /v1/checks/:commit_sha</h5>
+      <p>
+        Returns the coverage check information for the given commit SHA.
+
+        Example:
+        <pre><code>
+          curl -H "Authorization: Bearer $UNDERCOVER_API_TOKEN" \
+          https://undercover-ci.com/v1/checks/aa412c105eff7a7af918fc422bf5085101295798
+        </code></pre>
+
+        Response format:
+        <pre><code>
+          {
+            "id": 327889,
+            "head_sha": "aa412c105eff7a7af918fc422bf5085101295798",
+            "base_sha": "master",
+            "state": "complete",
+            "state_log": [
+              {
+                "to": "awaiting_coverage",
+                "ts": "2023-11-25T15:27:14Z",
+                "from": "created"
+              },
+              {
+                "to": "in_progress",
+                "ts": "2023-11-25T15:28:48Z",
+                "from": "awaiting_coverage"
+              },
+              {
+                "to": "complete",
+                "ts": "2023-11-25T15:37:22Z",
+                "from": "in_progress"
+              }
+            ],
+            "repo_full_name": "twitchy-tortoise/undercover-test"
+          }
+        </pre></code>
+      </p>
+
+      <h5>GET /v1/checks/:commit_sha/coverage</h5>
+      <p>
+        Returns the coverage report for the given commit SHA. The coverage report will be in the LCOV format.
+        The `curl` example below includes the <code>-L</code> flag to ensure curl follows the redirect to the storage provider.
+        <pre><code>
+          curl -LH "Authorization: Bearer $UNDERCOVER_API_TOKEN" \
+          -o check_coverage.lcov \
+          https://undercover-ci.com/v1/checks/aa412c105eff7a7af918fc422bf5085101295798/coverage
+        </code></pre>
       </p>
 
       <hr/>

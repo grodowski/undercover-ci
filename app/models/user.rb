@@ -28,7 +28,7 @@ class User < ApplicationRecord
   end
 
   def self.find_by_api_token(raw_token)
-    super(encrypt(raw_token, TOKEN_KEY, API_TOKEN_IV))
+    find_by api_token: encrypt(raw_token, TOKEN_KEY, API_TOKEN_IV)
   end
 
   def token=(new_token)
