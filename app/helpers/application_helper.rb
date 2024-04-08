@@ -91,4 +91,12 @@ module ApplicationHelper
 
     content + subscribe_link
   end
+
+  def admin_user_token_button_text
+    current_user.api_token.present? ? "Re-generate" : "Generate"
+  end
+
+  def mask_token(token)
+    token.presence || (current_user.api_token.present? ? "****" : nil)
+  end
 end

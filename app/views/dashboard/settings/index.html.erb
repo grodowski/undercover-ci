@@ -38,14 +38,14 @@
       <div class="col-lg-6">
         <% if @api_token %>
           <div class="alert alert-info">
-            Ensure your new API token is stored securely. It won't be displayed again.
+            Ensure your user API token is stored securely. It won't be displayed again until you re-generate it.
           </div>
         <% end %>
         <div class="input-group">
-          <span class="input-group-text">Access token</span>
-          <input type="text" class="form-control" readonly value="<%= @api_token || "****" %>"/>
+          <span class="input-group-text">Personal access token</span>
+          <input type="text" class="form-control" readonly placeholder="No access token generated" value="<%= mask_token(@api_token) %>"/>
           <%=
-            button_to "Re-generate", access_token_settings_url, method: :post,
+            button_to admin_user_token_button_text, access_token_settings_url, method: :post,
             data: {confirm: "You'll only see the new token once. Are you sure?"},
             class: "btn btn-outline-primary" ,
             form: {style: 'display:inline-block;'},
