@@ -40,8 +40,11 @@ describe "Settings" do
 
     get("/settings")
     body = response.body
-    expect(body).to include("Ensure your new API token is stored securely. It won't be displayed again.")
-    expect(body).to include("<input type=\"text\" class=\"form-control\" readonly value=\"s3krit\"/>")
+    expect(body).to include("Ensure your user API token is stored securely.")
+    expect(body).to include(
+      "<input type=\"text\" class=\"form-control\" readonly " \
+      "placeholder=\"No access token generated\" value=\"s3krit\"/>"
+    )
 
     get("/v1/checks/notexists.json")
     expect(response.status).to eq(401)
