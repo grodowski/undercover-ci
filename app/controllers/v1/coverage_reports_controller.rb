@@ -68,6 +68,7 @@ module V1
     end
 
     def check_subscription
+      return if @coverage_check.repo_public?
       return if @coverage_check.installation.active?
 
       @error_message = "Your UndercoverCI license has expired, visit https://undercover-ci.com/settings to subscribe."

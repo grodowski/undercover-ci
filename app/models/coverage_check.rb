@@ -43,6 +43,10 @@ class CoverageCheck < ApplicationRecord
     repo["default_branch"]
   end
 
+  def repo_public?
+    repo["visibility"] == "public"
+  end
+
   def pull_requests
     return [] unless check_suite
 

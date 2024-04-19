@@ -102,6 +102,26 @@ describe "Coverage Upload" do
     )
   end
 
+  it "allows public repos with an inactive subscription" do
+    check = make_coverage_check
+    check.state = :in_progress
+    check.repo["visibility"] = "public"
+    check.save!
+    Subscription.create!(
+      installation: check.installation,
+      state: :unsubscribed,
+      end_date: 1.day.ago,
+      gumroad_id: "subxxx",
+      license_key: "1337"
+    )
+
+    contents = File.read("spec/fixtures/coverage.lcov")
+    post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
+
+    expect(check.reload.state).to eq(:in_progress)
+    expect(response.status).to eq(201)
+  end
+
   it "raises a state machine error when check is complete" do
     check = make_coverage_check
     check.update!(state: :complete)
