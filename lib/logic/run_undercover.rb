@@ -18,6 +18,7 @@ module Logic
       @lcov_tmpfile = Tempfile.new
       @coverage_check = coverage_check
       @run = DataObjects::CheckRunInfo.from_coverage_check(coverage_check)
+      @changeset = nil
 
       raise RunError, "coverage_reports can't be blank" if coverage_check.coverage_reports.empty?
 
@@ -92,6 +93,7 @@ module Logic
 
     def teardown
       @repo&.close
+      @changeset&.instance_variable_get(:@repo)&.close # TODO: hack, expose repo.close through Undercover
       @lcov_tmpfile.close
       FileUtils.remove_entry(repo_path, true)
     end
@@ -105,8 +107,8 @@ module Logic
         opt.lcov = @lcov_tmpfile.path
         opt.path = repo_path
       end
-      changeset = Undercover::Changeset.new("#{repo_path}/.git", @run.compare)
-      Undercover::Report.new(changeset, opts).build
+      @changeset = Undercover::Changeset.new("#{repo_path}/.git", @run.compare)
+      Undercover::Report.new(@changeset, opts).build
     end
 
     def cancel_check_and_update_github(message)
