@@ -62,6 +62,7 @@ describe Logic::RunUndercover do
     stub_get_installation_token
     stub_post_check_runs
     allow(Git::Clone).to receive(:perform)
+    allow(Git::Fetch).to receive(:perform)
     expect_any_instance_of(described_class).to receive(:teardown).once
     allow(Rugged::Repository).to receive(:new).and_raise(Rugged::OSError)
 
@@ -92,6 +93,7 @@ describe Logic::RunUndercover do
         File.join(repo_path, ".git")
       )
     end
+    allow(Git::Fetch).to receive(:perform)
 
     subject
 
