@@ -31,7 +31,7 @@ gem "sprockets"
 gem "turbolinks"
 
 # Core
-gem "undercover"
+gem "undercover", github: "grodowski/undercover", branch: "handle-grafted-commits"
 
 # Github
 gem "jwt"
