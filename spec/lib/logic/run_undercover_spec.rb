@@ -62,6 +62,7 @@ describe Logic::RunUndercover do
     stub_get_installation_token
     stub_post_check_runs
     allow(Git::Clone).to receive(:perform)
+    allow(Git::Fetch).to receive(:perform)
     expect_any_instance_of(described_class).to receive(:teardown).once
     allow(Rugged::Repository).to receive(:new).and_raise(Rugged::OSError)
 
@@ -82,7 +83,7 @@ describe Logic::RunUndercover do
     expect(Git::Clone).to receive(:perform).with(
       "https://x-access-token:token@github.com/author/repo.git",
       repo_path,
-      "--depth 1"
+      "--depth 1 --no-tags"
     ) do
       FileUtils.cp_r("spec/fixtures/fake_repo/", repo_path) # fake clone, yay!
       # need to replace the git dir with a default name, since RunUndercover#run_undercover_cmd
@@ -92,6 +93,7 @@ describe Logic::RunUndercover do
         File.join(repo_path, ".git")
       )
     end
+    allow(Git::Fetch).to receive(:perform)
 
     subject
 

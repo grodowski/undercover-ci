@@ -72,9 +72,10 @@ module Logic
       Git::Clone.perform(
         "https://x-access-token:#{i_token}@github.com/#{run.full_name}.git",
         repo_path,
-        "--depth 1"
+        "--depth 1 --no-tags"
       )
-      Git::Fetch.perform(run.sha, repo_path, "--depth 1")
+      Git::Fetch.perform(run.compare, repo_path, "--depth 1 --no-tags")
+      Git::Fetch.perform(run.sha, repo_path, "--depth 1 --no-tags")
 
       list_branches = `cd #{repo_path} && git branch -a`
       crumb = Sentry::Breadcrumb.new(category: "clone_repo", message: list_branches.to_json, level: "info")
