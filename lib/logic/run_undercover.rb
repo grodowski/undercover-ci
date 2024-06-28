@@ -74,9 +74,7 @@ module Logic
         repo_path,
         "--depth 1 --no-tags"
       )
-      unless run.compare == "HEAD~1"
-        Git::Fetch.perform(run.compare, repo_path, "--depth 1 --no-tags")
-      end
+      Git::Fetch.perform(run.compare, repo_path, "--depth 1 --no-tags") unless run.compare == "HEAD~1"
       Git::Fetch.perform(run.sha, repo_path, "--depth 2 --no-tags")
 
       list_branches = `cd #{repo_path} && git branch -a`
