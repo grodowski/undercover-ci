@@ -4,12 +4,12 @@ ruby "3.3.0"
 source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-gem "rails", "~> 6.1"
+gem "rails", "~> 7.1"
 
 gem "aws-sdk-s3", require: false
 gem "bcrypt", "~> 3.1.15"
 gem "bootsnap", ">= 1.1.0", require: false
-gem "jbuilder", "~> 2.9"
+gem "jbuilder", "~> 2.12"
 gem "kaminari"
 gem "pg", ">= 0.18", "< 2.0"
 gem "puma"
