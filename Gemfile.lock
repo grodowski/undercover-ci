@@ -201,7 +201,6 @@ GEM
     matrix (0.4.2)
     method_source (1.1.0)
     mini_mime (1.1.2)
-    mini_portile2 (2.8.7)
     minitest (5.24.1)
     msgpack (1.7.2)
     multi_json (1.15.0)
@@ -217,8 +216,7 @@ GEM
     net-smtp (0.4.0.1)
       net-protocol
     nio4r (2.7.3)
-    nokogiri (1.16.6)
-      mini_portile2 (~> 2.8.2)
+    nokogiri (1.16.6-x86_64-linux)
       racc (~> 1.4)
     oauth2 (1.4.7)
       faraday (>= 0.8, < 2.0)
@@ -354,7 +352,7 @@ GEM
     sentry-ruby (5.18.1)
       bigdecimal
       concurrent-ruby (~> 1.0, >= 1.0.2)
-    sidekiq (7.2.1)
+    sidekiq (7.2.4)
       concurrent-ruby (< 2)
       connection_pool (>= 2.3.0)
       rack (>= 2.2.4)
@@ -408,7 +406,7 @@ GEM
     zeitwerk (2.6.16)
 
 PLATFORMS
-  ruby
+  x86_64-linux
 
 DEPENDENCIES
   aws-sdk-s3
