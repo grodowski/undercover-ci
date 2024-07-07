@@ -5,6 +5,16 @@ updates:
   schedule:
     interval: daily
     time: "04:00"
+  groups:
+    production-dependencies:
+      dependency-type: "production"
+    development-dependencies:
+      dependency-type: "development"
+      exclude-patterns:
+        - "rubocop*"
+    rubocop:
+      patterns:
+        - "rubocop*"
   open-pull-requests-limit: 10
   ignore:
   - dependency-name: aws-sdk-s3
