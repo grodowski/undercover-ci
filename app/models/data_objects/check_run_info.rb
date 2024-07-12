@@ -45,7 +45,7 @@ module DataObjects
     end
 
     def self.find_base_sha(payload)
-      pr_base_sha = payload.check_suite.dig("pull_requests", 0, "base", "ref")
+      pr_base_sha = payload.check_suite.dig("pull_requests", 0, "base", "sha")
       if pr_base_sha
         pr_base_sha
       elsif payload.check_suite.fetch("head_branch") != payload.repository.fetch("default_branch")

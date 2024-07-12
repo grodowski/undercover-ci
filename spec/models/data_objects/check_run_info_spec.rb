@@ -12,7 +12,7 @@ describe DataObjects::CheckRunInfo do
           "head_branch" => "feature_branch",
           "before" => "before_commit",
           "pull_requests" => [
-            {"base" => {"ref" => "pr_base_commit"}}
+            {"base" => {"ref" => "master", "sha" => "pr_base_commit"}},
           ]
         },
         "repository" => {
