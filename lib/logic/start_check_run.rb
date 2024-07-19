@@ -30,14 +30,19 @@ module Logic
       Logic::UpdateCoverageCheckState.new(coverage_check).await_coverage
       CreateCheckRunJob.perform_later(coverage_check.id)
 
-      ExpireCheckJob.set(
-        wait: installation.active? ? ExpireCheckJob::DEFAULT_WAIT : ExpireCheckJob::INACTIVE_WAIT
-      ).perform_later(coverage_check.id)
+      ExpireCheckJob.set(wait:).perform_later(coverage_check.id)
     end
 
     private
 
     attr_reader :coverage_check, :installation
+
+    def wait
+      return ExpireCheckJob::INACTIVE_WAIT unless installation.active?
+      return installation.expire_check_job_wait_minutes.minutes if installation.expire_check_job_wait_minutes
+
+      ExpireCheckJob::DEFAULT_WAIT
+    end
 
     def find_installation
       @installation = Installation.find_by!(installation_id: check_run_info.installation_id)

@@ -9,6 +9,8 @@ class Installation < ApplicationRecord
 
   validates_presence_of :installation_id
 
+  store_accessor :settings, :expire_check_job_wait_minutes
+
   after_create :ensure_subscription
 
   def github_type
