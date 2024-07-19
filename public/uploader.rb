@@ -18,7 +18,7 @@ require "pathname"
 require "uri"
 require "optparse"
 
-Options = Struct.new(:commit, :lcov, :repo, :url) do
+Options = Struct.new(:commit, :lcov, :repo, :url, :cancel) do
   def valid?
     (commit && !commit.empty?) &&
       (repo && !repo.empty?) &&
@@ -41,6 +41,9 @@ class UndercoverCiCoverageUpload
       opts.on("--commit COMMIT", "Commit SHA") do |v|
         @options.commit = v
       end
+      opts.on("--cancel", "Cancel coverage check") do |v|
+        @options.cancel = v
+      end
       opts.on("--lcov LCOV_FILE", "LCOV file path") do |v|
         @options.lcov = v
       end
@@ -49,6 +52,14 @@ class UndercoverCiCoverageUpload
       end
     end
     @opts_parser.parse!(argv)
+    @options.url ||= URI("https://undercover-ci.com/v1/coverage")
+  end
+
+  def valid?
+    return true if @options.valid?
+
+    error(@opts_parser)
+    false
   end
 
   def upload
@@ -57,7 +68,6 @@ class UndercoverCiCoverageUpload
       return self
     end
 
-    @options.url ||= URI("https://undercover-ci.com/v1/coverage")
     data = File.read(@options.lcov)
 
     unless data.size.positive?
@@ -66,18 +76,38 @@ class UndercoverCiCoverageUpload
     end
 
     coverage_data_base64 = Base64.strict_encode64(data)
-    resp = Net::HTTP.post(
+    request(
+      Net::HTTP::Post,
       @options.url,
       {
         repo: @options.repo,
         sha: @options.commit,
         lcov_base64: coverage_data_base64
-      }.to_json,
-      "Content-Type" => "application/json"
+      }.to_json
     )
+  end
+
+  def cancel
+    request(
+      Net::HTTP::Delete,
+      @options.url,
+      {
+        repo: @options.repo,
+        sha: @options.commit
+      }.to_json
+    )
+  end
+
+  private
+
+  def request(method, url, body)
+    http = Net::HTTP.start(url.hostname, use_ssl: url.instance_of?(URI::HTTPS))
+    req = method.new(url.path, "Content-Type" => "application/json")
+    req.body = body
+    resp = http.request(req)
     case resp.code.to_i
     when (200..299)
-      puts("Uploaded! #{resp.code}")
+      puts("Done! #{resp.code}")
     when 404
       error "Error 404: does a check for commit #{@options.commit} exist in #{@options.repo}? " \
             "Visit https://undercover-ci.com/docs or get support at jan@undercover-ci.com."
@@ -88,8 +118,6 @@ class UndercoverCiCoverageUpload
     self
   end
 
-  private
-
   def error(message)
     @exitcode = 1
     warn(message)
@@ -97,6 +125,12 @@ class UndercoverCiCoverageUpload
 end
 
 if __FILE__ == $PROGRAM_NAME
-  uploader = UndercoverCiCoverageUpload.new.upload
+  uploader = UndercoverCiCoverageUpload.new
+  exit(uploader.exitcode) unless uploader.valid?
+  if uploader.options.cancel
+    uploader.cancel
+  else
+    uploader.upload
+  end
   exit(uploader.exitcode)
 end

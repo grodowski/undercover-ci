@@ -38,6 +38,11 @@ module V1
       end
     end
 
+    def destroy
+      ExpireCheckJob.perform_now(@coverage_check.id, "Cancelled by user")
+      head(:no_content)
+    end
+
     private
 
     def validate_input(input_io)
