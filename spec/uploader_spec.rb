@@ -18,6 +18,16 @@ describe "uploader.rb" do
       )
   end
 
+  def stub_delete_coverage(payload, status: 204)
+    WebMock
+      .stub_request(:delete, "https://undercover-ci.com/v1/coverage")
+      .to_return(
+        status:,
+        body: JSON.generate(payload), # do not escape utf-8 with to_json
+        headers: {"Content-Type" => "application/json"}
+      )
+  end
+
   it "exits 1 and prints usage with empty args" do
     expected_banner = "Usage: ruby -e \"$(curl -s https://undercover-ci.com/uploader.rb)\" -- [options]"
     expect do
@@ -68,7 +78,7 @@ describe "uploader.rb" do
       uploader = build_uploader("--lcov spec/fixtures/coverage.lcov --repo alice/bob --commit 1fffbb")
       uploader.upload
       expect(uploader.exitcode).to eq(0)
-    end.to output("Uploaded! 201\n").to_stdout
+    end.to output("Done! 201\n").to_stdout
 
     expect(
       a_request(:post, "https://undercover-ci.com/v1/coverage")
@@ -77,6 +87,25 @@ describe "uploader.rb" do
           repo: "alice/bob",
           sha: "1fffbb",
           lcov_base64: Base64.strict_encode64(File.read("spec/fixtures/coverage.lcov"))
+        )
+      )
+    ).to have_been_made
+  end
+
+  it "accepts --cancel to cancel a check" do
+    stub_delete_coverage({}, status: 204)
+    expect do
+      uploader = build_uploader("--cancel --repo alice/bob --commit 1fffbb")
+      uploader.cancel
+      expect(uploader.exitcode).to eq(0)
+    end.to output("Done! 204\n").to_stdout
+
+    expect(
+      a_request(:delete, "https://undercover-ci.com/v1/coverage")
+      .with(
+        body: JSON.generate(
+          repo: "alice/bob",
+          sha: "1fffbb"
         )
       )
     ).to have_been_made
