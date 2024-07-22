@@ -68,6 +68,18 @@ describe Logic::StartCheckRun do
         expect(coverage_check.repo).to eq("full_name" => "grodowski/undercover-ci")
       end
     end
+
+    it "respects custom expire_check_job_wait_minutes" do
+      installation.update!(expire_check_job_wait_minutes: 7)
+      expect(CreateCheckRunJob).to receive(:perform_later).once
+
+      Timecop.freeze do
+        described_class.call(check_run_info)
+
+        coverage_check = CoverageCheck.last
+        expect(ExpireCheckJob).to have_been_enqueued.at(7.minutes.from_now).with(coverage_check.id)
+      end
+    end
   end
 
   context "with an active subscription" do
