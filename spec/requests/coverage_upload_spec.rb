@@ -4,10 +4,7 @@ require "base64"
 require "rails_helper"
 
 describe "Coverage Upload" do
-  # FIXME: authenticate
-  def path
-    "/v1/coverage.json"
-  end
+  let(:path) { "/v1/coverage.json" }
 
   it "renders 404 when CoverageCheck does not exist" do
     expect { post path, params: {repo: "foo", sha: "bar"} }.to raise_error(ActiveRecord::RecordNotFound)
@@ -151,6 +148,25 @@ describe "Coverage Upload" do
 
     expect(response.status).to eq(201)
     expect(fake_run).to have_received(:call)
+  end
+
+  describe "#destroy" do
+    it "transitions the CoverageCheck to cancelled" do
+      check = make_coverage_check
+
+      expect_any_instance_of(CheckRuns::Canceled).to receive(:post).once
+
+      delete path, params: {repo: check.repo_full_name, sha: check.head_sha}
+
+      expect(response.status).to eq(204)
+      expect(check.reload.state).to eq(:canceled)
+    end
+
+    it "returns a 404 if the check does not exist" do
+      expect do
+        delete path, params: {repo: "user/repository", sha: "b4c0n"}
+      end.to raise_error(ActiveRecord::RecordNotFound)
+    end
   end
 
   def make_coverage_check
