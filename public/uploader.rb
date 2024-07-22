@@ -21,13 +21,12 @@ require "optparse"
 Options = Struct.new(:commit, :lcov, :repo, :url, :cancel) do
   def valid?
     (commit && !commit.empty?) &&
-      (repo && !repo.empty?) &&
-      (lcov && !lcov.empty?)
+      (repo && !repo.empty?)
   end
 end
 
 class UndercoverCiCoverageUpload
-  attr_reader :exitcode
+  attr_reader :exitcode, :options
 
   def initialize(argv = ARGV)
     @exitcode = 0
