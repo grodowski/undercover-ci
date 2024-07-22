@@ -43,10 +43,15 @@ module CheckRuns
 
     def title
       return "License expired" if license_expired?
-      return "Service error" if error?
+      return "Check skipped" if cancelled_by_user?
       return "Timed out waiting for coverage data" if no_coverage?
+      return "Service error" if error?
 
       "Check run unsuccessful"
+    end
+
+    def cancelled_by_user?
+      db_check.state_log.last&.fetch("via") == "Cancelled by user"
     end
 
     def summary
