@@ -423,6 +423,7 @@ DEPENDENCIES
   listen
   net-imap
   net-pop
+  net-protocol
   net-smtp
   octokit
   omniauth
