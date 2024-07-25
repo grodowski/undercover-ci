@@ -39,7 +39,7 @@ module V1
     end
 
     def destroy
-      ExpireCheckJob.perform_now(@coverage_check.id, "Cancelled by user")
+      ExpireCheckJob.perform_now(@coverage_check.id, ExpireCheckJob::SKIPPED_MESSAGE)
       head(:no_content)
     end
 

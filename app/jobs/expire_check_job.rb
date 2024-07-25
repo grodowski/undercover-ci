@@ -3,6 +3,7 @@
 class ExpireCheckJob < ApplicationJob
   DEFAULT_WAIT = ENV.fetch("DEFAULT_WAIT", 120.minutes)
   INACTIVE_WAIT = 5.seconds
+  SKIPPED_MESSAGE = "Cancelled by user"
 
   queue_as :default
   retry_on Octokit::Error # defaults to 3s wait, 5 attempts

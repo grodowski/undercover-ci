@@ -11,7 +11,7 @@ module CheckRuns
         status: "completed",
         started_at: run.created_at, # TODO: update that in this PR
         completed_at: run.last_ts,
-        conclusion: "cancelled",
+        conclusion:,
         details_url:,
         external_id: run.external_id,
         output: {
@@ -29,6 +29,10 @@ module CheckRuns
       @db_check ||= CoverageCheck.find(run.external_id)
     end
 
+    def conclusion
+      skipped? ? "skipped" : "cancelled"
+    end
+
     def license_expired?
       !db_check.installation.active?
     end
@@ -43,19 +47,20 @@ module CheckRuns
 
     def title
       return "License expired" if license_expired?
-      return "Check skipped" if cancelled_by_user?
+      return "Check skipped" if skipped?
       return "Timed out waiting for coverage data" if no_coverage?
       return "Service error" if error?
 
       "Check run unsuccessful"
     end
 
-    def cancelled_by_user?
-      db_check.state_log.last&.fetch("via") == "Cancelled by user"
+    def skipped?
+      db_check.state_log.last&.fetch("via") == ExpireCheckJob::SKIPPED_MESSAGE
     end
 
     def summary
       return text_error if error?
+      return text_skipped if skipped?
 
       license_expired? ? text_expired : text_generic
     end
@@ -66,6 +71,10 @@ module CheckRuns
 
     def text_expired
       "🔐 Your UndercoverCI license has expired, visit [settings](https://undercover-ci.com/settings) to subscribe."
+    end
+
+    def text_skipped
+      "⏩ This check was manually skipped by a user"
     end
 
     def text_generic
