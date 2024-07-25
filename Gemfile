@@ -16,12 +16,6 @@ gem "puma"
 gem "redis-client"
 gem "sidekiq"
 
-# Required for Ruby 3.1+ until the mail gem gets an update
-gem "net-imap", require: false
-gem "net-pop", require: false
-gem "net-protocol", require: false
-gem "net-smtp", require: false
-
 # UI Gems
 gem "bootstrap"
 gem "bootstrap5-kaminari-views"
