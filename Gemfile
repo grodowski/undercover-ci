@@ -16,6 +16,12 @@ gem "puma"
 gem "redis-client"
 gem "sidekiq"
 
+# Required for Ruby 3.1+ until the mail gem gets an update
+gem "net-imap", require: false
+gem "net-pop", github: "ruby/net-pop" # https://stackoverflow.com/questions/78617432/strange-bundle-update-issue-disappearing-net-pop-0-1-2-dependency/78620570#78620570
+gem "net-protocol", require: false
+gem "net-smtp", require: false
+
 # UI Gems
 gem "bootstrap"
 gem "bootstrap5-kaminari-views"
