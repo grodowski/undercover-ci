@@ -292,7 +292,7 @@ GEM
     redis-client (0.22.2)
       connection_pool
     regexp_parser (2.9.2)
-    rexml (3.3.2)
+    rexml (3.3.3)
       strscan
     rspec-core (3.13.0)
       rspec-support (~> 3.13.0)
