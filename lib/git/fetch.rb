@@ -21,7 +21,7 @@ module Git
       cmd = "GIT_TERMINAL_PROMPT=0 cd #{dir} && git fetch origin #{ref} #{options}"
       Open3.popen3(cmd) do |_s_in, _s_out, s_err, wait_thr|
         err_msg = s_err.read
-        raise GitError, err_msg unless wait_thr.value.exitstatus.zero?
+        raise GitError, err_msg if wait_thr.value.exitstatus.nonzero?
       end
     end
   end

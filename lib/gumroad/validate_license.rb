@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require "uri"
 require "net/http"
+require "uri"
 
 module Gumroad
   RequestError = Class.new(StandardError)

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require "rails_helper"
 require "check_runs"
+require "rails_helper"
 
 describe CheckRuns::Canceled do
   let(:coverage_check) do

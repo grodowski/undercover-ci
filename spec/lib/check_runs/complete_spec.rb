@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require "rails_helper"
 require "check_runs"
+require "rails_helper"
 
 describe CheckRuns::Complete do
   describe "#format_lines" do
@@ -98,7 +98,7 @@ describe CheckRuns::Complete do
   end
 
   def check_run_fixture
-    mock_result = undercover_report_fixture.all_results[0]
+    mock_result = undercover_report_fixture.all_results.first
     mock_result_multi_line_branch_coverage = undercover_report_fixture.all_results[1]
     # TODO: not ideal, will need refactoring
     inst = Installation.create
