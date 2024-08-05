@@ -12,11 +12,11 @@
 # ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- [opts]
 
 require "base64"
-require "net/http"
 require "json"
+require "net/http"
+require "optparse"
 require "pathname"
 require "uri"
-require "optparse"
 
 Options = Struct.new(:commit, :lcov, :repo, :url, :cancel) do
   def valid?

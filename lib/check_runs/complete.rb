@@ -29,7 +29,7 @@ module CheckRuns
 
     # TODO: deserves to be moved elswhere
     def format_lines(lines)
-      prev = lines[0]
+      prev = lines.first
       slices = lines.slice_before do |e|
         (prev + 1 != e).tap { prev = e }
       end
@@ -83,7 +83,7 @@ module CheckRuns
     def text_for_run
       text = "Revision `#{run.sha[0..6]}` has modified the following " \
              "#{ActionController::Base.helpers.pluralize(@undercover_report.all_results.size, 'code location')}."
-      if @run.nodes.select(&:flagged?).any?
+      if @run.nodes.any?(&:flagged?)
         text += " Results marked with ⚠️ have untested lines added or changed in this commit, " \
                 "look into them!"
       end

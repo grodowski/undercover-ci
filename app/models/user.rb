@@ -7,6 +7,9 @@ class User < ApplicationRecord
 
   validates :uid, :name, :token, presence: true
 
+  TOKEN_KEY = ENV.fetch("USER_TOKEN_ENCRYPTION_KEY").freeze
+  API_TOKEN_IV = Base64.decode64("nPDwkL9ckWPJQZevoe+efg==\n") # deterministic iv
+
   def self.from_omniauth(auth_hash)
     user = find_or_initialize_by(uid: auth_hash[:uid])
     user.assign_attributes(
@@ -18,31 +21,8 @@ class User < ApplicationRecord
     user
   end
 
-  TOKEN_KEY = ENV.fetch("USER_TOKEN_ENCRYPTION_KEY").freeze
-  API_TOKEN_IV = Base64.decode64("nPDwkL9ckWPJQZevoe+efg==\n") # deterministic iv
-
-  def reset_api_token
-    SecureRandom.hex(16).tap do |new_token|
-      update!(api_token: self.class.encrypt(new_token, TOKEN_KEY, API_TOKEN_IV))
-    end
-  end
-
   def self.find_by_api_token(raw_token)
     find_by api_token: encrypt(raw_token, TOKEN_KEY, API_TOKEN_IV)
-  end
-
-  def token=(new_token)
-    super(self.class.encrypt(new_token, TOKEN_KEY))
-  end
-
-  def token
-    return if super.blank?
-
-    self.class.decrypt(super)
-  end
-
-  def analytics_id
-    "U#{id}"
   end
 
   def self.encrypt(value, key = TOKEN_KEY, stored_iv = nil)
@@ -58,5 +38,25 @@ class User < ApplicationRecord
     cipher.key = key
     cipher.iv = decoded_base64[0..15]
     cipher.update(decoded_base64[16..]) + cipher.final
+  end
+
+  def reset_api_token
+    SecureRandom.hex(16).tap do |new_token|
+      update!(api_token: self.class.encrypt(new_token, TOKEN_KEY, API_TOKEN_IV))
+    end
+  end
+
+  def token=(new_token)
+    super(self.class.encrypt(new_token, TOKEN_KEY))
+  end
+
+  def token
+    return if super.blank?
+
+    self.class.decrypt(super)
+  end
+
+  def analytics_id
+    "U#{id}"
   end
 end

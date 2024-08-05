@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 require "simplecov"
-require "simplecov_json_formatter"
 require "simplecov-lcov"
+require "simplecov_json_formatter"
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
