@@ -9,12 +9,12 @@ module ApplicationHelper
     if pr
       pr_number = pr["number"]
       base_vs_compare = content_tag("code", "#{pr['head']['ref']} @ #{coverage_check.head_sha[0..7]}") + \
-                        " 👉 " + \
+                        " 👉 " +
                         content_tag("code", pr["base"]["ref"])
       url = "https://github.com/#{repo}/pull/#{pr_number}/checks"
     else
-      base_vs_compare = content_tag("code", coverage_check.head_sha[0..7]) + \
-                        " 👉 " + \
+      base_vs_compare = content_tag("code", coverage_check.head_sha[0..7]) +
+                        " 👉 " +
                         content_tag("code", (coverage_check.base_sha.try(:[], 0..7) || coverage_check.default_branch))
       url = "https://github.com/#{repo}/commit/#{coverage_check.head_sha}"
     end

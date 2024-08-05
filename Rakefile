@@ -7,12 +7,11 @@ require_relative "config/application"
 
 if Rails.env.development? || Rails.env.test?
   require "rubocop/rake_task"
-  require "rspec/core/rake_task"
 
   desc "Run RuboCop"
   RuboCop::RakeTask.new(:rubocop)
 
-  task default: %i[rubocop]
+  task default: %i[rubocop spec]
 end
 
 Rails.application.load_tasks

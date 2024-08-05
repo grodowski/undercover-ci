@@ -4,7 +4,7 @@ ruby "3.3.3"
 source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-gem "rails", "~> 6.1"
+gem "rails", "~> 7.1"
 
 gem "aws-sdk-s3", require: false
 gem "bcrypt", "~> 3.1.15"
@@ -50,6 +50,7 @@ gem "sentry-ruby"
 group :development, :test do
   gem "byebug", platforms: %i[mri mingw x64_mingw]
   gem "pry-rails"
+  gem "rspec-rails"
   gem "rubocop"
   gem "webmock"
 end
@@ -63,7 +64,6 @@ end
 
 group :test do
   gem "capybara", ">= 2.15"
-  gem "rspec-rails"
   gem "selenium-webdriver"
   gem "simplecov"
   gem "simplecov-html"

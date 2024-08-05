@@ -7,7 +7,8 @@ describe "Coverage Upload" do
   let(:path) { "/v1/coverage.json" }
 
   it "renders 404 when CoverageCheck does not exist" do
-    expect { post path, params: {repo: "foo", sha: "bar"} }.to raise_error(ActiveRecord::RecordNotFound)
+    post path, params: {repo: "foo", sha: "bar"}
+    expect(response.status).to eq(404)
   end
 
   it "stores the LCOV in active storage" do
@@ -163,9 +164,9 @@ describe "Coverage Upload" do
     end
 
     it "returns a 404 if the check does not exist" do
-      expect do
-        delete path, params: {repo: "user/repository", sha: "b4c0n"}
-      end.to raise_error(ActiveRecord::RecordNotFound)
+      delete path, params: {repo: "user/repository", sha: "b4c0n"}
+
+      expect(response.status).to eq(404)
     end
   end
 

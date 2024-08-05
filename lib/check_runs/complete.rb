@@ -47,9 +47,9 @@ module CheckRuns
       results.map do |result|
         # TODO: duplicates pronto-undercover logic, move to Undercover::Result
         lines = result.coverage.map { |ln, *| ln if result.uncovered?(ln) }.compact.uniq
-        message = "#{result.node.human_name.capitalize} `#{result.node.name}` is missing" \
-                  " coverage for line#{'s' if lines.size > 1} #{format_lines(lines).join(',')}" \
-                  " (node coverage: #{result.coverage_f})."
+        message = "#{result.node.human_name.capitalize} `#{result.node.name}` is missing " \
+                  "coverage for line#{'s' if lines.size > 1} #{format_lines(lines).join(',')} " \
+                  "(node coverage: #{result.coverage_f})."
 
         lines_missing_branch_cov = result.coverage.map do |ln, _block, _branch, cov|
           ln if cov&.zero?
