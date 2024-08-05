@@ -4,7 +4,7 @@ require "rails_helper"
 
 describe "/beta" do
   before do
-    @old_code = ENV["BETA_CODE"]
+    @old_code = ENV.fetch("BETA_CODE", nil)
     ENV["BETA_CODE"] = "bacon"
   end
   after { ENV["BETA_CODE"] = @old_code }

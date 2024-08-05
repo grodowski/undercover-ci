@@ -33,7 +33,7 @@ module Gumroad
 
     def self.log(msg)
       puts "[#{name}] #{msg}"
-      super msg
+      super
     end
   end
 end

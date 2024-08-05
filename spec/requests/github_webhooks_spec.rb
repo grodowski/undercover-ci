@@ -15,9 +15,8 @@ describe "GitHub Webhooks" do
       ACCEPT: "text/html"
     }
 
-    expect do
-      post path, headers: invalid_headers
-    end.to raise_error(ActionController::RoutingError)
+    post path, headers: invalid_headers
+    expect(response.status).to eq(404)
   end
 
   %w[invalid sha1=invalid asdf=invalid].each do |sig|

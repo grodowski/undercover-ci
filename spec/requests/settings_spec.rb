@@ -49,8 +49,7 @@ describe "Settings" do
     get("/v1/checks/notexists.json")
     expect(response.status).to eq(401)
 
-    expect do
-      get("/v1/checks/notexists.json", headers: {HTTP_AUTHORIZATION: "Token token=s3krit"})
-    end.to raise_error(ActiveRecord::RecordNotFound)
+    get("/v1/checks/notexists.json", headers: {HTTP_AUTHORIZATION: "Token token=s3krit"})
+    expect(response.status).to eq(404)
   end
 end
