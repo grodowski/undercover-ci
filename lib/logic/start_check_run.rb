@@ -38,7 +38,7 @@ module Logic
     attr_reader :coverage_check, :installation
 
     def wait
-      return ExpireCheckJob::INACTIVE_WAIT unless installation.active?
+      return ExpireCheckJob::INACTIVE_WAIT unless coverage_check.installation_active?
       return installation.expire_check_job_wait_minutes.minutes if installation.expire_check_job_wait_minutes
 
       ExpireCheckJob::DEFAULT_WAIT

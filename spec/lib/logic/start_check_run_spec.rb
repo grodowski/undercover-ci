@@ -4,8 +4,9 @@ require "rails_helper"
 
 describe Logic::StartCheckRun do
   let(:check_run_info) do
-    DataObjects::CheckRunInfo.new("author/repo", "b4c0n1", "c0mp4r3", "123123", nil, nil)
+    DataObjects::CheckRunInfo.new("author/repo", "b4c0n1", "c0mp4r3", "123123", nil, payload)
   end
+  let(:payload) { OpenStruct.new("repository" => {"visibility" => "private"}) }
   let(:user) do
     User.create!(
       uid: "1337",
@@ -123,6 +124,26 @@ describe Logic::StartCheckRun do
         expect(coverage_check).to be_persisted
 
         expect(ExpireCheckJob).to have_been_enqueued.at(5.seconds.from_now).with(coverage_check.id)
+      end
+    end
+
+    context "and a public repo" do
+      let(:payload) { OpenStruct.new("repository" => {"visibility" => "public"}) }
+
+      it "enqueues with default timeout" do
+        expect(CreateCheckRunJob).to receive(:perform_later)
+
+        Timecop.freeze do
+          described_class.call(check_run_info)
+
+          coverage_check = CoverageCheck.last
+          expect(coverage_check.state).to eq(:awaiting_coverage)
+          expect(coverage_check.head_sha).to eq("b4c0n1")
+          expect(coverage_check.base_sha).to eq("c0mp4r3")
+          expect(coverage_check).to be_persisted
+
+          expect(ExpireCheckJob).to have_been_enqueued.at(120.minutes.from_now).with(coverage_check.id)
+        end
       end
     end
   end

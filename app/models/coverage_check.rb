@@ -31,6 +31,12 @@ class CoverageCheck < ApplicationRecord
     self.repo ||= {}
   end
 
+  def installation_active?
+    return true if repo_public?
+
+    installation.active?
+  end
+
   def state
     super&.to_sym
   end

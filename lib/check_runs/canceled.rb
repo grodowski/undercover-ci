@@ -34,7 +34,7 @@ module CheckRuns
     end
 
     def license_expired?
-      !db_check.installation.active?
+      !db_check.installation_active?
     end
 
     def no_coverage?
@@ -46,7 +46,7 @@ module CheckRuns
     end
 
     def title
-      return "License expired" if license_expired?
+      return "License expired" if license_expired? # and repo.private
       return "Check skipped" if skipped?
       return "Timed out waiting for coverage data" if no_coverage?
       return "Service error" if error?
