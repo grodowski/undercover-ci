@@ -1,3 +1,4 @@
 ruby 3.3.5
 nodejs 12.19.0
 postgres 14.8
+redis 6.2.5
