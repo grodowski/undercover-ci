@@ -20,6 +20,7 @@ class CoverageCheck < ApplicationRecord
     SQL
   end)
 
+  # TODO: add queued
   validates :state, inclusion: {
     in: %i[created awaiting_coverage in_progress complete canceled]
   }

@@ -20,6 +20,10 @@ class RunnerJob < ApplicationJob
   def perform(coverage_check_id)
     coverage_check = CoverageCheck.find(coverage_check_id)
 
+    # check throttling
+    # reschedule with delay
+    # or move to in_progress and RunUndercover
+
     Logic::RunUndercover.call(coverage_check)
     log("coverage_check #{coverage_check_id}: #{GC.stat}")
     GC.start
