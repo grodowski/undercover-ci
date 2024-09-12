@@ -6,10 +6,15 @@ module Logic
       transition(:created, :awaiting_coverage)
     end
 
-    def start
-      transition(%i[canceled awaiting_coverage in_progress], :in_progress)
+    def enqueue
+      transition(%i[canceled awaiting_coverage in_progress], :queued)
     end
 
+    def start
+      transition(:queued, :in_progress)
+    end
+
+    # TODO: inspect this state
     def restart
       transition(:in_progress, :awaiting_coverage, "restart")
     end

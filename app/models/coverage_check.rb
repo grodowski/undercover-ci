@@ -21,7 +21,7 @@ class CoverageCheck < ApplicationRecord
   end)
 
   validates :state, inclusion: {
-    in: %i[created awaiting_coverage in_progress complete canceled]
+    in: %i[created awaiting_coverage queued in_progress complete canceled]
   }
 
   after_initialize do
