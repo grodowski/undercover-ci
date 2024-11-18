@@ -5,6 +5,8 @@ module Dashboard
     before_action :check_current_user
     before_action :validate_installations, except: :new
 
+    REDIS_SSL_PARAMS = {ssl_params: {verify_mode: OpenSSL::SSL::VERIFY_NONE}}.freeze
+
     def index
       @api_token = fetch_user_displayable_token
       @installations = current_user.installations
@@ -28,7 +30,9 @@ module Dashboard
     end
 
     def redis
-      @redis ||= RedisClient.new(url: ENV.fetch("REDIS_URL", "redis://localhost:6379"))
+      @redis ||= RedisClient.new(
+        REDIS_SSL_PARAMS.merge(url: ENV.fetch("REDIS_URL", "redis://localhost:6379"))
+      )
     end
   end
 end
