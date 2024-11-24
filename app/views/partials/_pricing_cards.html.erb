@@ -1,22 +1,21 @@
 <div class="container mb-5">
   <div class="row">
-    <div class="col-md-6">
-      <div class="card mb-4 shadow-lg">
-        <div class="card-header text-center my-2">
-          <h4>Undercover GitHub App</h4>
+    <div class="col-md-4">
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header text-center">
+          <h4>Essential</h4>
         </div>
         <div class="card-body text-left">
           <div class="mb-4">
-            <h4>$49 per month</h4>
+            <h4>$49 per month*</h4>
             <span class="text-muted">VAT not included, try it free for 14 days</span>
           </div>
-          <p>Undercover GitHub App code review integration with quick setup for your organization. Included features:</p>
-          <p>✅ Coverage warnings as GitHub annotations (via GitHub Checks)</p>
-          <p>✅ Diff coverage summary view for each commit</p>
-          <p>✅ Branch coverage support</p>
-          <p>✅ Coverage analytics and reporting (in-app)</p>
-          <p>✅ Unlimited builds for private and public repos</p>
-          <p>✅ Unlimited users</p>
+          <p>Startups and small engineering teams.</p>
+          <hr/>
+          <p>💬 GitHub Checks annotations with coverage warnings and diff summary</p>
+          <p>🌳 Branch coverage</p>
+          <p>📦 2500 builds per month for private repos (with 2 concurrent builds at a time)</p>
+          <p>♾️ Unlimited users</p>
           <br/>
           <% if current_user.nil? %>
             <p class="text-center">
@@ -30,13 +29,44 @@
         </div>
       </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-4">
+      <div class="card mb-4 shadow-lg">
+        <div class="card-header text-center">
+          <h4>Plus</h4>
+        </div>
+        <div class="card-body text-left">
+          <div class="mb-4">
+            <h4>$249 per month*</h4>
+            <span class="text-muted">VAT not included, try it free for 14 days</span>
+          </div>
+          <p>Medium to large engineering teams.</p>
+          <hr/>
+          <p>Includes everything in Essential, plus:</p>
+          <p>📊 Metrics dashboards to track coverage trends per repository</p>
+          <p></p>
+          <p>♾️ Unlimited check builds for private repos</p>
+          <p>♾️ Unlimited concurrent check builds</p>
+          <p>♾️ Unlimited users</p>
+          <br/>
+          <% if current_user.nil? %>
+            <p class="text-center">
+              <%= link_to "Sign Up with GitHub", "/auth/github?r=sign_up", class: "btn btn-md btn-primary", method: :post %>
+            </p>
+          <% else %>
+            <p class="text-center">
+              <%= link_to "Start subscription", settings_path, class: "btn btn-md btn-primary" %>
+            </p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
       <div class="card mb-4 shadow-sm">
-        <div class="card-header text-center my-2">
+        <div class="card-header text-center">
           <h4>Open Source</h4>
         </div>
         <div class="card-body text-left">
-          <p>Undercover is built on <b>open-source</b> and will always remain free to use for public GitHub repositories.</p>
+          <p>Undercover is built on <b>open-source</b> and is free to use for public GitHub repositories. <%= link_to "Sign Up with GitHub", "/auth/github?r=sign_up", method: :post %> to get started.</p>
           <p>If a hosted GitHub App integration won't work for you, check out these links to get started and with local and CI/CD workflows:</p>
           <ul>
             <p>🔗 <a href="https://medium.com/@mrgrodo/improve-your-ruby-code-reviews-with-actionable-code-coverage-and-undercover-c4480575ea69">Improve your Ruby code reviews with actionable code coverage and Undercover</a>
@@ -46,6 +76,13 @@
           </ul>
         </div>
       </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col text-center my-3">
+      <p class="small mt-2">
+        * yearly discounts available for all plans by default
+      </p>
     </div>
   </div>
 </div>
