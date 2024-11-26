@@ -33,4 +33,39 @@ RSpec.describe CoverageCheck, type: :model do
       end
     end
   end
+
+  describe "#in_progress_for_installation" do
+    let(:user) { User.create!(uid: "1", email: "foo@bar.com", token: "sekrit", name: "Foo") }
+
+    it "returns 0 when there are no in_progress checks" do
+      installation = Installation.create!(installation_id: "123123")
+      expect(CoverageCheck.in_progress_for_installation(installation)).to be_empty
+    end
+
+    it "returns 2 when there are two in_progress checks" do
+      installation = Installation.create!(
+        installation_id: "123123", users: [user],
+        metadata: {target_type: "Organization"}
+      )
+      CoverageCheck.create!(
+        installation:,
+        head_sha: "b8f95241",
+        repo: {"full_name" => "author/repo", "default_branch" => "master"},
+        state: :queued
+      )
+      CoverageCheck.create!(
+        installation:,
+        head_sha: "b8f95242",
+        repo: {"full_name" => "author/repo", "default_branch" => "master"},
+        state: :in_progress
+      )
+      CoverageCheck.create!(
+        installation:,
+        head_sha: "b8f95243",
+        repo: {"full_name" => "author/repo", "default_branch" => "master"},
+        state: :in_progress
+      )
+      expect(CoverageCheck.in_progress_for_installation(installation).count).to eq(2)
+    end
+  end
 end

@@ -26,6 +26,8 @@ module Logic
     end
 
     def run_undercover
+      Logic::UpdateCoverageCheckState.new(coverage_check).start if coverage_check.state == :queued
+
       if coverage_check.state != :in_progress
         log "exiting early, coverage_check #{coverage_check.id} is #{coverage_check.state}, but should be in_progress"
         return
