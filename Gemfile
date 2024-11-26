@@ -15,6 +15,7 @@ gem "pg", ">= 0.18", "< 2.0"
 gem "puma"
 gem "redis-client"
 gem "sidekiq"
+gem "sidekiq-limit_fetch"
 
 # Required for Ruby 3.1+ until the mail gem gets an update
 gem "net-imap", require: false
