@@ -14,7 +14,6 @@ module Logic
       transition(:queued, :in_progress)
     end
 
-    # TODO: inspect this state
     def restart
       transition(:in_progress, :awaiting_coverage, "restart")
     end

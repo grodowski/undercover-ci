@@ -20,6 +20,10 @@ class CoverageCheck < ApplicationRecord
     SQL
   end)
 
+  scope :in_progress_for_installation, (lambda do |installation_id|
+    where(installation_id:, state: :in_progress)
+  end)
+
   validates :state, inclusion: {
     in: %i[created awaiting_coverage queued in_progress complete canceled]
   }
@@ -30,6 +34,8 @@ class CoverageCheck < ApplicationRecord
     self.state_log ||= []
     self.repo ||= {}
   end
+
+  delegate :max_concurrent_checks, to: :installation
 
   def installation_active?
     return true if repo_public?

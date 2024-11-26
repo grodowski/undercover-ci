@@ -54,7 +54,6 @@ describe Logic::RunUndercover do
     expect(coverage_check.state).to eq(:in_progress)
   end
 
-
   it "raises a RunError if CoverageCheck has zero attached coverage reports" do
     expect { subject }.to raise_error(Logic::RunUndercover::RunError, /coverage_reports can't be blank/)
   end
