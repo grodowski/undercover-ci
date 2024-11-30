@@ -1,10 +1,15 @@
 # frozen_string_literal: true
 
 module CheckRuns
-  class Complete < Base
+  class Complete < Base # rubocop:disable Metrics/ClassLength
+    # Prevents GitHub Checks API errors with the 50 annotation limit
+    # https://docs.github.com/en/rest/checks/runs?apiVersion=2022-11-28#update-a-check-run--parameters
+    MAX_ANNOTATIONS = 50
+
     # @param undercover_warnings [Array] list of warnings reported by Undercover
     def post(undercover_report)
       @undercover_report = undercover_report
+      @warnings = undercover_report.flagged_results
       client = installation_api_client(run.installation_id)
       client.post(
         "/repos/#{run.full_name}/check-runs",
@@ -20,7 +25,7 @@ module CheckRuns
           title: "Complete",
           summary: summary_for_run,
           text: text_for_run,
-          annotations: warnings_to_annotations
+          annotations: warnings_to_annotations.first(MAX_ANNOTATIONS)
         },
         accept: "application/vnd.github.antiope-preview+json"
       )
@@ -42,9 +47,8 @@ module CheckRuns
     # @return [Array] matching the format expected by GitHub Checks API
     # https://developer.github.com/v3/checks/runs/#output-object
     def warnings_to_annotations
-      results = @undercover_report.flagged_results
-      log "posting warnings: #{results}"
-      results.map do |result|
+      log "posting warnings: #{@warnings}"
+      @warnings.map do |result|
         # TODO: duplicates pronto-undercover logic, move to Undercover::Result
         lines = result.coverage.map { |ln, *| ln if result.uncovered?(ln) }.compact.uniq
         message = "#{result.node.human_name.capitalize} `#{result.node.name}` is missing " \
@@ -87,6 +91,11 @@ module CheckRuns
         text += " Results marked with ⚠️ have untested lines added or changed in this commit, " \
                 "look into them!"
       end
+      if @warnings.size > MAX_ANNOTATIONS
+        text += "\n\n"
+        text += "⚠️ Due to GitHub's 50 annotation limit, only the first 50 warnings are shown in the pull request " \
+                "diff. Please inspect the table below and the full report at #{details_url}."
+      end
       text += "\n\n"
       rows = ["file | name | coverage | branches", ":--- | :--- | ---: | ---:"]
       format_to_md = proc do |node|
@@ -108,7 +117,7 @@ module CheckRuns
 
     # TODO: read directly from node and not @undercover_report
     def total_branches_for_node(node)
-      result = @undercover_report.flagged_results.find do |res|
+      result = @warnings.find do |res|
         res.file_path == node.path && res.first_line == node.start_line && res.node.name == node.node_name
       end
       return unless result
