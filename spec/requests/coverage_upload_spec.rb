@@ -47,7 +47,7 @@ describe "Coverage Upload" do
     expect(response.status).to eq(201)
 
     expect(check.reload.coverage_reports.attached?).to eq(true)
-    expect(check.reload.state).to eq(:in_progress)
+    expect(check.reload.state).to eq(:queued)
   end
 
   it "transitions the check to in_progress and enqueues RunUndercover in 5 seconds" do
@@ -60,7 +60,7 @@ describe "Coverage Upload" do
       end.to have_enqueued_job(RunnerJob).at(5.seconds.from_now)
     end
 
-    expect(check.reload.state).to eq(:in_progress)
+    expect(check.reload.state).to eq(:queued)
     expect(response.status).to eq(201)
   end
 
@@ -75,7 +75,7 @@ describe "Coverage Upload" do
       end.to have_enqueued_job(RunnerJob).at(5.seconds.from_now)
     end
 
-    expect(check.reload.state).to eq(:in_progress)
+    expect(check.reload.state).to eq(:queued)
     expect(response.status).to eq(201)
   end
 
@@ -116,7 +116,7 @@ describe "Coverage Upload" do
     contents = File.read("spec/fixtures/coverage.lcov")
     post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
 
-    expect(check.reload.state).to eq(:in_progress)
+    expect(check.reload.state).to eq(:queued)
     expect(response.status).to eq(201)
   end
 

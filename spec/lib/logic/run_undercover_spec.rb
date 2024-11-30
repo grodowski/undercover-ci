@@ -35,6 +35,25 @@ describe Logic::RunUndercover do
     expect(subject).to be_nil
   end
 
+  it "transitions a CoverageCheck from queued to in_progress" do
+    coverage_check.update!(state: :queued)
+    coverage_check.coverage_reports.attach(
+      io: File.open("spec/fixtures/coverage.lcov"),
+      filename: "#{coverage_check.id}_b4c0n.lcov",
+      content_type: "text/plain"
+    )
+
+    # simulate a clone error, irrelevant for this test
+    stub_get_installation_token
+    stub_post_check_runs
+    allow(Git::Clone).to receive(:perform).and_raise(Git::GitError)
+    expect_any_instance_of(described_class).to receive(:teardown).once
+    expect { subject }.to raise_error(Logic::RunUndercover::CloneError)
+
+    # check that state has been updated
+    expect(coverage_check.state).to eq(:in_progress)
+  end
+
   it "raises a RunError if CoverageCheck has zero attached coverage reports" do
     expect { subject }.to raise_error(Logic::RunUndercover::RunError, /coverage_reports can't be blank/)
   end
