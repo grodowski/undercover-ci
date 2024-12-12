@@ -140,7 +140,7 @@ describe CheckRuns::Complete do
   def undercover_report_fixture
     mock_node = double(
       human_name: "instance method", name: "method", first_line: 1, last_line: 6,
-      source_lines_with_numbers: (1..6).zip(Array.new(6, "test_line"))
+      source_lines_with_numbers: (1..6).zip(Array.new(6, "test_line")), empty_def?: false
     )
     results = [
       Undercover::Result.new(
