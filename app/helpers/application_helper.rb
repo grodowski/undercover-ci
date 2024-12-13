@@ -60,6 +60,12 @@ module ApplicationHelper
     end
   end
 
+  def nav_link_ext(link_text, path, **html_args)
+    content_tag(:li, class: "nav-item") do
+      link_to link_text, path, {class: "nav-link", target: "_blank"}.merge(html_args)
+    end
+  end
+
   def gumroad_subscribe_link(installation)
     subscribe_link = link_to(
       "Subscribe",
