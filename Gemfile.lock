@@ -1,15 +1,4 @@
 GIT
-  remote: https://github.com/grodowski/undercover.git
-  revision: 31fbda6f5393d7f270bdbfdce17279cb027d2782
-  branch: handle-grafted-commits
-  specs:
-    undercover (0.5.0)
-      bigdecimal
-      imagen (>= 0.1.8)
-      rainbow (>= 2.1, < 4.0)
-      rugged (>= 0.27, < 1.8)
-
-GIT
   remote: https://github.com/ruby/net-pop.git
   revision: e8d0afe2773b9eb6a23c39e9e437f6fc0fc7c733
   specs:
@@ -166,7 +155,7 @@ GEM
     hashie (5.0.0)
     i18n (1.14.5)
       concurrent-ruby (~> 1.0)
-    imagen (0.1.8)
+    imagen (0.2.0)
       parser (>= 2.5, != 2.5.1.1)
     io-console (0.7.2)
     irb (1.14.0)
@@ -254,7 +243,7 @@ GEM
       actionpack (>= 4.2)
       omniauth (~> 2.0)
     parallel (1.26.3)
-    parser (3.3.5.0)
+    parser (3.3.6.0)
       ast (~> 2.4.1)
       racc
     pg (1.5.8)
@@ -418,6 +407,11 @@ GEM
     turbolinks-source (5.2.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
+    undercover (0.6.1)
+      bigdecimal
+      imagen (>= 0.2.0)
+      rainbow (>= 2.1, < 4.0)
+      rugged (>= 0.27, < 1.8)
     unicode-display_width (2.5.0)
     uri (0.13.0)
     useragent (0.16.10)
@@ -492,7 +486,7 @@ DEPENDENCIES
   timecop
   turbolinks
   tzinfo-data
-  undercover!
+  undercover
   web-console (>= 3.3.0)
   webdrivers
   webmock
