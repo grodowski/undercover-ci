@@ -109,6 +109,7 @@ module Logic
       opts = Undercover::Options.new.tap do |opt|
         opt.lcov = @lcov_tmpfile.path
         opt.path = repo_path
+        opt.glob_reject_filters = %w[test/* spec/* db/* *_test.rb *_spec.rb].freeze
       end
       @changeset = Undercover::Changeset.new("#{repo_path}/.git", @run.compare)
       Undercover::Report.new(@changeset, opts).build
