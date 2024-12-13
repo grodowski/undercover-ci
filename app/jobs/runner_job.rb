@@ -5,6 +5,8 @@ require "check_runs"
 # RunnerJob assumes that coverage results have been stored. It runs
 # the Clone, Analyse and Publish operations in sync.
 class RunnerJob < ApplicationJob
+  class Throttled < StandardError; end
+
   include ClassLoggable
   queue_as :runner
 
@@ -17,11 +19,25 @@ class RunnerJob < ApplicationJob
            Octokit::Error,
            Rugged::OSError
 
-  def perform(coverage_check_id)
-    coverage_check = CoverageCheck.find(coverage_check_id)
+  retry_on RunnerJob::Throttled,
+           wait: :polynomially_longer,
+           attempts: ENV.fetch("DEFAULT_THROTTLED_RETRY_ATTEMPTS", 20).to_i
 
-    Logic::RunUndercover.call(coverage_check)
+  def perform(coverage_check_id)
+    @coverage_check = CoverageCheck.find(coverage_check_id)
+    @installation = @coverage_check.installation
+
+    raise RunnerJob::Throttled unless can_schedule?
+
+    Logic::RunUndercover.call(@coverage_check)
     log("coverage_check #{coverage_check_id}: #{GC.stat}")
     GC.start
+  end
+
+  private
+
+  def can_schedule?
+    count = CoverageCheck.in_progress_for_installation(@installation).count
+    count < @coverage_check.max_concurrent_checks
   end
 end
