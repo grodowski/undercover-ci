@@ -9,7 +9,7 @@ class Installation < ApplicationRecord
 
   validates_presence_of :installation_id
 
-  DEFAULTS = {max_concurrent_checks: ENV.fetch("DEFAULT_MAX_CONCURRENT_CHECKS", 2)}.freeze
+  DEFAULTS = {max_concurrent_checks: ENV.fetch("DEFAULT_MAX_CONCURRENT_CHECKS", 2).to_i}.freeze
   store_accessor :settings, :expire_check_job_wait_minutes, :max_concurrent_checks
 
   after_create :ensure_subscription
@@ -45,6 +45,6 @@ class Installation < ApplicationRecord
   end
 
   def max_concurrent_checks
-    super || DEFAULTS[:max_concurrent_checks]
+    (super || DEFAULTS[:max_concurrent_checks]).to_i
   end
 end
