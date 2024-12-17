@@ -20,8 +20,8 @@ class RunnerJob < ApplicationJob
            Rugged::OSError
 
   retry_on RunnerJob::Throttled,
-           wait: :polynomially_longer,
-           attempts: ENV.fetch("DEFAULT_THROTTLED_RETRY_ATTEMPTS", 20).to_i
+           wait: 30.seconds,
+           attempts: ENV.fetch("DEFAULT_THROTTLED_RETRY_ATTEMPTS", 120).to_i
 
   def perform(coverage_check_id)
     @coverage_check = CoverageCheck.find(coverage_check_id)
