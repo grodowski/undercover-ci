@@ -23,7 +23,7 @@ module Logic
     end
 
     def cancel(message = nil)
-      transition(%i[created awaiting_coverage in_progress], :canceled, message)
+      transition(%i[queued created awaiting_coverage in_progress], :canceled, message)
     end
   end
 end
