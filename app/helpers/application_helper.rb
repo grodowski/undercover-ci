@@ -15,7 +15,7 @@ module ApplicationHelper
     else
       base_vs_compare = content_tag("code", coverage_check.head_sha[0..7]) +
                         " 👉 " +
-                        content_tag("code", (coverage_check.base_sha.try(:[], 0..7) || coverage_check.default_branch))
+                        content_tag("code", coverage_check.base_ref_or_branch)
       url = "https://github.com/#{repo}/commit/#{coverage_check.head_sha}"
     end
     # rubocop:enable Style/StringConcatenation
@@ -23,6 +23,7 @@ module ApplicationHelper
   end
 
   def coverage_result_badge(check)
+    # TODO: use CoverageCheck#result once backfilled
     warn_count = check.flagged_nodes_count
     badge_type = warn_count.zero? ? "text-bg-success" : "text-bg-warning"
     content_tag(:span, class: "badge rounded-pill #{badge_type}") do

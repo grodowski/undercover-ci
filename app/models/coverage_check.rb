@@ -23,10 +23,15 @@ class CoverageCheck < ApplicationRecord
   scope :in_progress_for_installation, (lambda do |installation_id|
     where(installation_id:, state: :in_progress)
   end)
+  scope :complete, -> { where(state: :complete) }
+  scope :last_90d, -> { where("coverage_checks.created_at > ?", 90.days.ago.beginning_of_day) }
+  scope :last_30d, -> { where("coverage_checks.created_at > ?", 30.days.ago.beginning_of_day) }
+  scope :last_7d, -> { where("coverage_checks.created_at > ?", 7.days.ago.beginning_of_day) }
 
   validates :state, inclusion: {
     in: %i[created awaiting_coverage queued in_progress complete canceled]
   }
+  validates :result, inclusion: {in: %i[passed failed]}, allow_nil: true
 
   after_initialize do
     self.state ||= :created
@@ -37,6 +42,10 @@ class CoverageCheck < ApplicationRecord
 
   delegate :max_concurrent_checks, to: :installation
 
+  def self.to_chartkick
+    group(:result).group_by_day(:created_at).count
+  end
+
   def installation_active?
     return true if repo_public?
 
@@ -44,6 +53,10 @@ class CoverageCheck < ApplicationRecord
   end
 
   def state
+    super&.to_sym
+  end
+
+  def result
     super&.to_sym
   end
 
@@ -63,5 +76,9 @@ class CoverageCheck < ApplicationRecord
     return [] unless check_suite
 
     check_suite["pull_requests"]
+  end
+
+  def base_ref_or_branch
+    base_sha.try(:[], 0..7) || default_branch
   end
 end

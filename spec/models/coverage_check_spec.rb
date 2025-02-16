@@ -68,4 +68,40 @@ RSpec.describe CoverageCheck, type: :model do
       expect(CoverageCheck.in_progress_for_installation(installation).count).to eq(2)
     end
   end
+
+  describe "#to_chartkick" do
+    it "is empty without records" do
+      expect(described_class.to_chartkick).to eq({})
+    end
+
+    it "returns a valid datapoint array" do
+      user = User.create!(
+        uid: "1337",
+        email: "foo@bar.com",
+        token: "sekritkey",
+        name: "Foo Bar"
+      )
+      installation = Installation.create!(installation_id: "123123", users: [user])
+      CoverageCheck.create!(
+        installation:,
+        head_sha: "953a804",
+        repo: {"full_name" => "author/repo", "default_branch" => "master"},
+        state: "complete",
+        result: "passed"
+      )
+      CoverageCheck.create!(
+        installation:,
+        head_sha: "953a805",
+        repo: {"full_name" => "author/repo", "default_branch" => "master"},
+        state: "complete",
+        result: "failed"
+      )
+      expect(described_class.to_chartkick).to match(
+        {
+          ["failed", Date.today] => 1,
+          ["passed", Date.today] => 1
+        }
+      )
+    end
+  end
 end

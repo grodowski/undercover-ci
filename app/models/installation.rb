@@ -28,6 +28,10 @@ class Installation < ApplicationRecord
     github_type == "user"
   end
 
+  def repo_names
+    (repos || []).map { _1["full_name"] }
+  end
+
   def subscription
     subscriptions.last
   end
