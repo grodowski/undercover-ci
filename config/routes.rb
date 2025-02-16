@@ -28,6 +28,10 @@ Rails.application.routes.draw do
     get "/app", controller: "checks", action: "index", as: :dashboard
     resources :checks, only: :show
 
+    resource :charts, only: [] do
+      get :total_checks
+    end
+
     resources :settings, only: %i[new index] do
       collection do
         post :access_token

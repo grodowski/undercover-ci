@@ -1,89 +1,97 @@
 <% if @show_coverage_upload_instruction %>
   💁‍♂️ Complete your setup and integrate UncercoverCI with your test suite
   <%= render partial: "partials/coverage_upload_instruction" %>
-<% end %>
-
-<p class="lead">Recently analysed commits</p>
-
-<div class="mb-5">
-  <div class="row mb-5">
-    <div class="col-lg-3">
-      <%=
-        select_tag(
-          :repository_name,
-          options_for_select(@repository_names),
-          class: "form-select",
-          aria_label: "Repository"
-        )
-      %>
-    </div>
-    <div class="col-lg-3">
-      <select class="form-select" aria-label="Branch">
-        <option selected>All branches</option>
-      </select>
-    </div>
-    <div class="col-lg-3">
-      <select class="form-select" aria-label="Date range">
-        <option selected>Last 30d</option>
-      </select>
-    </div>
-    <div class="col-lg-3 text-end">
-      <div class="btn-group" role="group" aria-label="Basic example">
-        <button type="button" class="btn btn-outline-primary">All</button>
-        <button type="button" class="btn btn-outline-primary">Failed</button>
-        <button type="button" class="btn btn-outline-primary">Passed</button>
-      </div>
-    </div>
-  </div>
+<% else %>
+  <p class="lead">Recently analysed commits</p>
 
   <div class="mb-5">
-    <%=
-      # TODO: move to an async controller
-      line_chart(
-        # TODO: add options (scope to installations, date range etc)
-        CoverageCheck.to_chartkick(),
-        # xmin: "2023-11-17",
-        # xmax: "2023-11-26",
-        xtitle: "date", ytitle: "total checks", legend: false
-      )
-    %>
-  </div>
+    <%= form_tag dashboard_url, method: :get, class: "row g-3 align-items-center" do %>
+      <div class="col-lg-3">
+      <%=
+        select_tag(
+        :repository_name,
+        options_for_select(@repository_names, selected: params[:repository_name]),
+        class: "form-select",
+        aria_label: "Repository",
+        onchange: "this.form.requestSubmit()"
+        )
+      %>
+      </div>
+      <div class="col-lg-3">
+      <%= select_tag(
+        :branch_name,
+        options_for_select(@branch_names, selected: params[:branch_name]),
+        class: "form-select",
+        aria_label: "Branch",
+        onchange: "this.form.requestSubmit()"
+      ) %>
+      </div>
+      <div class="col-lg-3">
+      <%= select_tag(
+        :date_range,
+        options_for_select(
+        [
+          ["Last 7d", "last_7d"],
+          ["Last 30d", "last_30d"],
+          ["Last 90d", "last_90d"]
+        ],
+        selected: params[:date_range] || "last_30d"
+        ),
+        class: "form-select",
+        aria_label: "Date range",
+        onchange: "this.form.requestSubmit()"
+      ) %>
+      </div>
+      <div class="col-lg-3 text-end">
+        <div class="btn-group" role="group" aria-label="State">
+          <%= link_to "All", dashboard_path(request.params.merge(result: nil)), class: "btn btn-outline-primary #{'active' unless params[:result].in?(%w(passed failed))}" %>
+          <%= link_to "Failed", dashboard_path(request.params.merge(result: "failed")), class: "btn btn-outline-primary #{'active' if params[:result] == 'failed'}" %>
+          <%= link_to "Passed", dashboard_path(request.params.merge(result: "passed")), class: "btn btn-outline-primary #{'active' if params[:result] == 'passed'}" %>
+        </div>
+      </div>
+    <% end %>
 
-  <table class="table table-hover">
-    <thead>
-      <tr>
-        <!-- TODO: update columns: show commit message -->
-        <th>Repo</th>
-        <th>Commit</th>
-        <th>Coverage</th>
-        <th>State</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @checks.each do |check| %>
-        <tr class="row-href" data-href="<%= check_path(check.id) %>">
-          <td><%= check.repo_full_name %></td>
-          <td>
-            <code><%= pull_request_or_commit_link(check) %></code>
-          </td>
-          <td>
-            <%= coverage_result_badge(check) %>
-          </td>
-          <td title="<%= check.state_log.last&.fetch("ts") %>">
-            <% if check.state != :created %>
-              <%= "#{check.state} (#{distance_of_time_in_words(Time.now, check.state_log.last&.fetch("ts"), include_seconds: true)} ago)" %>
-            <% else %>
-              <%= check.state %>
-            <% end %>
-          </td>
+    <div class="my-3">
+      <%=
+        column_chart(total_checks_charts_path(chart_params_for_async_chart))
+      %>
+    </div>
+
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Repo</th>
+          <th>Commit</th>
+          <th>Coverage</th>
+          <th>State</th>
         </tr>
-      <% end %>
-      <% if @checks.none? %>
-        <tr><td colspan=3><span>No data yet</span></td></tr>
-      <% end %>
-    </tbody>
-  </table>
-  <div class="d-flex justify-content-center">
-    <%= paginate @checks, theme: "bootstrap-5" %>
+      </thead>
+      <tbody>
+        <% @checks.each do |check| %>
+          <tr class="row-href" data-href="<%= check_path(check.id) %>">
+            <td><%= check.repo_full_name %></td>
+            <td>
+              <code><%= pull_request_or_commit_link(check) %></code>
+            </td>
+            <td>
+              <%= coverage_result_badge(check) %>
+            </td>
+            <td title="<%= check.state_log.last&.fetch("ts") %>">
+              <% if check.state != :created %>
+                <%= "#{check.state} (#{distance_of_time_in_words(Time.now, check.state_log.last&.fetch("ts"), include_seconds: true)} ago)" %>
+              <% else %>
+                <%= check.state %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @checks.none? %>
+          <tr><td colspan=3><span>No data yet</span></td></tr>
+        <% end %>
+      </tbody>
+    </table>
+    <div class="d-flex justify-content-center">
+      <%= paginate @checks, theme: "bootstrap-5" %>
+    </div>
   </div>
-</div>
+<% end %>

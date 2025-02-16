@@ -116,7 +116,9 @@ describe Logic::RunUndercover do
 
     subject
 
-    expect(coverage_check.reload.state).to eq(:complete)
+    coverage_check.reload
+    expect(coverage_check.state).to eq(:complete)
+    expect(coverage_check.result).to eq(:failed)
     expect(coverage_check.nodes.map(&:attributes).map(&:symbolize_keys)).to contain_exactly(
       hash_including(
         path: "foo.rb",

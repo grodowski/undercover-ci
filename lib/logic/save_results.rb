@@ -13,10 +13,14 @@ module Logic
 
     def call
       all_results.each { |result| build_node(result) }
-      coverage_check.save!
+      coverage_check.update!(result: build_result)
     end
 
     private
+
+    def build_result
+      all_results.any?(&:flagged?) ? "failed" : "passed"
+    end
 
     def build_node(node_result)
       coverage_check.nodes << Node.new(
