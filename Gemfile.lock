@@ -410,7 +410,7 @@ GEM
     turbolinks-source (5.2.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    undercover (0.6.2)
+    undercover (0.6.3)
       bigdecimal
       imagen (>= 0.2.0)
       rainbow (>= 2.1, < 4.0)
