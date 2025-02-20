@@ -5,3 +5,8 @@ b8f95245da7a39788914d388c2fc53781bef0402 b8f95245da7a39788914d388c2fc53781bef040
 b8f95245da7a39788914d388c2fc53781bef0402 b8f95245da7a39788914d388c2fc53781bef0402 Jan Grodowski <jgrodowski@gmail.com> 1579953345 +0100	checkout: moving from feature to master
 b8f95245da7a39788914d388c2fc53781bef0402 953a8049abaaa57f8db4ff97a55114283355d17e Jan Grodowski <jgrodowski@gmail.com> 1579953360 +0100	reset: moving to HEAD~1
 953a8049abaaa57f8db4ff97a55114283355d17e b8f95245da7a39788914d388c2fc53781bef0402 Jan Grodowski <jgrodowski@gmail.com> 1579953380 +0100	checkout: moving from master to feature
+b8f95245da7a39788914d388c2fc53781bef0402 953a8049abaaa57f8db4ff97a55114283355d17e Jan Grodowski <jgrodowski@gmail.com> 1740085504 +0100	checkout: moving from feature to master
+953a8049abaaa57f8db4ff97a55114283355d17e dce6e1e942a782506dd37eda819dead236c112da Jan Grodowski <jgrodowski@gmail.com> 1740085528 +0100	commit: empty head of master
+dce6e1e942a782506dd37eda819dead236c112da b8f95245da7a39788914d388c2fc53781bef0402 Jan Grodowski <jgrodowski@gmail.com> 1740085533 +0100	checkout: moving from master to feature
+b8f95245da7a39788914d388c2fc53781bef0402 dce6e1e942a782506dd37eda819dead236c112da Jan Grodowski <jgrodowski@gmail.com> 1740085543 +0100	checkout: moving from feature to master
+dce6e1e942a782506dd37eda819dead236c112da b8f95245da7a39788914d388c2fc53781bef0402 Jan Grodowski <jgrodowski@gmail.com> 1740085553 +0100	checkout: moving from master to feature

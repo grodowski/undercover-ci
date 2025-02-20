@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module Logic
-  class RunUndercover
+  class RunUndercover # rubocop:disable Metrics/ClassLength
+    include GithubRequests
     include ClassLoggable
 
     RunError = Class.new(StandardError)
@@ -36,6 +37,7 @@ module Logic
       log "starting run #{run} job_id: #{coverage_check.id}"
       CheckRuns::Run.new(run).post
 
+      update_compare_to_merge_base(run)
       clone_repo
       checkout
 
@@ -63,6 +65,16 @@ module Logic
       # In Rails 6 this will become `coverage_report_jov.coverage_reports.last.open`
       @lcov_tmpfile.write(coverage_check.coverage_reports.last.download)
       @lcov_tmpfile.flush
+    end
+
+    def update_compare_to_merge_base(run)
+      compare_response = installation_api_client(run.installation_id).compare(run.full_name, run.compare, run.sha)
+      merge_base_sha = compare_response.merge_base_commit.sha
+      run.compare = merge_base_sha
+      log("updated merge base for #{run} via GitHub compare")
+    rescue Octokit::Error => e
+      log("update_compare_to_merge_base failed with #{e}, retrying...")
+      raise # retry
     end
 
     # https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#http-based-git-access-by-an-installation

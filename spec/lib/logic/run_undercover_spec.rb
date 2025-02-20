@@ -46,6 +46,7 @@ describe Logic::RunUndercover do
     # simulate a clone error, irrelevant for this test
     stub_get_installation_token
     stub_post_check_runs
+    stub_fetch_merge_base
     allow(Git::Clone).to receive(:perform).and_raise(Git::GitError)
     expect_any_instance_of(described_class).to receive(:teardown).once
     expect { subject }.to raise_error(Logic::RunUndercover::CloneError)
@@ -66,6 +67,7 @@ describe Logic::RunUndercover do
     )
     stub_get_installation_token
     stub_post_check_runs
+    stub_fetch_merge_base
     allow(Git::Clone).to receive(:perform).and_raise(Git::GitError)
     expect_any_instance_of(described_class).to receive(:teardown).once
 
@@ -80,12 +82,31 @@ describe Logic::RunUndercover do
     )
     stub_get_installation_token
     stub_post_check_runs
+    stub_fetch_merge_base
     allow(Git::Clone).to receive(:perform)
     allow(Git::Fetch).to receive(:perform)
     expect_any_instance_of(described_class).to receive(:teardown).once
     allow(Rugged::Repository).to receive(:new).and_raise(Rugged::OSError)
 
     expect { subject }.to raise_error(Logic::RunUndercover::CheckoutError)
+  end
+
+  it "logs when GitHub API fails to fetch the merge base" do
+    coverage_check.coverage_reports.attach(
+      io: File.open("spec/fixtures/coverage.lcov"),
+      filename: "#{coverage_check.id}_b4c0n.lcov",
+      content_type: "text/plain"
+    )
+    stub_get_installation_token
+    stub_post_check_runs
+    stub_fetch_merge_base_error
+    allow(Rails.logger).to receive(:info)
+    expect(Rails.logger).to receive(:info)
+      .once
+      .with(a_string_matching(/\[Logic::RunUndercover\] update_compare_to_merge_base failed/))
+    expect_any_instance_of(described_class).to receive(:teardown).once
+
+    expect { subject }.to raise_error(Octokit::ServiceUnavailable)
   end
 
   it "clones the repository and runs the undercover command" do
@@ -96,6 +117,7 @@ describe Logic::RunUndercover do
     )
 
     stub_get_installation_token
+    stub_fetch_merge_base
     check_runs_stub = stub_post_check_runs
 
     repo_path = "tmp/job/#{coverage_check.id}"
@@ -164,6 +186,7 @@ describe Logic::RunUndercover do
 
     stub_get_installation_token
     check_runs_stub = stub_post_check_runs
+    stub_fetch_merge_base
     expect_any_instance_of(described_class).to receive(:clone_repo).once
     expect_any_instance_of(described_class).to receive(:teardown).once
 
@@ -190,5 +213,23 @@ describe Logic::RunUndercover do
     WebMock
       .stub_request(:post, "https://api.github.com/repos/author/repo/check-runs")
       .to_return(status: 200, body: "", headers: {"Content-Type" => "application/json"})
+  end
+
+  def stub_fetch_merge_base
+    compare_json = {
+      # actual commits from spec/fixtures/fake_repo
+      base_commit: {sha: "dce6e1e942a782506dd37eda819dead236c112da"},
+      merge_base_commit: {sha: "953a8049abaaa57f8db4ff97a55114283355d17e"}
+    }.to_json
+
+    WebMock
+      .stub_request(:get, /https:\/\/api.github.com\/repos\/author\/repo\/compare\/\w+\.\.\.\w+/)
+      .to_return(status: 200, body: compare_json, headers: {"Content-Type" => "application/json"})
+  end
+
+  def stub_fetch_merge_base_error
+    WebMock
+      .stub_request(:get, /https:\/\/api.github.com\/repos\/author\/repo\/compare\/\w+\.\.\.\w+/)
+      .to_return(status: 503)
   end
 end
