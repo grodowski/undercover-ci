@@ -63,13 +63,16 @@ Rails.application.configure do
   config.active_job.verbose_enqueue_logs = true
 
   # Suppress logger output for asset requests.
-  config.assets.quiet = true
+  config.assets.quiet = false
+
+  # Apply rubocop rules to generators
+  config.generators.apply_rubocop_autocorrect_after_generate!
 
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true
 
   # Annotate rendered view with file names.
-  # config.action_view.annotate_rendered_view_with_filenames = true
+  config.action_view.annotate_rendered_view_with_filenames = true
 
   # Uncomment if you wish to allow Action Cable access from any origin.
   # config.action_cable.disable_request_forgery_protection = true
@@ -79,5 +82,8 @@ Rails.application.configure do
 
   # Allow e.g. 49b5-178-115-53-85.ngrok.io
   config.hosts << /[a-z0-9-]+\.ngrok-free\.app/
+
+  # Use only id for inspection in prod
+  config.active_record.attributes_for_inspect = [:id]
 end
 # rubocop:enable Metrics/BlockLength

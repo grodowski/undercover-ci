@@ -32,7 +32,7 @@ describe "Coverage Upload" do
 
     expect(response.status).to eq(422)
     expect(JSON.parse(response.body)).to eq(
-      "error" => "could not recognise '<!DOCTYPE html>\n' as valid LCOV"
+      "error" => "could not recognise '<!doctype html>\n' as valid LCOV"
     )
     expect(check.reload.coverage_reports.attached?).to eq(false)
   end
