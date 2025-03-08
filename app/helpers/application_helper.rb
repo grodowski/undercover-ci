@@ -8,7 +8,7 @@ module ApplicationHelper
     # rubocop:disable Style/StringConcatenation
     if pr
       pr_number = pr["number"]
-      base_vs_compare = content_tag("code", "#{pr['head']['ref']} @ #{coverage_check.head_sha[0..7]}") + \
+      base_vs_compare = content_tag("code", "#{pr['head']['ref']} @ #{coverage_check.head_sha[0..7]}") +
                         " 👉 " +
                         content_tag("code", pr["base"]["ref"])
       url = "https://github.com/#{repo}/pull/#{pr_number}/checks"
@@ -48,7 +48,7 @@ module ApplicationHelper
                     [:blue, ""]
                   end
     color_class = "node-coverage-#{color}"
-    content_tag(:span, "#{node.coverage * 100}%", class: color_class) + \
+    content_tag(:span, "#{node.coverage * 100}%", class: color_class) +
       content_tag(:span, text)
   end
 
