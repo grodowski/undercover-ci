@@ -17,7 +17,8 @@ class RunnerJob < ApplicationJob
   retry_on ActiveStorage::FileNotFoundError,
            Logic::RunUndercover::RunError,
            Octokit::Error,
-           Rugged::OSError
+           Rugged::OSError,
+           Faraday::Error
 
   retry_on RunnerJob::Throttled,
            wait: 30.seconds,

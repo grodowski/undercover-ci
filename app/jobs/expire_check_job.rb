@@ -6,7 +6,7 @@ class ExpireCheckJob < ApplicationJob
   SKIPPED_MESSAGE = "Cancelled by user"
 
   queue_as :default
-  retry_on Octokit::Error # defaults to 3s wait, 5 attempts
+  retry_on Octokit::Error, Faraday::Error # defaults to 3s wait, 5 attempts
 
   def perform(coverage_check_id, error_message = "")
     @coverage_check = CoverageCheck.find(coverage_check_id)
