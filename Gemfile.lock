@@ -142,7 +142,7 @@ GEM
     crass (1.0.6)
     date (3.4.1)
     diff-lcs (1.6.0)
-    docile (1.4.0)
+    docile (1.4.1)
     drb (2.2.1)
     erubi (1.13.1)
     execjs (2.9.1)
@@ -427,7 +427,6 @@ GEM
       imagen (>= 0.2.0)
       rainbow (>= 2.1, < 4.0)
       rugged (>= 0.27, < 1.10)
-      simplecov
     unicode-display_width (3.1.4)
       unicode-emoji (~> 4.0, >= 4.0.4)
     unicode-emoji (4.0.4)
