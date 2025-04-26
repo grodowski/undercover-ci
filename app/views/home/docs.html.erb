@@ -26,7 +26,8 @@ Learn how to install UndercoverCI for your repos, report coverage data and use t
           <ul>
             <li class=""><a href="#undercover-uploader">UndercoverCI uploader</a>
             <li class=""><a href="#parallel-tests">Parallel tests</a>
-            <li class=""><a href="#ignoring-test-coverage-checks">Ignoring/skipping coverage</a></li>
+            <li class=""><a href="#nocov-syntax">Skip coverage with code comments</a></li>
+            <li class=""><a href="#ignoring-test-coverage-checks">Skip coverage entirely</a></li>
             <li class=""><a href="#api">API access</a>
           </ul>
         </li>
@@ -160,6 +161,9 @@ Learn how to install UndercoverCI for your repos, report coverage data and use t
         GitHub Actions or <code>$TRAVIS_COMMIT</code> for TravisCI.</li> Consult your CI service documentation to get the
         right head SHA value for your build environment.
 
+        <h6 class="mb-2 mt-3"><code>--cancel</code></h6>
+        Cancel coverage check represented by the given <code>--commit</code>. The check will be passing and marked as completed + skipped on your GitHub commit or pull request.
+
         <h6 class="mb-2 mt-3"><code>--lcov</code></h6>
         A relative path to the coverage report, will look like <code>coverage/lcov/$reponame.lcov</code> unless SimpleCov's config defaults were changed.
       </p>
@@ -218,7 +222,7 @@ Learn how to install UndercoverCI for your repos, report coverage data and use t
         </code></pre>
       </p>
 
-      <h4 id="ignoring-test-coverage-checks" class="mt-5 mb-2">Ignoring/skipping coverage</h4>
+      <h4 id="nocov-syntax" class="mt-5 mb-2">Ignoring/skipping coverage with code comments</h4>
       <p>
         Pull requests in projects with low or nonexistent test coverage are likely to generate large numbers of check warnings. While the default workflow would be to address them before the PR approval, your strategy might be different.
       </p>
@@ -235,6 +239,13 @@ Learn how to install UndercoverCI for your repos, report coverage data and use t
         </code></pre>
 
         Read more about the <code>:nocov:</code> syntax in <a href="https://github.com/simplecov-ruby/simplecov#ignoringskipping-code" target="_blank">SimpleCov's readme</a>.
+      </p>
+
+      <h4 id="ignoring-test-coverage-checks" class="mt-5 mb-2">Skip coverage entirely</h4>
+
+      <p>
+        UndercoverCI checks can be skipped entirely if an analysis is redundant for any user-defined reason (e.g. commit is unrelated or tests haven't ran).
+        Use the <code>--cancel</code> uploader option within your CI workflow to achieve this (<a href="#undercover-uploader">uploader docs</a>).
       </p>
 
       <h4 id="api" class="mt-5 mb-2">API V1</h4>
