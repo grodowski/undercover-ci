@@ -197,6 +197,27 @@ Learn how to install UndercoverCI for your repos, report coverage data and use t
         </code></pre>
       </p>
 
+      <h6>Parallel tests in <a href="https://guides.rubyonrails.org/testing.html#parallel-testing" target="_blank">Rails and Minitest</a></h6>
+      <p>
+        Try the snippet below to configure SimpleCov with <code>parallelize</code> in Rails and produce a single coverage output
+        file that will be suitable for UndercoverCI.
+        You can find more context in this <a href="https://github.com/simplecov-ruby/simplecov/issues/718#issuecomment-538201587" target="_blank">GitHub issue</a>.
+        <pre><code>
+          # test_helper.rb
+          # ...
+          parallelize(workers: :number_of_processors)
+
+          parallelize_setup do |worker|
+            SimpleCov.command_name "#{SimpleCov.command_name}-#{worker}"
+          end
+
+          parallelize_teardown do |worker|
+            SimpleCov.result
+          end
+          # ...
+        </code></pre>
+      </p>
+
       <h4 id="ignoring-test-coverage-checks" class="mt-5 mb-2">Ignoring/skipping coverage</h4>
       <p>
         Pull requests in projects with low or nonexistent test coverage are likely to generate large numbers of check warnings. While the default workflow would be to address them before the PR approval, your strategy might be different.

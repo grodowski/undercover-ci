@@ -83,6 +83,18 @@
                         --commit <b>${{ github.event.pull_request.head.sha || github.sha }}</b> \
                         --lcov <b>coverage/lcov/$repository-name.lcov</b>
             </code></pre>
+             <div class="alert alert-info" role="alert">
+              If you're running tests agains multiple versions of Ruby (or other dependencies), make sure to only upload coverage once, for a selected test matrix entry. Example:
+              <pre><code>
+                # ...
+                - name: Run tests with coverage
+                  if: ${{ matrix.ruby-version == env.undercover_version }}
+                  env:
+                    COVERAGE: "true"
+                  run: bundle exec rspec
+                # ...
+              </code></pre>
+            </div>
           </li>
           <li>Store your changes, push a commit and... profit! Soon you'll receive your first GitHub check looking for untested code. 🔍✨</li>
         </ol>
