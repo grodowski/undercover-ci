@@ -4,8 +4,9 @@ require "rails_helper"
 
 describe Logic::StartCheckRun do
   let(:check_run_info) do
-    DataObjects::CheckRunInfo.new("author/repo", "b4c0n1", "c0mp4r3", "123123", nil, payload)
+    DataObjects::CheckRunInfo.new("author/repo", "b4c0n1", "c0mp4r3", installation_id, nil, payload)
   end
+  let(:installation_id) { "123123" }
   let(:payload) { OpenStruct.new("repository" => {"visibility" => "private"}) }
   let(:user) do
     User.create!(
@@ -15,7 +16,7 @@ describe Logic::StartCheckRun do
       name: "Foo Bar"
     )
   end
-  let(:installation) { Installation.create!(installation_id: "123123", users: [user]) }
+  let(:installation) { Installation.create!(installation_id: installation_id, users: [user]) }
 
   it "fails if installation does not exist" do
     expect(CreateCheckRunJob).not_to receive(:perform_later)
@@ -144,6 +145,72 @@ describe Logic::StartCheckRun do
 
           expect(ExpireCheckJob).to have_been_enqueued.at(120.minutes.from_now).with(coverage_check.id)
         end
+      end
+    end
+  end
+
+  context "with branch filtering" do
+    let(:payload) do
+      OpenStruct.new(
+        "check_suite" => {"id" => "1234", "head_branch" => branch_name},
+        "repository" => {"full_name" => "grodowski/undercover-ci"}
+      )
+    end
+
+    context "when per-repo filter is set" do
+      let(:installation_id) { "999999" }
+
+      before do
+        installation.update!(
+          settings: {
+            repo_branch_filters: {
+              "author/repo" => "^(main|develop)$"
+            }
+          }
+        )
+      end
+
+      context "and branch matches per-repo filter" do
+        let(:branch_name) { "develop" }
+
+        it "creates coverage check using per-repo filter" do
+          installation.itself
+          expect(CreateCheckRunJob).to receive(:perform_later).once
+
+          described_class.call(check_run_info)
+
+          coverage_check = CoverageCheck.last
+          expect(coverage_check.state).to eq(:awaiting_coverage)
+          expect(coverage_check).to be_persisted
+        end
+      end
+
+      context "and branch does not match per-repo filter" do
+        let(:branch_name) { "feature/test" }
+
+        it "skips creating coverage check" do
+          installation.itself
+          expect(CreateCheckRunJob).not_to receive(:perform_later)
+
+          described_class.call(check_run_info)
+
+          expect(CoverageCheck.count).to eq(0)
+        end
+      end
+    end
+
+    context "when no branch filter is set" do
+      let(:branch_name) { "feature/test" }
+
+      it "creates coverage check for any branch" do
+        installation.itself
+        expect(CreateCheckRunJob).to receive(:perform_later).once
+
+        described_class.call(check_run_info)
+
+        coverage_check = CoverageCheck.last
+        expect(coverage_check.state).to eq(:awaiting_coverage)
+        expect(coverage_check).to be_persisted
       end
     end
   end

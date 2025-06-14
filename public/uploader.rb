@@ -20,8 +20,8 @@ require "uri"
 
 Options = Struct.new(:commit, :lcov, :repo, :url, :cancel) do
   def valid?
-    (commit && !commit.empty?) &&
-      (repo && !repo.empty?)
+    commit && !commit.empty? &&
+      repo && !repo.empty?
   end
 end
 

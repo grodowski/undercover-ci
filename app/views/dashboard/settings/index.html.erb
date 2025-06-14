@@ -20,11 +20,51 @@
         <hr/>
       <% end %>
       <h6>GitHub Repos (<%= link_to "Manage", inst.metadata["html_url"] %>)</h6>
-      <ul>
-        <% inst.repos.each do |repo| %>
-          <%= content_tag("li", repo["full_name"]) %>
+      <div class="mb-3">
+        <% inst.repos.each_with_index do |repo, index| %>
+          <div class="border rounded mb-2 bg-white">
+            <div class="d-flex justify-content-between align-items-center p-3">
+              <div class="d-flex align-items-center gap-2">
+                <strong><%= repo["full_name"] %></strong>
+                <span class="badge bg-<%= repo["private"] ? "warning" : "success" %>">
+                  <%= repo["private"] ? "Private" : "Public" %>
+                </span>
+                <% if inst.repo_branch_filters[repo["full_name"]].present? %>
+                  <span class="badge bg-info">Filtered</span>
+                <% end %>
+              </div>
+              <button class="btn btn-sm btn-outline-secondary"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#collapse-<%= inst.installation_id %>-<%= index %>"
+                      aria-expanded="false">
+                <i class="fas fa-cog"></i> Configure
+              </button>
+            </div>
+
+            <div class="collapse" id="collapse-<%= inst.installation_id %>-<%= index %>">
+              <div class="border-top p-3">
+                <label class="form-label small">
+                  Branch Filter
+                  <a href="/docs#branch-filtering" target="_blank" class="text-decoration-none ms-1 text-muted" title="Learn more about branch filtering">
+                    (docs)
+                  </a>
+                </label>
+                <p class="small text-muted mb-2">Enter a regular expression to only run coverage checks on matching branches. Leave blank to run on all branches.</p>
+                <%= form_with url: update_branch_filter_settings_path, method: :patch, local: true, class: "d-flex gap-2" do |form| %>
+                  <%= form.hidden_field :installation_id, value: inst.installation_id %>
+                  <%= form.hidden_field :repo_full_name, value: repo["full_name"] %>
+                  <%= form.text_field :branch_filter_regex,
+                                      value: inst.repo_branch_filters[repo["full_name"]],
+                                      placeholder: "example: ^(?!main$).* to exclude main",
+                                      class: "form-control form-control-sm flex-grow-1" %>
+                  <%= form.submit "Update", class: "btn btn-sm btn-outline-primary" %>
+                <% end %>
+              </div>
+            </div>
+          </div>
         <% end %>
-      </ul>
+      </div>
     </div>
   </div>
 <% end %>

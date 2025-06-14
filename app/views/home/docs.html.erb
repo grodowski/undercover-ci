@@ -27,6 +27,7 @@ Learn how to install UndercoverCI for your repos, report coverage data and use t
             <li class=""><a href="#undercover-uploader">UndercoverCI uploader</a>
             <li class=""><a href="#parallel-tests">Parallel tests</a>
             <li class=""><a href="#nocov-syntax">Skip coverage with code comments</a></li>
+            <li class=""><a href="#branch-filtering">Branch filtering</a></li>
             <li class=""><a href="#ignoring-test-coverage-checks">Skip coverage entirely</a></li>
             <li class=""><a href="#api">API access</a>
           </ul>
@@ -239,6 +240,53 @@ Learn how to install UndercoverCI for your repos, report coverage data and use t
         </code></pre>
 
         Read more about the <code>:nocov:</code> syntax in <a href="https://github.com/simplecov-ruby/simplecov#ignoringskipping-code" target="_blank">SimpleCov's readme</a>.
+      </p>
+
+      <h4 id="branch-filtering" class="mt-5 mb-2">Branch filtering</h4>
+      <p>
+        UndercoverCI allows you to configure which branches should trigger coverage checks using regular expressions. This is useful for excluding certain branches like main, release branches, or including only branches with specific naming patterns.
+      </p>
+
+      <p>
+        To configure branch filtering, go to your Settings page and expand the configuration section for any repository. Enter a regular expression in the "Branch Filter" field that matches the branches you want to include for coverage checks.
+      </p>
+
+      <h6 class="mb-2 mt-3">Examples</h6>
+      <div class="table-responsive">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Regular Expression</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Include only branches with "with-coverage-check" tag</td>
+              <td><code>.*with-coverage-check.*</code></td>
+            </tr>
+            <tr>
+              <td>Exclude main branch</td>
+              <td><code>^(?!main$).*</code></td>
+            </tr>
+            <tr>
+              <td>Exclude main and any branches starting with "release-"</td>
+              <td><code>^(?!main$|release-).*</code></td>
+            </tr>
+            <tr>
+              <td>Include only feature branches (starting with "feature/")</td>
+              <td><code>^feature/.*</code></td>
+            </tr>
+            <tr>
+              <td>Include development branches but exclude main, master, and release branches</td>
+              <td><code>^(?!main$|master$|release-).*</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Leave the field blank to run coverage checks on all branches. If you enter an invalid regular expression, UndercoverCI will default to checking all branches.
       </p>
 
       <h4 id="ignoring-test-coverage-checks" class="mt-5 mb-2">Skip coverage entirely</h4>

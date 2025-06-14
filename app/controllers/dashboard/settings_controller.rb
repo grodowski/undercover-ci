@@ -18,6 +18,18 @@ module Dashboard
       redirect_to settings_path
     end
 
+    def update_branch_filter
+      installation = current_user.installations.find_by!(installation_id: params[:installation_id])
+
+      unless params[:repo_full_name].present?
+        redirect_to settings_path, alert: "Repository name is required"
+        return
+      end
+
+      installation.set_repo_branch_filter(params[:repo_full_name], params[:branch_filter_regex])
+      redirect_to settings_path, notice: "Branch filter updated for #{params[:repo_full_name]}"
+    end
+
     private
 
     def fetch_user_displayable_token
