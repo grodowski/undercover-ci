@@ -35,6 +35,7 @@ Rails.application.routes.draw do
     resources :settings, only: %i[new index] do
       collection do
         post :access_token
+        patch :update_branch_filter
       end
     end
   end

@@ -18,13 +18,20 @@
       %>
       </div>
       <div class="col-lg-3">
-      <%= select_tag(
-        :branch_name,
-        options_for_select(@branch_names, selected: params[:branch_name]),
-        class: "form-select",
-        aria_label: "Branch",
-        onchange: "this.form.requestSubmit()"
-      ) %>
+        <%= text_field_tag(
+          :branch_name,
+          params[:branch_name],
+          list: "branch_list",
+          class: "form-control",
+          placeholder: "Select or type branch name",
+          aria_label: "Branch",
+          onchange: "this.form.requestSubmit()"
+        ) %>
+        <datalist id="branch_list">
+          <% @branch_names.each do |branch_option| %>
+            <option value="<%= branch_option.is_a?(Array) ? branch_option.last : branch_option %>">
+          <% end %>
+        </datalist>
       </div>
       <div class="col-lg-3">
       <%= select_tag(

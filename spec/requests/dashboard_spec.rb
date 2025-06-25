@@ -90,6 +90,62 @@ describe "Dashboard spec" do
       expect(response.body).to include("<span class=\"badge rounded-pill text-bg-success\">0 warnings</span>")
     end
 
+    context "filter_checks_from_params functionality" do
+      let!(:inst) { Installation.create!(installation_id: 1337, users: [user]) }
+      let!(:old_check) do
+        CoverageCheck.create!(
+          head_sha: "OLD_SHA", installation: inst, created_at: 2.months.ago,
+          repo: {"full_name" => "owner/repo1"}, check_suite: {"head_branch" => "main"}, result: "failed"
+        )
+      end
+      let!(:recent_check) do
+        CoverageCheck.create!(
+          head_sha: "RECENT_SHA", installation: inst, created_at: 1.day.ago,
+          repo: {"full_name" => "owner/repo2"}, check_suite: {"head_branch" => "feature"}, result: "passed"
+        )
+      end
+
+      before do
+        get("/auth/github/callback")
+      end
+
+      it "filters by date range" do
+        get("/app", params: {date_range: "last_7d"})
+        expect(response.body).to include("RECENT_S")
+        expect(response.body).not_to include("OLD_SHA")
+      end
+
+      it "filters by repository name" do
+        get("/app", params: {repository_name: "owner/repo1", date_range: "last_90d"})
+        expect(response.body).to include("OLD_SHA")
+        expect(response.body).not_to include("RECENT_S")
+      end
+
+      it "filters by branch name" do
+        get("/app", params: {branch_name: "feature"})
+        expect(response.body).to include("RECENT_S")
+        expect(response.body).not_to include("OLD_SHA")
+      end
+
+      it "filters by result status" do
+        get("/app", params: {result: "passed"})
+        expect(response.body).to include("RECENT_S")
+        expect(response.body).not_to include("OLD_SHA")
+      end
+
+      it "handles 'all' values for filters" do
+        get("/app", params: {repository_name: "all", branch_name: "all", result: "all", date_range: "last_90d"})
+        expect(response.body).to include("OLD_SHA")
+        expect(response.body).to include("RECENT_S")
+      end
+
+      it "combines multiple filters" do
+        get("/app", params: {date_range: "last_7d", result: "passed"})
+        expect(response.body).to include("RECENT_S")
+        expect(response.body).not_to include("OLD_SHA")
+      end
+    end
+
     context "with a github installation" do
       let(:github_installations) { [{id: 1_337, app_id: 18_310}] }
 

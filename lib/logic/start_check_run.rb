@@ -16,6 +16,11 @@ module Logic
 
     def create_and_queue_check_run
       find_installation
+
+      unless branch_matches_filter?
+        log "StartCheckRun skipping due to branch filter, branch: #{branch_name}, repo: #{repo_full_name}"
+        return
+      end
       build_coverage_check
 
       unless coverage_check.state == :created
@@ -53,6 +58,18 @@ module Logic
         head_sha: check_run_info.sha,
         base_sha: check_run_info.compare
       )
+    end
+
+    def branch_name
+      check_run_info.payload.check_suite&.fetch("head_branch", "")
+    end
+
+    def branch_matches_filter?
+      installation.branch_matches_filter?(branch_name, repo_full_name)
+    end
+
+    def repo_full_name
+      check_run_info.full_name
     end
   end
 end

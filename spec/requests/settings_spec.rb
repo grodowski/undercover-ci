@@ -12,6 +12,13 @@ describe "Settings" do
     )
   end
 
+  let!(:installation) do
+    Installation.create!(
+      installation_id: "1337",
+      settings: {}
+    ).tap { |inst| inst.users << user }
+  end
+
   let(:github_installations) { [{id: "1337", target_type: "User"}] }
   before do
     stub_request(:get, "https://api.github.com/user/installations/1337/repositories?per_page=100")
@@ -29,6 +36,54 @@ describe "Settings" do
         headers: {"Content-Type" => "application/json"}
       )
     Rails.application.env_config["omniauth.auth"] = OmniAuth.config.mock_auth[:github]
+  end
+
+  describe "PATCH /settings/update_branch_filter" do
+    before do
+      get("/auth/github/callback")
+    end
+
+    it "updates branch filter for repository" do
+      patch(
+        "/settings/update_branch_filter", params: {
+          installation_id: "1337",
+          repo_full_name: "owner/repo",
+          branch_filter_regex: "main|develop"
+        }
+      )
+
+      expect(response).to redirect_to(settings_path)
+      expect(flash[:notice]).to eq("Branch filter updated for owner/repo")
+      expect(installation.reload.settings["repo_branch_filters"]["owner/repo"]).to eq("main|develop")
+    end
+
+    it "removes branch filter when blank" do
+      installation.set_repo_branch_filter("owner/repo", "existing-filter")
+
+      patch(
+        "/settings/update_branch_filter", params: {
+          installation_id: "1337",
+          repo_full_name: "owner/repo",
+          branch_filter_regex: ""
+        }
+      )
+
+      expect(response).to redirect_to(settings_path)
+      expect(flash[:notice]).to eq("Branch filter updated for owner/repo")
+      expect(installation.reload.settings["repo_branch_filters"]).not_to have_key("owner/repo")
+    end
+
+    it "redirects with alert when repo_full_name is missing" do
+      patch(
+        "/settings/update_branch_filter", params: {
+          installation_id: "1337",
+          branch_filter_regex: "main"
+        }
+      )
+
+      expect(response).to redirect_to(settings_path)
+      expect(flash[:alert]).to eq("Repository name is required")
+    end
   end
 
   it "resets user access token" do
