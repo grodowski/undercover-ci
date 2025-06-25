@@ -35,8 +35,7 @@ module Dashboard
       checks = current_user.coverage_checks
       checks = checks.where("repo->>'full_name' = ?", chart_params[:repository_name]) if chart_params[:repository_name]
 
-      checks.complete
-            .last_90d
+      checks.last_90d
             .order(created_at: :desc)
             .pluck(Arel.sql("check_suite->>'head_branch'"))
             .uniq.unshift(["All branches", "all"])
