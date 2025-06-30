@@ -47,7 +47,7 @@ describe Logic::RunUndercover do
     stub_get_installation_token
     stub_post_check_runs
     stub_fetch_merge_base
-    allow(Git::Clone).to receive(:perform).and_raise(Git::GitError)
+    allow(Git).to receive(:clone).and_raise(Git::Error)
     expect_any_instance_of(described_class).to receive(:teardown).once
     expect { subject }.to raise_error(Logic::RunUndercover::CloneError)
 
@@ -59,7 +59,7 @@ describe Logic::RunUndercover do
     expect { subject }.to raise_error(Logic::RunUndercover::RunError, /coverage_reports can't be blank/)
   end
 
-  it "raises a CloneError when Git::Clone fails to clone to trigger a retry" do
+  it "raises a CloneError when Git.clone fails to clone to trigger a retry" do
     coverage_check.coverage_reports.attach(
       io: File.open("spec/fixtures/coverage.lcov"),
       filename: "#{coverage_check.id}_b4c0n.lcov",
@@ -68,7 +68,7 @@ describe Logic::RunUndercover do
     stub_get_installation_token
     stub_post_check_runs
     stub_fetch_merge_base
-    allow(Git::Clone).to receive(:perform).and_raise(Git::GitError)
+    allow(Git).to receive(:clone).and_raise(Git::Error)
     expect_any_instance_of(described_class).to receive(:teardown).once
 
     expect { subject }.to raise_error(Logic::RunUndercover::CloneError)
@@ -83,8 +83,7 @@ describe Logic::RunUndercover do
     stub_get_installation_token
     stub_post_check_runs
     stub_fetch_merge_base
-    allow(Git::Clone).to receive(:perform)
-    allow(Git::Fetch).to receive(:perform)
+    allow(Git).to receive(:clone) { double("Git::Base", fetch: true) }
     expect_any_instance_of(described_class).to receive(:teardown).once
     allow(Rugged::Repository).to receive(:new).and_raise(Rugged::OSError)
 
@@ -121,10 +120,10 @@ describe Logic::RunUndercover do
     check_runs_stub = stub_post_check_runs
 
     repo_path = "tmp/job/#{coverage_check.id}"
-    expect(Git::Clone).to receive(:perform).with(
+    expect(Git).to receive(:clone).with(
       "https://x-access-token:token@github.com/author/repo.git",
       repo_path,
-      "--depth 1 --no-tags"
+      depth: 1
     ) do
       FileUtils.cp_r("spec/fixtures/fake_repo/", repo_path) # fake clone, yay!
       # need to replace the git dir with a default name, since RunUndercover#run_undercover_cmd
@@ -133,8 +132,8 @@ describe Logic::RunUndercover do
         File.join(repo_path, "fake.git"),
         File.join(repo_path, ".git")
       )
+      double("Git::Base", fetch: true)
     end
-    allow(Git::Fetch).to receive(:perform)
 
     subject
 

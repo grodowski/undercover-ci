@@ -2,6 +2,9 @@ export GITHUB_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEArjMo
 export GITHUB_APP_IDENTIFIER=bacon_app_id
 export GITHUB_WEBHOOK_SECRET=sekrit
 
+# ruby-git
+export GIT_TIMEOUT=30
+
 # Puma
 export WEB_CONCURRENCY=1
 export RAILS_MAX_THREADS=1

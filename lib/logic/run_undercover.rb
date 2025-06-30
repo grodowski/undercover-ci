@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Logic
-  class RunUndercover # rubocop:disable Metrics/ClassLength
+  class RunUndercover
     include GithubRequests
     include ClassLoggable
 
@@ -83,18 +83,15 @@ module Logic
       FileUtils.remove_entry(repo_path, true)
 
       i_token = CheckRuns::InstallationAccessToken.new(run).get
-      Git::Clone.perform(
-        "https://x-access-token:#{i_token}@github.com/#{run.full_name}.git",
-        repo_path,
-        "--depth 1 --no-tags"
-      )
-      Git::Fetch.perform(run.compare, repo_path, "--depth 1 --no-tags") unless run.compare == "HEAD~1"
-      Git::Fetch.perform(run.sha, repo_path, "--depth 2 --no-tags")
+      git = Git.clone("https://x-access-token:#{i_token}@github.com/#{run.full_name}.git", repo_path, depth: 1)
+
+      git.fetch("origin", ref: run.compare, depth: 1) unless run.compare == "HEAD~1"
+      git.fetch("origin", ref: run.sha, depth: 2)
 
       list_branches = `cd #{repo_path} && git branch -a`
       crumb = Sentry::Breadcrumb.new(category: "clone_repo", message: list_branches.to_json, level: "info")
       Sentry.add_breadcrumb(crumb)
-    rescue Git::GitError => e
+    rescue Git::Error => e
       log "clone_repo failed with #{e}"
       raise CloneError
     end

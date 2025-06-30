@@ -38,6 +38,7 @@ gem "sprockets"
 gem "turbolinks"
 
 # Core
+gem "git"
 gem "undercover"
 
 # Github
