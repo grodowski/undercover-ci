@@ -58,6 +58,7 @@ group :development, :test do
   gem "pry-rails"
   gem "rspec-rails"
   gem "rubocop"
+  gem "ruby-lsp-rspec", require: false
   gem "webmock"
 end
 

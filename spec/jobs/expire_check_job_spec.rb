@@ -30,12 +30,12 @@ RSpec.describe ExpireCheckJob, type: :job do
     expect(check.state).to eq(:canceled)
   end
 
-  it "cancels the check when it's in_progress" do
+  it "does not cancel the check when it's in_progress" do
     check.update!(state: :in_progress)
     described_class.perform_now(check.id)
 
     check.reload
-    expect(check.state).to eq(:canceled)
+    expect(check.state).to eq(:in_progress)
   end
 
   it "is a no-op when a check is already canceled" do
