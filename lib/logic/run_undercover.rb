@@ -34,7 +34,7 @@ module Logic
         return
       end
 
-      log "starting run #{run} job_id: #{coverage_check.id}"
+      log "starting run #{run.external_id} job_id: #{coverage_check.id}"
       CheckRuns::Run.new(run).post
 
       update_compare_to_merge_base(run)
@@ -45,7 +45,7 @@ module Logic
       warnings = report.flagged_results
       log "undercover warnings: #{warnings.size}, " \
           "total nodes: #{report.all_results.size}"
-      log "completing analysis... #{run} job_id: #{coverage_check.id}"
+      log "completing analysis... #{run.external_id} job_id: #{coverage_check.id}"
 
       # TODO: improve error handling with transactions
       Logic::SaveResults.call(coverage_check, report)
@@ -56,7 +56,7 @@ module Logic
       cancel_check_and_update_github(e.message)
     ensure
       teardown
-      log "teardown complete #{run} job_id: #{coverage_check.id}"
+      log "teardown complete #{run.external_id} job_id: #{coverage_check.id}"
     end
 
     private
@@ -71,7 +71,7 @@ module Logic
       compare_response = installation_api_client(run.installation_id).compare(run.full_name, run.compare, run.sha)
       merge_base_sha = compare_response.merge_base_commit.sha
       run.compare = merge_base_sha
-      log("updated merge base for #{run} via GitHub compare")
+      log("updated merge base for #{run.external_id} via GitHub compare")
     rescue Octokit::Error => e
       log("update_compare_to_merge_base failed with #{e}, retrying...")
       raise # retry

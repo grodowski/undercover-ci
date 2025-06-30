@@ -18,7 +18,7 @@ module CheckRuns
         },
         accept: "application/vnd.github.antiope-preview+json"
       )
-      log "#{run} response: #{client.last_response.status}"
+      log "#{run.external_id} response: #{client.last_response.status}"
     end
 
     private

@@ -31,8 +31,6 @@ class RunnerJob < ApplicationJob
     raise RunnerJob::Throttled unless can_schedule?
 
     Logic::RunUndercover.call(@coverage_check)
-    log("coverage_check #{coverage_check_id}: #{GC.stat}")
-    GC.start
   end
 
   private

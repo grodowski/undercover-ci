@@ -11,6 +11,7 @@ gem "bcrypt", "~> 3.1.15"
 gem "bootsnap", ">= 1.1.0", require: false
 gem "jbuilder", "~> 2.13"
 gem "kaminari"
+gem "ostruct"
 gem "pg", ">= 0.18", "< 2.0"
 gem "puma"
 gem "redis-client"

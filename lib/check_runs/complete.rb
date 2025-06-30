@@ -29,7 +29,7 @@ module CheckRuns
         },
         accept: "application/vnd.github.antiope-preview+json"
       )
-      log "#{run} response: #{client.last_response.status}"
+      log "#{run.external_id} response: #{client.last_response.status}"
     end
 
     # TODO: deserves to be moved elswhere
@@ -47,7 +47,7 @@ module CheckRuns
     # @return [Array] matching the format expected by GitHub Checks API
     # https://developer.github.com/v3/checks/runs/#output-object
     def warnings_to_annotations
-      log "posting warnings: #{@warnings}"
+      log "posting warnings: #{@warnings.size}"
       @warnings.map do |result|
         # TODO: duplicates pronto-undercover logic, move to Undercover::Result
         lines = result.coverage.map { |ln, *| ln if result.uncovered?(ln) }.compact.uniq
