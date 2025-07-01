@@ -8,7 +8,6 @@ end
 
 Sidekiq.configure_server do |config|
   config.redis = REDIS_SSL_PARAMS.merge(size: 10)
-  config.report_after_job_retries = true
 end
 
 # runner jobs are time consuming, always leave an extra slot in the sidekiq concurrency pool

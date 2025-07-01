@@ -53,6 +53,7 @@ gem "omniauth-rails_csrf_protection"
 # Tooling
 gem "sentry-rails"
 gem "sentry-ruby"
+gem "sentry-sidekiq"
 
 group :development, :test do
   gem "byebug", platforms: %i[mri mingw x64_mingw]
