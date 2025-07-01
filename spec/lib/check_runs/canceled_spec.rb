@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "check_runs"
 require "rails_helper"
 
 describe CheckRuns::Canceled do
