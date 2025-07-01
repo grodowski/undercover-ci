@@ -1,29 +1,37 @@
 # frozen_string_literal: true
 
 desc "Monitor old coverage checks and log statistics"
-task monitor_checks: :environment do
+task monitor_checks: :environment do # rubocop:disable Metrics/BlockLength
   ten_minutes_ago = 10.minutes.ago
 
-  # Count in_progress checks older than 10 minutes
-  old_in_progress_count = CoverageCheck.where(state: :in_progress)
-                                      .where("created_at < ?", ten_minutes_ago)
-                                      .count
+  # Count in_progress checks that transitioned to in_progress more than 10 minutes ago
+  old_in_progress_count = CoverageCheck.where(state: :in_progress).select do |check|
+    in_progress_transition = check.state_log.find { |log| log["to"] == "in_progress" }
+    in_progress_transition && Time.parse(in_progress_transition["ts"]) < ten_minutes_ago
+  end.count
 
-  # Count queued checks older than 10 minutes
-  old_queued_count = CoverageCheck.where(state: :queued)
-                                 .where("created_at < ?", ten_minutes_ago)
-                                 .count
+  # Count queued checks that transitioned to queued more than 10 minutes ago
+  old_queued_count = CoverageCheck.where(state: :queued).select do |check|
+    queued_transition = check.state_log.find { |log| log["to"] == "queued" }
+    queued_transition && Time.parse(queued_transition["ts"]) < ten_minutes_ago
+  end.count
 
-  # Find oldest queued check
-  oldest_queued = CoverageCheck.where(state: :queued)
-                              .order(:created_at)
-                              .first
+  # Find oldest queued check based on state transition timestamp
+  oldest_queued = CoverageCheck.where(state: :queued).min_by do |check|
+    queued_transition = check.state_log.find { |log| log["to"] == "queued" }
+    Time.parse(queued_transition["ts"])
+  end
 
   oldest_queued_age = if oldest_queued
-                       Time.current - oldest_queued.created_at
-                     else
-                       0
-                     end
+                        queued_transition = oldest_queued.state_log.find { |log| log["to"] == "queued" }
+                        if queued_transition
+                          Time.current - Time.parse(queued_transition["ts"])
+                        else
+                          0
+                        end
+                      else
+                        0
+                      end
 
   Rails.logger.info "Check Monitor Stats:"
   Rails.logger.info "  - In-progress checks older than 10 minutes: #{old_in_progress_count}"
