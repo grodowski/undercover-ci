@@ -21,8 +21,18 @@ class RunnerJob < ApplicationJob
            Faraday::Error
 
   retry_on RunnerJob::Throttled,
-           wait: ->(executions) { self.calculate_wait_time(executions - 1) },
+           wait: ->(executions) { calculate_wait_time(executions - 1) },
            attempts: ENV.fetch("DEFAULT_THROTTLED_RETRY_ATTEMPTS", 120).to_i
+
+  def self.calculate_wait_time(attempt)
+    # Fast retries in first few minutes: 5s, 10s, 15s, 20s, 25s, 30s, then 30s
+    case attempt
+    when 0..5
+      (attempt + 1) * 5
+    else
+      30
+    end
+  end
 
   def perform(coverage_check_id)
     @coverage_check = CoverageCheck.find(coverage_check_id)
@@ -38,15 +48,5 @@ class RunnerJob < ApplicationJob
   def can_schedule?
     count = CoverageCheck.in_progress_for_installation(@installation).count
     count < @coverage_check.max_concurrent_checks
-  end
-
-  def self.calculate_wait_time(attempt)
-    # Fast retries in first few minutes: 5s, 10s, 15s, 20s, 25s, 30s, then 30s
-    case attempt
-    when 0..5
-      (attempt + 1) * 5
-    else
-      30
-    end
   end
 end
