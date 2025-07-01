@@ -8,28 +8,44 @@ module CheckRuns
 
     # @param undercover_warnings [Array] list of warnings reported by Undercover
     def post(undercover_report)
-      @undercover_report = undercover_report
-      @warnings = undercover_report.flagged_results
-      client = installation_api_client(run.installation_id)
-      client.post(
-        "/repos/#{run.full_name}/check-runs",
-        head_sha: run.sha,
-        name: "coverage",
-        status: "completed",
-        started_at: run.created_at,
-        completed_at: run.last_ts,
-        conclusion: conclusion_for_run,
-        details_url:,
-        external_id: run.external_id,
-        output: {
-          title: "Complete",
-          summary: summary_for_run,
-          text: text_for_run,
-          annotations: warnings_to_annotations.first(MAX_ANNOTATIONS)
-        },
-        accept: "application/vnd.github.antiope-preview+json"
-      )
-      log "#{run.external_id} response: #{client.last_response.status}"
+      tries = 0
+      retry_limit = 2
+      begin
+        tries += 1
+        @undercover_report = undercover_report
+        @warnings = undercover_report.flagged_results
+        client = installation_api_client(run.installation_id)
+        client.post(
+          "/repos/#{run.full_name}/check-runs",
+          head_sha: run.sha,
+          name: "coverage",
+          status: "completed",
+          started_at: run.created_at,
+          completed_at: run.last_ts,
+          conclusion: conclusion_for_run,
+          details_url:,
+          external_id: run.external_id,
+          output: {
+            title: "Complete",
+            summary: summary_for_run,
+            text: text_for_run,
+            annotations: warnings_to_annotations.first(MAX_ANNOTATIONS)
+          },
+          accept: "application/vnd.github.antiope-preview+json"
+        )
+        log "#{run.external_id} response: #{client.last_response.status}"
+      rescue Octokit::UnprocessableEntity => e
+        retry if tries <= retry_limit
+
+        error_message = if e.message.include?("Only 65535 characters are allowed")
+                          "The check output exceeded GitHub's character limit, please inspect " \
+                            "the UndercoverCI dashboard directly"
+                        else
+                          e.message
+                        end
+        log("Check #{run.external_id} failed with #{error_message}, expiring...")
+        ExpireCheckJob.perform_later(run.external_id, error_message)
+      end
     end
 
     # TODO: deserves to be moved elswhere
