@@ -24,15 +24,12 @@ describe RunnerJob do
     described_class.perform_now(check.id)
   end
 
-  it "throttles when checks are in progress" do
+  it "retries when throttled" do
     installation.update!(max_concurrent_checks: 1)
     make_check(installation, state: :in_progress)
 
-    expect_any_instance_of(RunnerJob).to receive(:retry_job)
-
-    perform_enqueued_jobs do
-      described_class.perform_now(check.id)
-    end
+    expect(Logic::RunUndercover).not_to receive(:call)
+    expect { described_class.perform_now(check.id) }.to have_enqueued_job(described_class)
   end
 
   def make_check(installation, state: :queued)
