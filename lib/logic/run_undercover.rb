@@ -120,6 +120,7 @@ module Logic
       opts = Undercover::Options.new.tap do |opt|
         opt.lcov = @lcov_tmpfile.path
         opt.path = repo_path
+        opt.max_warnings_limit = 51 # up to 50 are supported by CheckRuns::Complete, 51 triggers the warning message
       end
       @changeset = Undercover::Changeset.new("#{repo_path}/.git", @run.compare)
       Undercover::Report.new(@changeset, opts).build
