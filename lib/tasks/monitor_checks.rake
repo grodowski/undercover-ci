@@ -33,8 +33,10 @@ task monitor_checks: :environment do # rubocop:disable Metrics/BlockLength
                         0
                       end
 
-  Rails.logger.warn "In-progress checks older than 10 minutes: #{old_in_progress_count}" if old_in_progress_count.any?
-  Rails.logger.warn "Queued checks older than 10 minutes: #{old_queued_count}" if old_queued_count.any?
+  if old_in_progress_count.positive?
+    Rails.logger.warn "In-progress checks older than 10 minutes: #{old_in_progress_count}"
+  end
+  Rails.logger.warn "Queued checks older than 10 minutes: #{old_queued_count}" if old_queued_count.positive?
   Rails.logger.warn "Oldest queued check age: #{oldest_queued_age.round(2)} seconds" if oldest_queued_age > 30
 
   puts "Check Monitor Stats:"
