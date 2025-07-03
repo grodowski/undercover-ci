@@ -16,5 +16,6 @@ Rails.application.config.filter_parameters += %i[
   otp
   ssn
   lcov_base64
+  file_base64
   check_suite
 ]
