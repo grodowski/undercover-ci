@@ -61,6 +61,25 @@ describe "uploader.rb" do
     ).to_stderr
   end
 
+  it "validates that either lcov or simplecov is provided" do
+    expect do
+      uploader = build_uploader("--repo alice/bob --commit 1fffbb")
+      uploader.upload
+      expect(uploader.exitcode).to eq(1)
+    end.to output(a_string_including("Usage:")).to_stderr
+  end
+
+  it "exits 1 when supplied SimpleCov JSON report is empty" do
+    allow(File).to receive(:read).with("spec/fixtures/empty_coverage.json").and_return("")
+    expect do
+      uploader = build_uploader("--simplecov spec/fixtures/empty_coverage.json --repo alice/bob --commit 1fffbb")
+      uploader.upload
+      expect(uploader.exitcode).to eq(1)
+    end.to output(
+      a_string_including("spec/fixtures/empty_coverage.json is an empty file, is that the correct path?")
+    ).to_stderr
+  end
+
   it "handles 404 when check is not found" do
     stub_post_coverage({"error" => "record not found"}, status: 404)
     expect do
@@ -78,6 +97,27 @@ describe "uploader.rb" do
       uploader = build_uploader("--lcov spec/fixtures/coverage.lcov --repo alice/bob --commit 1fffbb")
       uploader.upload
       expect(uploader.exitcode).to eq(0)
+    end.to output(a_string_ending_with("Done! 201\n")).to_stdout
+
+    expect(
+      a_request(:post, "https://undercover-ci.com/v1/coverage")
+      .with(
+        body: JSON.generate(
+          repo: "alice/bob",
+          sha: "1fffbb",
+          file_base64: Base64.strict_encode64(File.read("spec/fixtures/coverage.lcov")),
+          file_type: "lcov"
+        )
+      )
+    ).to have_been_made
+  end
+
+  it "uploads SimpleCov JSON coverage successfully" do
+    stub_post_coverage({}, status: 201)
+    expect do
+      uploader = build_uploader("--simplecov spec/fixtures/coverage.json --repo alice/bob --commit 1fffbb")
+      uploader.upload
+      expect(uploader.exitcode).to eq(0)
     end.to output("Done! 201\n").to_stdout
 
     expect(
@@ -86,7 +126,8 @@ describe "uploader.rb" do
         body: JSON.generate(
           repo: "alice/bob",
           sha: "1fffbb",
-          lcov_base64: Base64.strict_encode64(File.read("spec/fixtures/coverage.lcov"))
+          file_base64: Base64.strict_encode64(File.read("spec/fixtures/coverage.json")),
+          file_type: "json"
         )
       )
     ).to have_been_made

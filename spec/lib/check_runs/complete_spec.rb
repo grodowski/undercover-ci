@@ -173,22 +173,22 @@ describe CheckRuns::Complete do
       human_name: "instance method", name: "method", first_line: 1, last_line: 6,
       source_lines_with_numbers: (1..6).zip(Array.new(6, "test_line")), empty_def?: false
     )
+
+    mock_adapter_res = instance_double(
+      "Undercover::LcovParser",
+      coverage: [[2, 1], [3, 0], [4, 0], [5, 0], [4, 0, 1, 1], [4, 0, 2, 0], [5, 0, 1, 1], [5, 0, 2, 0]],
+      skipped?: false
+    )
+    mock_adapter_res2 = instance_double(
+      "Undercover::LcovParser",
+      coverage: [[2, 1], [3, 0], [4, 0], [5, 0], [4, 0, 1, 1], [4, 0, 2, 0], [5, 0, 1, 1], [5, 0, 2, 1]],
+      skipped?: false
+    )
+
     results = [
-      Undercover::Result.new(
-        mock_node,
-        [[2, 1], [3, 0], [4, 0], [5, 0], [4, 0, 1, 1], [4, 0, 2, 0], [5, 0, 1, 1], [5, 0, 2, 0]],
-        "spec/fixtures/application_record.rb"
-      ),
-      Undercover::Result.new(
-        mock_node,
-        [[2, 1], [3, 0], [4, 0], [5, 0], [4, 0, 1, 1], [4, 0, 2, 0], [5, 0, 1, 1], [5, 0, 2, 1]],
-        "spec/fixtures/application_record.rb"
-      ),
-      Undercover::Result.new(
-        mock_node,
-        [[2, 1], [3, 0], [4, 0], [5, 0], [4, 0, 1, 1], [4, 0, 2, 0], [5, 0, 1, 1], [5, 0, 2, 0]],
-        "spec/fixtures/application_record.rb"
-      )
+      Undercover::Result.new(mock_node, mock_adapter_res, "spec/fixtures/application_record.rb"),
+      Undercover::Result.new(mock_node, mock_adapter_res2, "spec/fixtures/application_record.rb"),
+      Undercover::Result.new(mock_node, mock_adapter_res, "spec/fixtures/application_record.rb")
     ]
     instance_double(Undercover::Report, all_results: results, flagged_results: results[0..1])
   end

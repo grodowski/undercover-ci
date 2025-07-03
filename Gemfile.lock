@@ -418,7 +418,6 @@ GEM
       simplecov-html (~> 0.11)
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.13.1)
-    simplecov-lcov (0.8.0)
     simplecov_json_formatter (0.1.4)
     snaky_hash (2.0.1)
       hashie
@@ -445,12 +444,14 @@ GEM
     turbolinks-source (5.2.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    undercover (0.6.6)
+    undercover (0.7.1)
       base64
       bigdecimal
       imagen (>= 0.2.0)
       rainbow (>= 2.1, < 4.0)
       rugged (>= 0.27, < 1.10)
+      simplecov
+      simplecov_json_formatter
     unicode-display_width (3.1.4)
       unicode-emoji (~> 4.0, >= 4.0.4)
     unicode-emoji (4.0.4)
@@ -527,7 +528,6 @@ DEPENDENCIES
   sidekiq-limit_fetch
   simplecov
   simplecov-html
-  simplecov-lcov
   spring
   spring-watcher-listen (~> 2.1.0)
   sprockets

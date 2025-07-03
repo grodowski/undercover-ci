@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Logic
-  class RunUndercover
+  class RunUndercover # rubocop:disable Metrics/ClassLength
     include GithubRequests
     include ClassLoggable
 
@@ -16,12 +16,15 @@ module Logic
     attr_reader :coverage_check, :run
 
     def initialize(coverage_check)
-      @lcov_tmpfile = Tempfile.new
       @coverage_check = coverage_check
       @run = DataObjects::CheckRunInfo.from_coverage_check(coverage_check)
       @changeset = nil
 
       raise RunError, "coverage_reports can't be blank" if coverage_check.coverage_reports.empty?
+
+      @coverage_attachment = coverage_check.coverage_reports.last
+      @is_json_format = @coverage_attachment.filename.to_s.end_with?(".json")
+      @coverage_tmpfile = Tempfile.new
 
       fetch_report
     end
@@ -63,8 +66,8 @@ module Logic
 
     def fetch_report
       # In Rails 6 this will become `coverage_report_jov.coverage_reports.last.open`
-      @lcov_tmpfile.write(coverage_check.coverage_reports.last.download)
-      @lcov_tmpfile.flush
+      @coverage_tmpfile.write(@coverage_attachment.download)
+      @coverage_tmpfile.flush
     end
 
     def update_compare_to_merge_base(run)
@@ -108,7 +111,7 @@ module Logic
     def teardown
       @repo&.close
       @changeset&.instance_variable_get(:@repo)&.close # TODO: hack, expose repo.close through Undercover
-      @lcov_tmpfile.close
+      @coverage_tmpfile.close
       FileUtils.remove_entry(repo_path, true)
     end
 
@@ -118,7 +121,11 @@ module Logic
 
     def run_undercover_cmd
       opts = Undercover::Options.new.tap do |opt|
-        opt.lcov = @lcov_tmpfile.path
+        if @is_json_format
+          opt.simplecov_resultset = @coverage_tmpfile.path
+        else
+          opt.lcov = @coverage_tmpfile.path
+        end
         opt.path = repo_path
         opt.max_warnings_limit = 51 # up to 50 are supported by CheckRuns::Complete, 51 triggers the warning message
       end

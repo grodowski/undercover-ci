@@ -173,6 +173,38 @@ describe Logic::RunUndercover do
     expect(check_runs_stub).to have_been_requested.twice
   end
 
+  it "handles JSON coverage reports" do
+    coverage_check.coverage_reports.attach(
+      io: File.open("spec/fixtures/coverage.json"),
+      filename: "#{coverage_check.id}_b4c0n.json",
+      content_type: "application/json"
+    )
+
+    stub_get_installation_token
+    stub_fetch_merge_base
+    check_runs_stub = stub_post_check_runs
+
+    repo_path = "tmp/job/#{coverage_check.id}"
+    expect(Git).to receive(:clone).with(
+      "https://x-access-token:token@github.com/author/repo.git",
+      repo_path,
+      depth: 1
+    ) do
+      FileUtils.cp_r("spec/fixtures/fake_repo/", repo_path)
+      FileUtils.mv(
+        File.join(repo_path, "fake.git"),
+        File.join(repo_path, ".git")
+      )
+      double("Git::Base", fetch: true)
+    end
+
+    subject
+
+    coverage_check.reload
+    expect(coverage_check.state).to eq(:complete)
+    expect(check_runs_stub).to have_been_requested.twice
+  end
+
   it "cancels the check on ReferenceError and returns a helpful error message" do
     allow(Rugged::Repository).to receive(:new)
       .and_raise(Rugged::ReferenceError, "revspec 'main' not found")

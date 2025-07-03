@@ -1,3 +1,12 @@
+<div class="alert alert-info mt-3" role="alert">
+  <p>
+    <strong>New in undercover 0.7.0:</strong> UndercoverCI now supports a JSON coverage format which fixes a regression with <code>:nocov:</code> syntax and adds relative path support for running undercover in nested directories of monorepo-like projects. If you're currently uploading LCOV coverage with <code>simplecov-lcov</code> gem, we recommend replacing <code>simplecov-lcov</code> with <code>undercover</code> gem and updating your uploader command from <code>--lcov</code> to <code>--simplecov coverage/coverage.json</code>, like in the examples below.
+  </p>
+  <p>
+    ⚠️ The LCOV coverage format is considered deprecated and will be removed from UndercoverCI uploader and APIs after 2026/01/31.
+  </p>
+</div>
+
 <div class="card mt-2 mb-5">
   <div class="card-header">
     <ul class="nav nav-tabs card-header-tabs" role="tablist">
@@ -14,12 +23,11 @@
       <div class="tab-pane fade" id="circle-ci" role="tabpanel" aria-labelledby="circle-ci">
         <ol>
           <li>
-            Add <code>simplecov</code> and <code>simplecov-lcov</code> gems to report test coverage. Configure them in <code>spec_helper.rb</code> or <code>test_helper.rb</code> by appending this snippet to the beginning of the file:
+            Add <code>simplecov</code> and <code>undercover</code> gems to report test coverage. Configure them in <code>spec_helper.rb</code> or <code>test_helper.rb</code> by appending this snippet to the beginning of the file:
             <pre><code>
               require 'simplecov'
-              require 'simplecov-lcov'
-              SimpleCov::Formatter::LcovFormatter.config.report_with_single_file = true
-              SimpleCov.formatter = SimpleCov::Formatter::LcovFormatter
+              require 'undercover/simplecov_formatter'
+              SimpleCov.formatter = SimpleCov::Formatter::Undercover
               SimpleCov.start do
                 add_filter(/^\/spec\//) # For RSpec, use `test` for MiniTest
                 enable_coverage(:branch)
@@ -32,7 +40,7 @@
               ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- \
                 --repo <b>$your-username/$repository-name</b> \
                 --commit <b>$CIRCLE_SHA1</b> \
-                --lcov <b>coverage/lcov/$repository-name.lcov</b>
+                --simplecov <b>coverage/coverage.json</b>
             </code></pre>
           </li>
           <li>Store your changes, push a commit and... profit! Soon you'll receive your first GitHub check looking for untested code. 🔍✨</li>
@@ -44,12 +52,11 @@
       <div class="tab-pane fade active show" id="actions" role="tabpanel" aria-labelledby="actions">
         <ol>
           <li>
-            Add <code>simplecov</code> and <code>simplecov-lcov</code> gems to report test coverage. Configure them in <code>spec_helper.rb</code> or <code>test_helper.rb</code> by appending this snippet to the beginning of the file:
+            Add <code>simplecov</code> and <code>undercover</code> gems to report test coverage. Configure them in <code>spec_helper.rb</code> or <code>test_helper.rb</code> by appending this snippet to the beginning of the file:
             <pre><code>
               require 'simplecov'
-              require 'simplecov-lcov'
-              SimpleCov::Formatter::LcovFormatter.config.report_with_single_file = true
-              SimpleCov.formatter = SimpleCov::Formatter::LcovFormatter
+              require 'undercover/simplecov_formatter'
+              SimpleCov.formatter = SimpleCov::Formatter::Undercover
               SimpleCov.start do
                 add_filter(/^\/spec\//) # For RSpec, use `test` for MiniTest
                 enable_coverage(:branch)
@@ -81,7 +88,7 @@
                       ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- \
                         --repo <b>${{ github.repository }}</b> \
                         --commit <b>${{ github.event.pull_request.head.sha || github.sha }}</b> \
-                        --lcov <b>coverage/lcov/$repository-name.lcov</b>
+                        --simplecov <b>coverage/coverage.json</b>
             </code></pre>
              <div class="alert alert-info" role="alert">
               If you're running tests agains multiple versions of Ruby (or other dependencies), make sure to only upload coverage once, for a selected test matrix entry. Example:

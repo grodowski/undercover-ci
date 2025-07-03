@@ -1,0 +1,12 @@
+{
+  "meta": {
+    "simplecov_root": "/project/path",
+    "timestamp": 1623456789
+  },
+  "coverage": {
+    "./foo.rb": {
+      "lines": [1, 1, 0, 1, null, null, 1, 1, 1],
+      "branches": {}
+    }
+  }
+}

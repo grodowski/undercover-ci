@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 require "simplecov"
-require "simplecov-lcov"
-require "simplecov_json_formatter"
+require "undercover/simplecov_formatter"
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
@@ -16,11 +15,9 @@ RSpec.configure do |config|
   # Seed global randomisation in specs using the rspec seed
   Kernel.srand config.seed
 
-  SimpleCov::Formatter::LcovFormatter.config.report_with_single_file = true
   SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new(
     [
-      SimpleCov::Formatter::LcovFormatter,
-      SimpleCov::Formatter::JSONFormatter,
+      SimpleCov::Formatter::Undercover,
       SimpleCov::Formatter::HTMLFormatter
     ]
   )

@@ -147,7 +147,7 @@ Learn how to install UndercoverCI for your repos, report coverage data and use t
           ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- \
                     --repo grodowski/undercover \
                     --commit $CIRCLE_SHA1 \
-                    --lcov coverage/lcov/undercover.lcov
+                    --simplecov coverage/coverage.json
         </code></pre>
 
         The <code>uploader.rb</code> script is securely downloaded and evaluated with the required command-line options:
@@ -165,8 +165,11 @@ Learn how to install UndercoverCI for your repos, report coverage data and use t
         <h6 class="mb-2 mt-3"><code>--cancel</code></h6>
         Cancel coverage check represented by the given <code>--commit</code>. The check will be passing and marked as completed + skipped on your GitHub commit or pull request.
 
-        <h6 class="mb-2 mt-3"><code>--lcov</code></h6>
-        A relative path to the coverage report, will look like <code>coverage/lcov/$reponame.lcov</code> unless SimpleCov's config defaults were changed.
+        <h6 class="mb-2 mt-3"><code>--simplecov</code></h6>
+        A relative path to the SimpleCov JSON coverage report, defaults to <code>coverage/coverage.json</code>.
+
+        <h6 class="mb-2 mt-3"><code>--lcov</code> (legacy)</h6>
+        A relative path to the LCOV coverage report. Still supported for backward compatibility, but SimpleCov JSON format is recommended.
       </p>
 
       <h4 id="parallel-tests" class="mt-5 mb-2">Parallel tests</h4>
@@ -178,18 +181,16 @@ Learn how to install UndercoverCI for your repos, report coverage data and use t
           # frozen_string_literal: true
 
           require 'simplecov'
-          require 'simplecov-lcov'
+          require 'undercover/simplecov_formatter'
 
-          puts('Merging coverage results from parallel CircleCI tests containers into a single LCOV report...')
+          puts('Merging coverage results from parallel CircleCI tests containers into a single JSON report...')
 
           SimpleCov.collate(Dir['/home/circleci/rspec/*.resultset.json']) do
             enable_coverage(:branch)
           end
 
-          report_path = ARGV[0] || 'coverage.lcov'
-          SimpleCov.formatter = SimpleCov::Formatter::LcovFormatter
-          SimpleCov::Formatter::LcovFormatter.config.report_with_single_file = true
-          SimpleCov::Formatter::LcovFormatter.config.single_report_path = report_path
+          report_path = ARGV[0] || 'coverage/coverage.json'
+          SimpleCov.formatter = SimpleCov::Formatter::Undercover
 
           merged_result = SimpleCov.result
           merged_result.format!
@@ -198,7 +199,7 @@ Learn how to install UndercoverCI for your repos, report coverage data and use t
             puts('Written report has 0 bytes')
             exit 1
           end
-          puts("Done! LCOV saved to #{SimpleCov::Formatter::LcovFormatter.config.single_report_path}")
+          puts("Done! Coverage saved to #{report_path}")
         </code></pre>
       </p>
 
@@ -343,11 +344,11 @@ Learn how to install UndercoverCI for your repos, report coverage data and use t
 
       <h5>GET /v1/checks/:commit_sha/coverage</h5>
       <p>
-        Returns the coverage report for the given commit SHA. The coverage report will be in the LCOV format.
+        Returns the coverage report for the given commit SHA. The coverage report will be in the original format (JSON or LCOV) as uploaded.
         The `curl` example below includes the <code>-L</code> flag to ensure curl follows the redirect to the storage provider.
         <pre><code>
           curl -LH "Authorization: Bearer $UNDERCOVER_API_TOKEN" \
-          -o check_coverage.lcov \
+          -o check_coverage.json \
           https://undercover-ci.com/v1/checks/aa412c105eff7a7af918fc422bf5085101295798/coverage
         </code></pre>
       </p>

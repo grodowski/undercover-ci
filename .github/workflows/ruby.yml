@@ -51,4 +51,4 @@ jobs:
           ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- \
             --repo grodowski/undercover-ci \
             --commit ${{ github.event.pull_request.head.sha || github.sha }} \
-            --lcov coverage/lcov/undercover-ci.lcov
+            --simplecov coverage/coverage.json

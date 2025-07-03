@@ -24,6 +24,26 @@ describe "Coverage Upload" do
     expect(response.status).to eq(201)
   end
 
+  it "stores JSON coverage in active storage" do
+    check = make_coverage_check
+    contents = File.read("spec/fixtures/coverage.json")
+
+    post path,
+         params: {
+           repo: check.repo_full_name,
+           sha: check.head_sha,
+           file_base64: Base64.encode64(contents),
+           file_type: "json"
+         }
+
+    check.reload
+    expect(check.coverage_reports).not_to be_empty
+
+    expect(check.coverage_reports.attachments.first.download).to eq(contents)
+    expect(check.coverage_reports.attachments.first.filename.to_s).to end_with(".json")
+    expect(response.status).to eq(201)
+  end
+
   it "validates uploads" do
     check = make_coverage_check
     contents = File.read("public/404.html") # text/html, should fail
@@ -33,6 +53,42 @@ describe "Coverage Upload" do
     expect(response.status).to eq(422)
     expect(JSON.parse(response.body)).to eq(
       "error" => "could not recognise '<!doctype html>\n' as valid LCOV"
+    )
+    expect(check.reload.coverage_reports.attached?).to eq(false)
+  end
+
+  it "validates JSON uploads" do
+    check = make_coverage_check
+    contents = "invalid json content"
+
+    post path,
+         params: {
+           repo: check.repo_full_name,
+           sha: check.head_sha,
+           file_base64: Base64.encode64(contents),
+           file_type: "json"
+         }
+
+    expect(response.status).to eq(422)
+    expect(JSON.parse(response.body)["error"]).to include("Invalid JSON format")
+    expect(check.reload.coverage_reports.attached?).to eq(false)
+  end
+
+  it "validates file size limit" do
+    check = make_coverage_check
+    large_content = "x" * (2.megabytes + 1) # Just over 2MB
+
+    post path,
+         params: {
+           repo: check.repo_full_name,
+           sha: check.head_sha,
+           file_base64: Base64.encode64(large_content),
+           file_type: "json"
+         }
+
+    expect(response.status).to eq(422)
+    expect(JSON.parse(response.body)).to eq(
+      "error" => "File size exceeds 2MB limit"
     )
     expect(check.reload.coverage_reports.attached?).to eq(false)
   end
