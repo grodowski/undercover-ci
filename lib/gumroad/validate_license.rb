@@ -5,6 +5,7 @@ require "uri"
 
 module Gumroad
   RequestError = Class.new(StandardError)
+  LicenseInvalid = Class.new(StandardError)
 
   class ValidateLicense
     include ClassLoggable

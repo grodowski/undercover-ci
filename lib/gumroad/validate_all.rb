@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# :nocov:
 module Gumroad
   module ValidateAll
     extend ClassLoggable
@@ -24,8 +25,10 @@ module Gumroad
         end
         if validator.license.failed_at
           Sentry.capture_exception(
-            "#{subscription.gumroad_id} license validation " \
-            "- payment failed on #{validator.license.failed_at}"
+            Gumroad::LicenseInvalid.new(
+              "installation:#{installation_id}, gumroad:#{subscription.gumroad_id} license validation " \
+              "- payment failed at #{validator.license.failed_at}"
+            )
           )
         end
       else
@@ -39,3 +42,4 @@ module Gumroad
     end
   end
 end
+# :nocov:
