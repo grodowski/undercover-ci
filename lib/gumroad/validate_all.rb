@@ -19,17 +19,17 @@ module Gumroad
       if status.error?
         log "key:#{subscription.license_key} installation:#{installation_id} " \
             "error:#{status.error} license:#{validator.license}"
-        if validator.license.cancelled_at || validator.license.failed_at
-          log("cancelled_at: #{validator.license.failed_at}")
+        unsubscribe_timestamp = validator.license.cancelled_at || validator.license.failed_at
+        if unsubscribe_timestamp
           if subscription.state != :unsubscribed
             Sentry.capture_exception(
               Gumroad::LicenseInvalid.new(
                 "installation:#{installation_id}, gumroad:#{subscription.gumroad_id} license validation " \
-                "- payment failed at #{validator.license.failed_at}"
+                "cancelled_at: #{validator.license.cancelled_at}, failed_at: #{validator.license.failed_at}"
               )
             )
           end
-          Logic::UpdateSubscriptionState.new(subscription).unsubscribe(validator.license.failed_at)
+          Logic::UpdateSubscriptionState.new(subscription).unsubscribe(unsubscribe_timestamp)
         end
       else
         log "key:#{subscription.license_key} installation:#{installation_id}, ok:#{status.success?}"
