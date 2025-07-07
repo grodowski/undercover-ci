@@ -39,7 +39,7 @@ gem "turbolinks"
 
 # Core
 gem "git"
-gem "undercover"
+gem "undercover", github: "grodowski/undercover"
 
 # Github
 gem "jwt"
