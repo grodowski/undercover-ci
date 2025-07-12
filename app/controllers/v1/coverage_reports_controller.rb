@@ -29,6 +29,9 @@ module V1
         end
 
         if @error_message
+          Rails.logger.warn(
+            "coverage_controller#create 422 coverage_check:#{@coverage_check.id} error: #{@error_message}"
+          )
           render "shared/generic_error", format: :json, status: :unprocessable_entity
         else
           head(:created)
@@ -46,9 +49,8 @@ module V1
     private
 
     def validate_input(input_io)
-      # Check file size (2MB limit)
-      if input_io.size > 2.megabytes
-        @error_message = "File size exceeds 2MB limit"
+      if input_io.size > 10.megabytes
+        @error_message = "File size exceeds 10MB limit"
         return false
       end
 
