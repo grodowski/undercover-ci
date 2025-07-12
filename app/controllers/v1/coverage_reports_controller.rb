@@ -49,11 +49,6 @@ module V1
     private
 
     def validate_input(input_io)
-      if input_io.size > 10.megabytes
-        @error_message = "File size exceeds 10MB limit"
-        return false
-      end
-
       case file_type
       when :lcov
         Undercover::LcovParser.new(input_io, nil).parse

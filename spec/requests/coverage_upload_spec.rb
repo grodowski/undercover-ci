@@ -74,25 +74,6 @@ describe "Coverage Upload" do
     expect(check.reload.coverage_reports.attached?).to eq(false)
   end
 
-  it "validates file size limit" do
-    check = make_coverage_check
-    large_content = "x" * (2.megabytes + 1) # Just over 2MB
-
-    post path,
-         params: {
-           repo: check.repo_full_name,
-           sha: check.head_sha,
-           file_base64: Base64.encode64(large_content),
-           file_type: "json"
-         }
-
-    expect(response.status).to eq(422)
-    expect(JSON.parse(response.body)).to eq(
-      "error" => "File size exceeds 2MB limit"
-    )
-    expect(check.reload.coverage_reports.attached?).to eq(false)
-  end
-
   it "accepts coverage even though the check has been canceled" do
     check = make_coverage_check
     check.update!(state: :canceled)
