@@ -120,17 +120,35 @@ module Logic
     end
 
     def run_undercover_cmd
-      opts = Undercover::Options.new.tap do |opt|
-        if @is_json_format
-          opt.simplecov_resultset = @coverage_tmpfile.path
-        else
-          opt.lcov = @coverage_tmpfile.path
-        end
-        opt.path = repo_path
-        opt.max_warnings_limit = 51 # up to 50 are supported by CheckRuns::Complete, 51 triggers the warning message
-      end
+      opts = build_undercover_options
       @changeset = Undercover::Changeset.new("#{repo_path}/.git", @run.compare)
       Undercover::Report.new(@changeset, opts).build
+    end
+
+    def build_undercover_options
+      opts = Undercover::Options.new
+      undercover_config_path = File.join(repo_path, ".undercover")
+
+      config_args = []
+      if File.exist?(undercover_config_path)
+        log "found .undercover config file, parsing options"
+        config_args = opts.__send__(:args_from_options_file, undercover_config_path)
+      end
+      opts.parse(config_args)
+
+      if @is_json_format
+        opts.simplecov_resultset = @coverage_tmpfile.path
+        opts.lcov = nil
+      else
+        opts.simplecov_resultset = nil
+        opts.lcov = @coverage_tmpfile.path
+      end
+      opts.path = repo_path
+      opts.compare = @run.compare
+      opts.max_warnings_limit = 51
+      opts.git_dir = ".git"
+
+      opts
     end
 
     def cancel_check_and_update_github(message)

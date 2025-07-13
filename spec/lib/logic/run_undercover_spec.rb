@@ -263,4 +263,103 @@ describe Logic::RunUndercover do
       .stub_request(:get, /https:\/\/api.github.com\/repos\/author\/repo\/compare\/\w+\.\.\.\w+/)
       .to_return(status: 503)
   end
+
+  describe "#build_undercover_options" do
+    let(:runner) { described_class.new(coverage_check) }
+    let(:repo_path) { "tmp/job/#{coverage_check.id}" }
+
+    before do
+      coverage_check.coverage_reports.attach(
+        io: File.open("spec/fixtures/coverage.lcov"),
+        filename: "#{coverage_check.id}_b4c0n.lcov",
+        content_type: "text/plain"
+      )
+      FileUtils.mkdir_p(repo_path)
+    end
+
+    after do
+      FileUtils.rm_rf(repo_path)
+    end
+
+    it "builds options without .undercover file" do
+      opts = runner.__send__(:build_undercover_options)
+
+      expect(opts.lcov).to eq(runner.instance_variable_get(:@coverage_tmpfile).path)
+      expect(opts.path).to eq(repo_path)
+      expect(opts.compare).to eq(runner.instance_variable_get(:@run).compare)
+      expect(opts.max_warnings_limit).to eq(51)
+    end
+
+    it "respects .undercover file when present" do
+      config_content = <<~CONFIG
+        -r ruby24
+        -w 25
+        -f *.rb,*.rake
+        -x test/*,spec/*
+      CONFIG
+      File.write(File.join(repo_path, ".undercover"), config_content)
+
+      opts = runner.__send__(:build_undercover_options)
+
+      expect(opts.syntax_version).to eq("ruby24")
+      expect(opts.max_warnings_limit).to eq(51) # CI override
+      expect(opts.glob_allow_filters).to eq(["*.rb", "*.rake"])
+      expect(opts.glob_reject_filters).to eq(["test/*", "spec/*"])
+    end
+
+    it "overrides CI-controlled options from .undercover file" do
+      config_content = <<~CONFIG
+        -c origin/main
+        -l different.lcov
+        -s different.json
+        -p /some/path
+        -g /some/git/dir
+        -r ruby25
+        -w 10
+      CONFIG
+      File.write(File.join(repo_path, ".undercover"), config_content)
+
+      opts = runner.__send__(:build_undercover_options)
+
+      expect(opts.compare).to eq(runner.instance_variable_get(:@run).compare)
+      expect(opts.lcov).to eq(runner.instance_variable_get(:@coverage_tmpfile).path)
+      expect(opts.path).to eq(repo_path)
+      expect(opts.max_warnings_limit).to eq(51)
+      expect(opts.syntax_version).to eq("ruby25")
+    end
+
+    it "handles .undercover file with only CI-controlled options" do
+      config_content = <<~CONFIG
+        -c origin/main
+        -l different.lcov
+        -p /some/path
+      CONFIG
+      File.write(File.join(repo_path, ".undercover"), config_content)
+
+      opts = runner.__send__(:build_undercover_options)
+
+      expect(opts.compare).to eq(runner.instance_variable_get(:@run).compare)
+      expect(opts.lcov).to eq(runner.instance_variable_get(:@coverage_tmpfile).path)
+      expect(opts.path).to eq(repo_path)
+    end
+
+    it "handles JSON coverage format" do
+      coverage_check.coverage_reports.first.destroy
+      coverage_check.coverage_reports.attach(
+        io: File.open("spec/fixtures/coverage.json"),
+        filename: "#{coverage_check.id}_b4c0n.json",
+        content_type: "application/json"
+      )
+
+      runner_json = described_class.new(coverage_check)
+      FileUtils.mkdir_p("tmp/job/#{coverage_check.id}")
+
+      opts = runner_json.__send__(:build_undercover_options)
+
+      expect(opts.simplecov_resultset).to eq(runner_json.instance_variable_get(:@coverage_tmpfile).path)
+      expect(opts.lcov).to be_nil
+
+      FileUtils.rm_rf("tmp/job/#{coverage_check.id}")
+    end
+  end
 end
