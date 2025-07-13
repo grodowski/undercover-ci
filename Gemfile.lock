@@ -1,17 +1,4 @@
 GIT
-  remote: https://github.com/grodowski/undercover.git
-  revision: b0e002fed5c2db02f4d5fee1d39d6acf3741a9e4
-  specs:
-    undercover (0.7.2)
-      base64
-      bigdecimal
-      imagen (>= 0.2.0)
-      rainbow (>= 2.1, < 4.0)
-      rugged (>= 0.27, < 1.10)
-      simplecov
-      simplecov_json_formatter
-
-GIT
   remote: https://github.com/ruby/net-pop.git
   revision: e8d0afe2773b9eb6a23c39e9e437f6fc0fc7c733
   specs:
@@ -457,6 +444,14 @@ GEM
     turbolinks-source (5.2.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
+    undercover (0.7.3)
+      base64
+      bigdecimal
+      imagen (>= 0.2.0)
+      rainbow (>= 2.1, < 4.0)
+      rugged (>= 0.27, < 1.10)
+      simplecov
+      simplecov_json_formatter
     unicode-display_width (3.1.4)
       unicode-emoji (~> 4.0, >= 4.0.4)
     unicode-emoji (4.0.4)
@@ -539,7 +534,7 @@ DEPENDENCIES
   timecop
   turbolinks
   tzinfo-data
-  undercover!
+  undercover
   web-console (>= 3.3.0)
   webdrivers
   webmock
