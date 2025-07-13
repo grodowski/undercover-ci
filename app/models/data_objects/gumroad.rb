@@ -12,7 +12,7 @@ module DataObjects
       end
 
       def installation_id
-        url_params["installation_id"]
+        url_params && url_params["installation_id"]
       end
     end
 
