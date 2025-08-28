@@ -121,8 +121,13 @@ module Logic
 
     def run_undercover_cmd
       opts = build_undercover_options
+      simplecov_adapter = if opts.simplecov_resultset
+                            Undercover::SimplecovResultAdapter.parse(File.open(opts.simplecov_resultset), opts)
+                          else
+                            Undercover::LcovParser.parse(File.open(opts.lcov), opts)
+                          end
       @changeset = Undercover::Changeset.new("#{repo_path}/.git", @run.compare)
-      Undercover::Report.new(@changeset, opts).build
+      Undercover::Report.new(@changeset, opts, simplecov_adapter).build
     end
 
     def build_undercover_options
