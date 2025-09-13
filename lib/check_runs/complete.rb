@@ -5,6 +5,7 @@ module CheckRuns
     # Prevents GitHub Checks API errors with the 50 annotation limit
     # https://docs.github.com/en/rest/checks/runs?apiVersion=2022-11-28#update-a-check-run--parameters
     MAX_ANNOTATIONS = 50
+    DEFAULT_FAILURE_MODE = "failure"
 
     # @param undercover_warnings [Array] list of warnings reported by Undercover
     def post(undercover_report)
@@ -91,7 +92,8 @@ module CheckRuns
     end
 
     def conclusion_for_run
-      run.success? ? "success" : "failure"
+      failure_mode = run.failure_mode || DEFAULT_FAILURE_MODE
+      run.success? ? "success" : failure_mode
     end
 
     def summary_for_run
