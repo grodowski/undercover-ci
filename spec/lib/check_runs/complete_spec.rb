@@ -96,6 +96,71 @@ describe CheckRuns::Complete do
       end
   end
 
+  it "respects failure mode configured by the check run object" do
+    run = DataObjects::CheckRunInfo.new(
+      "grodowski/undercover-ci",
+      "abc123",
+      "installation-1",
+      nil,
+      "2020-02-02T16:13:22Z",
+      nil,
+      :complete,
+      1337,
+      "2020-02-02T16:20:47Z",
+      check_run_fixture.nodes
+    )
+    run.failure_mode = "neutral"
+    check_run_complete = described_class.new(run)
+
+    dummy_github = instance_spy(Octokit::Client)
+    allow(dummy_github).to receive_message_chain(:last_response, :status)
+    allow(check_run_complete).to receive(:installation_api_client) { dummy_github }
+
+    check_run_complete.post(undercover_report_fixture)
+
+    expect(dummy_github)
+      .to have_received(:post) do |path, payload|
+        expect(payload[:conclusion]).to eq("neutral")
+        expect(path).to eq("/repos/grodowski/undercover-ci/check-runs")
+        expect(payload[:external_id]).to eq(1337)
+        expect(payload[:status]).to eq("completed")
+        expect(payload[:completed_at]).to eq("2020-02-02T16:20:47Z")
+        expect(payload[:details_url]).to eq("https://undercover-ci.com/checks/1337")
+      end
+  end
+
+  it "responds with success conclusion with a successful check run" do
+    run = DataObjects::CheckRunInfo.new(
+      "grodowski/undercover-ci",
+      "abc123",
+      "installation-1",
+      nil,
+      "2020-02-02T16:13:22Z",
+      nil,
+      :complete,
+      1337,
+      "2020-02-02T16:20:47Z",
+      check_run_fixture(result: :passed).nodes
+    )
+    check_run_complete = described_class.new(run)
+
+    dummy_github = instance_spy(Octokit::Client)
+    allow(dummy_github).to receive_message_chain(:last_response, :status)
+    allow(check_run_complete).to receive(:installation_api_client) { dummy_github }
+
+    check_run_complete.post(undercover_report_fixture)
+
+    expect(dummy_github)
+      .to have_received(:post) do |path, payload|
+        expect(payload[:conclusion]).to eq("success")
+        expect(path).to eq("/repos/grodowski/undercover-ci/check-runs")
+        expect(payload[:external_id]).to eq(1337)
+        expect(payload[:status]).to eq("completed")
+        expect(payload[:completed_at]).to eq("2020-02-02T16:20:47Z")
+        expect(payload[:details_url]).to eq("https://undercover-ci.com/checks/1337")
+      end
+  end
+
   it "retries on UnprocessableEntity and enqueues ExpireCheckJob on final failure" do
     run = DataObjects::CheckRunInfo.new(
       "grodowski/undercover-ci",
@@ -128,44 +193,44 @@ describe CheckRuns::Complete do
     expect(dummy_github).to have_received(:post).exactly(3).times
   end
 
-  def check_run_fixture
+  def check_run_fixture(result: :failed)
     mock_result = undercover_report_fixture.all_results.first
     mock_result_multi_line_branch_coverage = undercover_report_fixture.all_results[1]
-    # TODO: not ideal, will need refactoring
     inst = Installation.create
-    CoverageCheck.create!(
-      installation: inst,
-      state: :complete,
-      nodes: [
-        Node.new(
-          node_type: "instance method",
-          node_name: "method",
-          start_line: mock_result.first_line,
-          end_line: mock_result.last_line,
-          coverage: 1.0,
-          flagged: false,
-          path: mock_result.file_path
-        ),
-        Node.new(
-          node_type: "instance method",
-          node_name: "method",
-          start_line: mock_result.first_line,
-          end_line: mock_result.last_line,
-          coverage: 0.0,
-          flagged: true,
-          path: mock_result.file_path
-        ),
-        Node.new(
-          node_type: "instance method",
-          node_name: "method",
-          start_line: mock_result_multi_line_branch_coverage.first_line,
-          end_line: mock_result_multi_line_branch_coverage.last_line,
-          coverage: 0.0,
-          flagged: true,
-          path: mock_result_multi_line_branch_coverage.file_path
-        )
-      ]
-    )
+    CoverageCheck.new(installation: inst, state: :complete).tap do |check|
+      if result == :failed
+        check.nodes = [
+          Node.new(
+            node_type: "instance method",
+            node_name: "method",
+            start_line: mock_result.first_line,
+            end_line: mock_result.last_line,
+            coverage: 1.0,
+            flagged: false,
+            path: mock_result.file_path
+          ),
+          Node.new(
+            node_type: "instance method",
+            node_name: "method",
+            start_line: mock_result.first_line,
+            end_line: mock_result.last_line,
+            coverage: 0.0,
+            flagged: true,
+            path: mock_result.file_path
+          ),
+          Node.new(
+            node_type: "instance method",
+            node_name: "method",
+            start_line: mock_result_multi_line_branch_coverage.first_line,
+            end_line: mock_result_multi_line_branch_coverage.last_line,
+            coverage: 0.0,
+            flagged: true,
+            path: mock_result_multi_line_branch_coverage.file_path
+          )
+        ]
+        check.save!
+      end
+    end
   end
 
   def undercover_report_fixture

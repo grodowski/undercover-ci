@@ -15,6 +15,7 @@ module DataObjects
     last_ts
     nodes
     state_log
+    failure_mode
   ].freeze
 
   # TODO: consider refactoring into OpenStruct/Class with named attrs
@@ -30,7 +31,7 @@ module DataObjects
 
     def self.from_coverage_check(db_check)
       new(
-        db_check.repo.fetch("full_name"),
+        db_check.repo_full_name,
         db_check.head_sha,
         db_check.base_sha.presence || db_check.default_branch,
         db_check.installation.installation_id,
@@ -40,7 +41,8 @@ module DataObjects
         db_check.id.to_s,
         db_check.state_log.last&.fetch("ts"),
         db_check.nodes, # TODO: wrap AR models with a dedicated read model
-        db_check.state_log
+        db_check.state_log,
+        db_check.failure_mode
       )
     end
 
