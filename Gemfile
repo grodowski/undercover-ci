@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-ruby "3.4.2"
+ruby "3.4.5"
 source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
@@ -56,7 +56,7 @@ gem "sentry-ruby"
 gem "sentry-sidekiq"
 
 group :development, :test do
-  gem "byebug", platforms: %i[mri mingw x64_mingw]
+  gem "byebug", platforms: %i[mri windows]
   gem "pry-rails"
   gem "rspec-rails"
   gem "rubocop"
@@ -81,4 +81,4 @@ group :test do
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-gem "tzinfo-data", platforms: %i[mingw mswin x64_mingw jruby]
+gem "tzinfo-data", platforms: %i[windows jruby]

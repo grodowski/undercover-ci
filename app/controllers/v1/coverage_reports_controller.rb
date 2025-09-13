@@ -32,12 +32,12 @@ module V1
           Rails.logger.warn(
             "coverage_controller#create 422 coverage_check:#{@coverage_check.id} error: #{@error_message}"
           )
-          render "shared/generic_error", format: :json, status: :unprocessable_entity
+          render "shared/generic_error", format: :json, status: :unprocessable_content
         else
           head(:created)
         end
       else
-        render "shared/generic_error", format: :json, status: :unprocessable_entity
+        render "shared/generic_error", format: :json, status: :unprocessable_content
       end
     end
 
@@ -105,7 +105,7 @@ module V1
       return if @coverage_check.installation.active?
 
       @error_message = "Your UndercoverCI license has expired, visit https://undercover-ci.com/settings to subscribe."
-      render "shared/generic_error", format: :json, status: :unprocessable_entity
+      render "shared/generic_error", format: :json, status: :unprocessable_content
     end
   end
 end
