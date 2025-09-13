@@ -9,7 +9,7 @@ gem "rails", "~> 8.0"
 gem "aws-sdk-s3", require: false
 gem "bcrypt", "~> 3.1.15"
 gem "bootsnap", ">= 1.1.0", require: false
-gem "jbuilder", "~> 2.13"
+gem "jbuilder", "~> 2.14"
 gem "kaminari"
 gem "ostruct"
 gem "pg", ">= 0.18", "< 2.0"
