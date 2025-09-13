@@ -3,6 +3,7 @@
 module Dashboard
   class ChecksController < ApplicationController
     include Chartable
+
     DEFAULT_PER_PAGE = 25
 
     before_action :check_current_user

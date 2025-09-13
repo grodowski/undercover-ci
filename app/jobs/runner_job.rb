@@ -8,6 +8,7 @@ class RunnerJob < ApplicationJob
   class Throttled < StandardError; end
 
   include ClassLoggable
+
   queue_as :runner
 
   # default retry for uncaught exceptions
