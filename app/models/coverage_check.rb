@@ -81,4 +81,8 @@ class CoverageCheck < ApplicationRecord
   def base_ref_or_branch
     base_sha.try(:[], 0..7) || default_branch
   end
+
+  def failure_mode
+    installation.repo_failure_modes[repo_full_name]
+  end
 end

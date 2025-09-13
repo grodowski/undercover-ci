@@ -10,7 +10,11 @@ class Installation < ApplicationRecord
   validates_presence_of :installation_id
 
   DEFAULTS = {max_concurrent_checks: ENV.fetch("DEFAULT_MAX_CONCURRENT_CHECKS", 2).to_i}.freeze
-  store_accessor :settings, :expire_check_job_wait_minutes, :max_concurrent_checks, :repo_branch_filters
+  store_accessor :settings,
+                 :expire_check_job_wait_minutes,
+                 :max_concurrent_checks,
+                 :repo_branch_filters,
+                 :repo_failure_modes
 
   after_create :ensure_subscription
 
@@ -65,8 +69,15 @@ class Installation < ApplicationRecord
     end
   end
 
-  def repo_branch_filters
-    super || {}
+  def repo_branch_filters = super || {}
+  def repo_failure_modes = super || {}
+
+  def set_repo_failure_mode(repo_full_name, failure_mode)
+    failure_mode = failure_mode&.to_sym || :failure
+
+    modes = repo_failure_modes.dup
+    modes[repo_full_name] = failure_mode
+    self.repo_failure_modes = modes
   end
 
   def set_repo_branch_filter(repo_full_name, filter_regex)
@@ -76,6 +87,6 @@ class Installation < ApplicationRecord
     else
       filters.delete(repo_full_name)
     end
-    update!(settings: settings.merge(repo_branch_filters: filters))
+    self.repo_branch_filters = filters
   end
 end

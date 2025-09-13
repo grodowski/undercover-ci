@@ -18,7 +18,7 @@ module Dashboard
       redirect_to settings_path
     end
 
-    def update_branch_filter
+    def update
       installation = current_user.installations.find_by!(installation_id: params[:installation_id])
 
       unless params[:repo_full_name].present?
@@ -26,8 +26,15 @@ module Dashboard
         return
       end
 
+      if params[:failure_mode].present? && !%w[failure neutral].include?(params[:failure_mode])
+        redirect_to settings_path, alert: "Invalid failure mode"
+        return
+      end
+
+      installation.set_repo_failure_mode(params[:repo_full_name], params[:failure_mode].presence)
       installation.set_repo_branch_filter(params[:repo_full_name], params[:branch_filter_regex])
-      redirect_to settings_path, notice: "Branch filter updated for #{params[:repo_full_name]}"
+      installation.save!
+      redirect_to settings_path, notice: "Saved settings for #{params[:repo_full_name]}"
     end
 
     private
