@@ -16,7 +16,6 @@ gem "pg", ">= 0.18", "< 2.0"
 gem "puma"
 gem "redis-client"
 gem "sidekiq"
-gem "sidekiq-limit_fetch"
 
 # Charts
 gem "chartkick"
