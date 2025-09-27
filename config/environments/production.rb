@@ -74,8 +74,7 @@ Rails.application.configure do # rubocop:disable Metrics/BlockLength
   # config.cache_store = :mem_cache_store
 
   # Use a real queuing backend for Active Job (and separate queues per environment).
-  config.active_job.queue_adapter = :solid_queue
-  config.solid_queue.connects_to = { database: { writing: :queue } }
+  config.active_job.queue_adapter = :sidekiq
   # config.active_job.queue_name_prefix = "undercover_ci_production"
 
   config.action_mailer.perform_caching = false
