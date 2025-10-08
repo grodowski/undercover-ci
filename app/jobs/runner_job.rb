@@ -17,6 +17,7 @@ class RunnerJob < ApplicationJob
   # defaults to 3s wait, 2 attempts
   retry_on ActiveStorage::FileNotFoundError,
            Logic::RunUndercover::RunError,
+           Logic::RunUndercover::CloneError,
            Octokit::Error,
            Rugged::OSError,
            Faraday::Error,
