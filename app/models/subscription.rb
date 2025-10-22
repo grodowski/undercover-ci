@@ -22,7 +22,7 @@ class Subscription < ApplicationRecord
     when :beta, :subscribed
       true
     when :unsubscribed
-      return Time.now < end_date.end_of_day if end_date
+      return Time.now < end_date if end_date
 
       Time.now < trial_expiry_date
     end
