@@ -241,7 +241,7 @@ describe CheckRuns::Complete do
 
     mock_adapter_res = instance_double(
       "Undercover::LcovParser",
-      coverage: [[2, 1], [3, 0], [4, 0], [5, 0], [4, 0, 1, 1], [4, 0, 2, 0], [5, 0, 1, 1], [5, 0, 2, 0]],
+      coverage: [[2, 1], [3, 0], [4, 0], [5, 0], [4, 0, 1, "ignored"], [4, 0, 2, 0], [5, 0, 1, 1], [5, 0, 2, 0]],
       skipped?: false
     )
     mock_adapter_res2 = instance_double(

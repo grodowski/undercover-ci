@@ -73,7 +73,7 @@ module CheckRuns
                   "(node coverage: #{result.coverage_f})."
 
         lines_missing_branch_cov = result.coverage.map do |ln, _block, _branch, cov|
-          ln if cov&.zero?
+          ln if cov != "ignored" && cov&.zero?
         end.compact.uniq
         if lines_missing_branch_cov.any?
           message += "\nMissing branch coverage found in line#{'s' if lines_missing_branch_cov.size > 1} " \
@@ -141,7 +141,7 @@ module CheckRuns
       return unless result
 
       branches = result.coverage.select { |cov| cov.size == 4 } # BRDA branch
-      count_covered = branches.count { |cov| cov[3].positive? } # was that branch covered?
+      count_covered = branches.count { |cov| cov[3] == "ignored" || cov[3].try(:positive?) } # ignored or covered?
 
       "#{count_covered}/#{branches.size}"
     end
