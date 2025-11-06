@@ -192,3 +192,17 @@ a.lead { line-height: 1.2; }
   border-radius: 10px;
   border: 20px solid white;
 }
+
+// maintenance banner
+.maintenance-banner__icon {
+  width: 18px;
+  height: 18px;
+  color: currentColor;
+}
+
+@media (max-width: 640px) {
+  .maintenance-banner__icon {
+    width: 16px;
+    height: 16px;
+  }
+}
