@@ -6,6 +6,7 @@
 # set REDIS_URL
 # run with puma -p 3001 sidekiq_admin.ru
 
+require "rack/session"
 require "sidekiq"
 
 Sidekiq.configure_client do |config|
