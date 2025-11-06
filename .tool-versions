@@ -1,4 +1,4 @@
 ruby 3.4.5
 nodejs v24.4.0
-postgres 14.8
+postgres 17.0
 redis 8.0.2
