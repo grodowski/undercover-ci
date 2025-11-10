@@ -15,7 +15,7 @@
   </head>
 
   <body>
-    <%= render 'partials/maintenance_banner' %>
+    <%= render 'partials/maintenance_banner' if ENV["MAINTENANCE_REASON"] %>
     <%= render 'partials/navbar' %>
     <main role="main">
       <%= yield %>
