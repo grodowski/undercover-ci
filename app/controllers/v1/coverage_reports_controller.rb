@@ -5,6 +5,8 @@ require "securerandom"
 
 module V1
   class CoverageReportsController < ApiController
+    include JsonFormatterValidation
+
     protect_from_forgery with: :null_session
     before_action :find_coverage_check
     before_action :check_subscription
@@ -55,14 +57,15 @@ module V1
         true
       when :json
         input_io.rewind
-        JSON.parse(input_io.read)
+        parsed = JSON.parse(input_io.read)
+        validate_formatted_json(parsed)
         true
       else
         # :nocov:
         false
         # :nocov:
       end
-    rescue Undercover::LcovParseError => e
+    rescue JsonFormatterValidation::Invalid, Undercover::LcovParseError => e
       @error_message = e.message
       false
     rescue JSON::ParserError => e
