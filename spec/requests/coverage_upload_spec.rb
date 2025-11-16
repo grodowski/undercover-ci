@@ -74,6 +74,47 @@ describe "Coverage Upload" do
     expect(check.reload.coverage_reports.attached?).to eq(false)
   end
 
+  it "validates JSON uploads for basic expected formatter schema" do
+    contents = nil
+    check = make_coverage_check
+    do_post = proc do
+      post path,
+           params: {
+             repo: check.repo_full_name,
+             sha: check.head_sha,
+             file_base64: Base64.encode64(contents),
+             file_type: "json"
+           }
+    end
+
+    contents = {}.to_json
+    do_post.call
+
+    expect(response.status).to eq(422)
+    expect(JSON.parse(response.body)["error"]).to eq(
+      "Missing JSON keys: meta, coverage. Did you use SimpleCov::Formatter::Undercover?"
+    )
+    expect(check.reload.coverage_reports.attached?).to eq(false)
+
+    contents = {meta: {simplecov_root: ""}}.to_json
+    do_post.call
+
+    expect(response.status).to eq(422)
+    expect(JSON.parse(response.body)["error"]).to eq(
+      "Missing JSON keys: coverage. Did you use SimpleCov::Formatter::Undercover?"
+    )
+    expect(check.reload.coverage_reports.attached?).to eq(false)
+
+    contents = {meta: {}, coverage: {"foo.rb" => {}}}.to_json
+    do_post.call
+
+    expect(response.status).to eq(422)
+    expect(JSON.parse(response.body)["error"]).to eq(
+      "Missing/malformed coverage data. Did you use SimpleCov::Formatter::Undercover?"
+    )
+    expect(check.reload.coverage_reports.attached?).to eq(false)
+  end
+
   it "accepts coverage even though the check has been canceled" do
     check = make_coverage_check
     check.update!(state: :canceled)
