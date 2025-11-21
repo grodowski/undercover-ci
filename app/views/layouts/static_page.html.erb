@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>UndercoverCI<%= t = yield :title; " | #{t}" if t %></title>
+    <title>Undercover CI<%= t = yield :title; " | #{t}" if t.present? %></title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +9,8 @@
     <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
     <%= javascript_include_tag 'analytics' %>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" id="hljs-light">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" id="hljs-dark" disabled>
     <%= render 'partials/favicons' %>
     <%= render 'partials/seo_tags' %>
     <%= render 'partials/heap_identify' %>
@@ -21,5 +23,97 @@
       <%= yield %>
     </main>
     <%= render 'partials/footer' %>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/ruby.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+    <script>
+      // Trim leading whitespace from code blocks before highlighting
+      function highlightCode() {
+        // Remove existing highlighting
+        document.querySelectorAll('pre code.hljs').forEach(function(block) {
+          block.classList.remove('hljs');
+          block.removeAttribute('data-highlighted');
+        });
+
+        document.querySelectorAll('pre code').forEach(function(block) {
+          const lines = block.textContent.split('\n');
+          // Remove empty first/last lines
+          if (lines[0].trim() === '') lines.shift();
+          if (lines[lines.length - 1].trim() === '') lines.pop();
+
+          // Find minimum indentation
+          const minIndent = lines
+            .filter(line => line.trim().length > 0)
+            .reduce((min, line) => {
+              const indent = line.match(/^\s*/)[0].length;
+              return Math.min(min, indent);
+            }, Infinity);
+
+          // Remove minimum indentation from all lines
+          if (minIndent > 0 && minIndent !== Infinity) {
+            const trimmedLines = lines.map(line => line.substring(minIndent));
+            block.textContent = trimmedLines.join('\n');
+          }
+        });
+
+        hljs.highlightAll();
+      }
+
+      // Run on initial page load
+      document.addEventListener('DOMContentLoaded', highlightCode);
+
+      // Run on Turbolinks page transitions
+      document.addEventListener('turbolinks:load', highlightCode);
+    </script>
+
+    <script>
+      // Theme toggle functionality
+      (function() {
+        const html = document.documentElement;
+        const toggle = document.getElementById('theme-toggle');
+        const hljsLight = document.getElementById('hljs-light');
+        const hljsDark = document.getElementById('hljs-dark');
+
+        // Get stored theme or default to system preference
+        const getStoredTheme = () => localStorage.getItem('theme');
+        const setStoredTheme = (theme) => localStorage.setItem('theme', theme);
+
+        const getPreferredTheme = () => {
+          const storedTheme = getStoredTheme();
+          if (storedTheme) return storedTheme;
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
+
+        const setTheme = (theme) => {
+          html.setAttribute('data-theme', theme);
+          setStoredTheme(theme);
+
+          // Toggle highlight.js theme
+          if (hljsLight && hljsDark) {
+            if (theme === 'dark') {
+              hljsLight.disabled = true;
+              hljsDark.disabled = false;
+            } else {
+              hljsLight.disabled = false;
+              hljsDark.disabled = true;
+            }
+          }
+        };
+
+        // Set initial theme
+        setTheme(getPreferredTheme());
+
+        // Toggle theme on button click
+        if (toggle) {
+          toggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
+          });
+        }
+      })();
+    </script>
   </body>
 </html>
