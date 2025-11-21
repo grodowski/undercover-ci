@@ -35,16 +35,19 @@ module CheckRuns
           accept: "application/vnd.github.antiope-preview+json"
         )
         log "#{run.external_id} response: #{client.last_response.status}"
-      rescue Octokit::UnprocessableEntity => e
+      rescue Octokit::UnprocessableEntity, Octokit::InternalServerError => e
         retry if tries <= retry_limit
 
         error_message = if e.message.include?("Only 65535 characters are allowed")
                           "The check output exceeded GitHub's character limit, please inspect " \
                             "the UndercoverCI dashboard directly"
+                        elsif e.is_a?(Octokit::InternalServerError)
+                          "500 - Something went wrong"
                         else
                           e.message
                         end
-        log("Check #{run.external_id} failed with #{error_message}, expiring...")
+        log("Check completion #{run.external_id} failed with #{error_message}, expiring...")
+        Sentry.capture_exception(e) if e.is_a?(Octokit::InternalServerError)
         ExpireCheckJob.perform_later(run.external_id, error_message)
       end
     end
