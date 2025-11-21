@@ -214,7 +214,10 @@ describe CheckRuns::Complete do
     allow(check_run_complete).to receive(:installation_api_client) { dummy_github }
 
     expect(Sentry).to receive(:capture_exception).with(instance_of(Octokit::InternalServerError))
-    expect(ExpireCheckJob).to receive(:perform_later).with(1337, "500 - Something went wrong")
+    expect(ExpireCheckJob).to receive(:perform_later).with(
+      1337,
+      "The check result failed to submit due to a service error (500)"
+    )
 
     check_run_complete.post(undercover_report_fixture)
 

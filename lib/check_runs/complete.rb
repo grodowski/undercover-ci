@@ -42,7 +42,7 @@ module CheckRuns
                           "The check output exceeded GitHub's character limit, please inspect " \
                             "the UndercoverCI dashboard directly"
                         elsif e.is_a?(Octokit::InternalServerError)
-                          "500 - Something went wrong"
+                          "The check result failed to submit due to a service error (500)"
                         else
                           e.message
                         end
