@@ -193,6 +193,34 @@ describe CheckRuns::Complete do
     expect(dummy_github).to have_received(:post).exactly(3).times
   end
 
+  it "retries on InternalServerError, reports to Sentry, and enqueues ExpireCheckJob on final failure" do
+    run = DataObjects::CheckRunInfo.new(
+      "grodowski/undercover-ci",
+      "abc123",
+      "installation-1",
+      nil,
+      "2020-02-02T16:13:22Z",
+      nil,
+      :complete,
+      1337,
+      "2020-02-02T16:20:47Z",
+      check_run_fixture.nodes
+    )
+    check_run_complete = described_class.new(run)
+
+    dummy_github = instance_spy(Octokit::Client)
+    allow(dummy_github).to receive_message_chain(:last_response, :status)
+    allow(dummy_github).to receive(:post).and_raise(Octokit::InternalServerError)
+    allow(check_run_complete).to receive(:installation_api_client) { dummy_github }
+
+    expect(Sentry).to receive(:capture_exception).with(instance_of(Octokit::InternalServerError))
+    expect(ExpireCheckJob).to receive(:perform_later).with(1337, "500 - Something went wrong")
+
+    check_run_complete.post(undercover_report_fixture)
+
+    expect(dummy_github).to have_received(:post).exactly(3).times
+  end
+
   def check_run_fixture(result: :failed)
     mock_result = undercover_report_fixture.all_results.first
     mock_result_multi_line_branch_coverage = undercover_report_fixture.all_results[1]
