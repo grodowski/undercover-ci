@@ -11,9 +11,6 @@ class RunnerJob < ApplicationJob
 
   queue_as :runner
 
-  # default retry for uncaught exceptions
-  sidekiq_options retry: 2
-
   # defaults to 3s wait, 2 attempts
   retry_on ActiveStorage::FileNotFoundError,
            Logic::RunUndercover::RunError,

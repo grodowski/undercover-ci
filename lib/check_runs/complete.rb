@@ -35,6 +35,7 @@ module CheckRuns
           accept: "application/vnd.github.antiope-preview+json"
         )
         log "#{run.external_id} response: #{client.last_response.status}"
+        true
       rescue Octokit::UnprocessableEntity, Octokit::InternalServerError => e
         retry if tries <= retry_limit
 
@@ -49,11 +50,16 @@ module CheckRuns
         log("Check completion #{run.external_id} failed with #{error_message}, expiring...")
         if e.is_a?(Octokit::InternalServerError)
           Sentry.capture_exception(e) do |scope|
-            scope.set_context("status", client.last_response.status)
-            scope.set_context("headers", client.last_response.headers)
+            scope.set_extras(
+              {
+                response_status: client.last_response.status,
+                response_headers: client.last_response.headers
+              }
+            )
           end
         end
         ExpireCheckJob.perform_later(run.external_id, error_message)
+        false
       end
     end
 
