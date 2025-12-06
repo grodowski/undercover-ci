@@ -53,8 +53,8 @@ module Logic
       # TODO: improve error handling with transactions
       Logic::SaveResults.call(coverage_check, report)
       run_with_results = DataObjects::CheckRunInfo.from_coverage_check(coverage_check)
-      CheckRuns::Complete.new(run_with_results).post(report)
-      Logic::UpdateCoverageCheckState.new(coverage_check).complete
+      success = CheckRuns::Complete.new(run_with_results).post(report)
+      Logic::UpdateCoverageCheckState.new(coverage_check).complete if success
     rescue Rugged::ReferenceError => e
       cancel_check_and_update_github(e.message)
     ensure
