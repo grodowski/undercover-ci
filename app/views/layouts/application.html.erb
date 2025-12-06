@@ -21,5 +21,19 @@
       <%= yield %>
     </main>
     <%= render 'partials/dash_footer' %>
+
+    <script>
+      (function() {
+        const html = document.documentElement;
+        html.setAttribute('data-theme', 'light');
+
+        const originalSetItem = localStorage.setItem;
+        localStorage.setItem = function(key, value) {
+          if (key !== 'theme') {
+            originalSetItem.apply(this, arguments);
+          }
+        };
+      })();
+    </script>
   </body>
 </html>
