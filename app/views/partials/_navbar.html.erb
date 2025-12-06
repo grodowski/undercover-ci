@@ -15,7 +15,21 @@
         <%= nav_link_with_state("Documentation", docs_page_path) %>
         <%= nav_link_ext("GitHub", "https://github.com/grodowski/undercover") %>
       </ul>
-      <span class="navbar-text">
+      <span class="navbar-text d-flex align-items-center gap-2">
+        <button id="theme-toggle" class="btn btn-link theme-toggle" aria-label="Toggle theme">
+          <svg class="theme-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle class="sun-icon" cx="12" cy="12" r="5"/>
+            <line class="sun-icon" x1="12" y1="1" x2="12" y2="3"/>
+            <line class="sun-icon" x1="12" y1="21" x2="12" y2="23"/>
+            <line class="sun-icon" x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line class="sun-icon" x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line class="sun-icon" x1="1" y1="12" x2="3" y2="12"/>
+            <line class="sun-icon" x1="21" y1="12" x2="23" y2="12"/>
+            <line class="sun-icon" x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line class="sun-icon" x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            <path class="moon-icon" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" style="display: none;"/>
+          </svg>
+        </button>
         <% if current_user %>
           <%= link_to "Dashboard", "/app", class: "btn btn-dark" %>
           <%= link_to "Sign out", "/auth/logout", class: "btn btn-dark", method: :delete %>

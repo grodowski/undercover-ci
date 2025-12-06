@@ -1,3 +1,62 @@
-<footer class="container px-3 py-3">
-  © 2025 Undercover · <a href="mailto:jan@undercover-ci.com">Support</a> · <%= link_to("Docs", docs_page_path) %><% if ENV["FF_TERMS_OF_SERVICE"] %> · <a href="<%= privacy_page_path %>" data-turbolinks="false">Privacy</a> · <a href="<%= terms_page_path %>" data-turbolinks="false">Terms of service</a><% end %> · <a href="https://grodowski.github.io" target="_blank">About</a>
+<footer class="site-footer">
+  <div class="container py-5">
+    <div class="row">
+      <div class="col-lg-3 col-md-4 mb-4 mb-lg-0">
+        <div class="footer-brand mb-3">
+          <%= image_tag "logo/Logo_Asset_1@3x-8.png", class: 'footer-logo footer-logo-light mb-3' %>
+          <%= image_tag "logo/Logo_Asset_2@3x-8.png", class: 'footer-logo footer-logo-dark mb-3' %>
+          <p class="text-muted" style="max-width: 220px;">Ruby test coverage toolkit ready for the vibe coding era</p>
+        </div>
+        <div class="footer-social mt-4">
+          <a href="https://github.com/grodowski/undercover" target="_blank" class="text-muted me-3" aria-label="GitHub">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+          </a>
+          <a href="https://twitter.com/mrgrodo" target="_blank" class="text-muted me-3" aria-label="Twitter">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-3 col-6 mb-4 mb-lg-0 offset-lg-2 offset-md-1">
+        <h6 class="footer-heading">Product</h6>
+        <ul class="footer-links list-unstyled">
+          <li><a href="/#how-it-works">Features</a></li>
+          <li><%= link_to "Pricing", pricing_page_path %></li>
+          <li><%= link_to "Documentation", docs_page_path %></li>
+          <li><a href="https://github.com/grodowski/undercover" target="_blank">GitHub</a></li>
+        </ul>
+      </div>
+
+      <div class="col-lg-3 col-md-3 col-6 mb-4 mb-lg-0 offset-lg-1">
+        <h6 class="footer-heading">Company</h6>
+        <ul class="footer-links list-unstyled">
+          <li><a href="https://grodowski.github.io" target="_blank">About</a></li>
+          <li><a href="mailto:jan@undercover-ci.com">Support</a></li>
+          <% if ENV["FF_TERMS_OF_SERVICE"] %>
+            <li><a href="<%= privacy_page_path %>" data-turbolinks="false">Privacy</a></li>
+            <li><a href="<%= terms_page_path %>" data-turbolinks="false">Terms</a></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="footer-divider my-4">
+
+    <div class="row align-items-center">
+      <div class="col-md-6 text-center text-md-start">
+        <p class="footer-copyright mb-md-0 small text-muted">
+          © 2025 UndercoverCI. All rights reserved.
+        </p>
+      </div>
+      <div class="col-md-6 text-center text-md-end">
+        <p class="footer-made-with mb-0 small text-muted">
+          Built with ❤️ for the Ruby community
+        </p>
+      </div>
+    </div>
+  </div>
 </footer>
