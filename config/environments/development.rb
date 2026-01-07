@@ -44,6 +44,9 @@ Rails.application.configure do
 
   config.action_mailer.perform_caching = false
 
+  config.active_job.verbose_enqueue_logs = true
+  config.active_job.queue_adapter = :solid_queue
+
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
 
@@ -58,9 +61,6 @@ Rails.application.configure do
 
   # Highlight code that triggered database queries in logs.
   config.active_record.verbose_query_logs = true
-
-  # Highlight code that enqueued background job in logs.
-  config.active_job.verbose_enqueue_logs = true
 
   # Suppress logger output for asset requests.
   config.assets.quiet = false
