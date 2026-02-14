@@ -35,3 +35,6 @@ export DEFAULT_MAX_CONCURRENT_CHECKS=2
 # Gumroad
 export GUMROAD_SELLER_ID=
 export GUMROAD_SUBSCRIPTION_PRODUCT_PERMALINK=
+
+# icu4c fix for postgres on mac (development)
+export PKG_CONFIG_PATH="/opt/homebrew/opt/icu4c/lib/pkgconfig"
