@@ -586,6 +586,10 @@ blockquote {
   max-width: 1140px;
   margin: 0 auto;
   padding: 0 15px;
+
+  @include media-breakpoint-down(sm) {
+    padding: 0;
+  }
 }
 
 .carousel-track-container {
@@ -635,6 +639,10 @@ blockquote {
       width: 18px;
       height: 18px;
     }
+  }
+
+  @include media-breakpoint-down(sm) {
+    display: none;
   }
 }
 
