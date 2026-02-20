@@ -11,9 +11,9 @@
           <strong class="lead-highlight">Verify your human and AI-written PRs with structure-aware coverage checks. </strong> Catch <strong class="lead-highlight">untested changes</strong> before you ship.
         </p>
         <p class="lead my-5">
-          🎯 Ship every PR with adequate test coverage<br/>
+          🎯 Ship every PR knowing what's tested<br/>
           🛠️ Works with all Ruby testing frameworks<br/>
-          🚀 Trusted by teams at GitLab, Rainforest QA, Rhino<br/>
+          🔓 Free forever for open source<br/>
         </p>
       </div>
       <div class="col-lg-7 pl-3 pt-lg-3 my-lg-3">
@@ -27,9 +27,8 @@
       <div class="col text-center my-3">
         <% if current_user.nil? %>
           <%= link_to "Sign Up with GitHub", "/auth/github?r=sign_up", class: "btn btn-lg btn-light font-weight-bold", method: :post %>
-          <p class="small mt-2">
-            Free forever for open-source repos.<br/>
-            14-day free trial for private repos. No seat-based pricing.<br/>
+          <p class="mt-2">
+            14-day free trial for private repos. <strong>No seat-based pricing.</strong><br/>
             Supports Ruby and GitHub.
           </p>
         <% else %>
@@ -289,7 +288,7 @@
   <div class="container">
     <div class="text-center mb-5 pb-4">
       <h2 class="mb-4">How it works</h2>
-      <p class="section-subtitle mx-auto" style="max-width: 700px;">Stop focusing on getting to 100% test coverage. Detect when changed code is untested before it's deployed.</p>
+      <p class="section-subtitle mx-auto" style="max-width: 700px;">Detect when changed code is untested before it's deployed.<br/>Stop chasing 100% and focus on what you're actually shipping.</p>
     </div>
 
     <div class="feature-item">
