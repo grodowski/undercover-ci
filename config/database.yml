@@ -81,5 +81,3 @@ test:
 production:
   <<: *default
   database: undercover-ci_production
-  username: undercover-ci
-  password: <%= ENV['UNDERCOVER-CI_DATABASE_PASSWORD'] %>
