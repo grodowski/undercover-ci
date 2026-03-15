@@ -7,6 +7,8 @@ class User < ApplicationRecord
 
   validates :uid, :name, :token, presence: true
 
+  after_create_commit :notify_admin
+
   TOKEN_KEY = ENV.fetch("USER_TOKEN_ENCRYPTION_KEY").freeze
   API_TOKEN_IV = Base64.decode64("nPDwkL9ckWPJQZevoe+efg==\n") # deterministic iv
 
@@ -54,6 +56,10 @@ class User < ApplicationRecord
     return if super.blank?
 
     self.class.decrypt(super)
+  end
+
+  def notify_admin
+    AdminMailer.new_user(self).deliver_later(wait: 2.minutes)
   end
 
   def analytics_id
