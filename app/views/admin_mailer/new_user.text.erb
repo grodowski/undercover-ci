@@ -1,0 +1,13 @@
+New user signed up.
+
+Name: <%= @user.name %>
+Email: <%= @user.email %>
+GitHub UID: <%= @user.uid %>
+Created at: <%= @user.created_at %>
+<% if @user.installations.any? %>
+
+Installations (<%= @user.installations.count %>):
+<% @user.installations.each do |installation| %>
+  - ID: <%= installation.installation_id %>, type: <%= installation.github_type %>, repos: <%= installation.repo_names.join(", ").presence || "none" %>
+<% end %>
+<% end %>
