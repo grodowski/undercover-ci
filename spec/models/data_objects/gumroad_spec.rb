@@ -10,7 +10,7 @@ describe DataObjects::Gumroad do
       "product_name" => "UndercoverCI - Private Repositories",
       "permalink" => "1337",
       "product_permalink" => "https://gum.co/1337",
-      "email" => "jan@undercover-ci.com",
+      "email" => "help@undercover-ci.com",
       "price" => "53900",
       "currency" => "usd",
       "quantity" => "1",

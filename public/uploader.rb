@@ -122,10 +122,10 @@ class UndercoverCiCoverageUpload
       puts("Done! #{resp.code}")
     when 404
       error "Error 404: does a check for commit #{@options.commit} exist in #{@options.repo}? " \
-            "Visit https://undercover-ci.com/docs or get support at jan@undercover-ci.com."
+            "Visit https://undercover-ci.com/docs or get support at help@undercover-ci.com."
     else
       error "Error #{resp.code}, #{resp.body}. " \
-            "Visit https://undercover-ci.com/docs or get support at jan@undercover-ci.com."
+            "Visit https://undercover-ci.com/docs or get support at help@undercover-ci.com."
     end
     self
   end

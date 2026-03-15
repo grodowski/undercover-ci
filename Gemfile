@@ -49,6 +49,9 @@ gem "omniauth"
 gem "omniauth-github"
 gem "omniauth-rails_csrf_protection"
 
+# Mailer
+gem "postmark-rails"
+
 # Tooling
 gem "sentry-rails"
 gem "sentry-ruby"

@@ -6,6 +6,17 @@ RSpec.describe Installation, type: :model do
   let(:user) { User.create!(uid: "1", email: "foo@bar.com", token: "sekrit", name: "Foo") }
 
   describe "create" do
+    before { stub_const("ENV", ENV.to_h.merge("ADMIN_EMAIL" => "admin@example.com")) }
+
+    it "enqueues an admin notification email" do
+      expect do
+        Installation.create!(
+          installation_id: "123123", users: [user],
+          metadata: {target_type: "Organization"}
+        )
+      end.to have_enqueued_mail(AdminMailer, :new_installation)
+    end
+
     it "ensures a trial subscription for orgs" do
       installation = Installation.create!(
         installation_id: "123123", users: [user],
