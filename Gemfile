@@ -4,10 +4,10 @@ ruby "3.4.5"
 source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-gem "rails", "~> 8.0"
+gem "rails", "~> 8.1"
 
 gem "aws-sdk-s3", require: false
-gem "bcrypt", "~> 3.1.15"
+gem "bcrypt", "~> 3.1.21"
 gem "bootsnap", ">= 1.1.0", require: false
 gem "jbuilder", "~> 2.14"
 gem "kaminari"
