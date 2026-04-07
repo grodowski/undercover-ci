@@ -50,7 +50,7 @@ describe Gumroad::ValidateLicense do
         "product_name" => "UndercoverCI - Private Repositories",
         "permalink" => "xxxx",
         "product_permalink" => "https://gum.co/xxxx",
-        "email" => "jan@undercover-ci.com",
+        "email" => "help@undercover-ci.com",
         "price" => 4900,
         "currency" => "usd",
         "quantity" => 1,

@@ -1,0 +1,19 @@
+New installation added.
+
+Installation ID: <%= @installation.installation_id %>
+Type: <%= @installation.github_type %>
+Created at: <%= @installation.created_at %>
+<% if @installation.metadata.present? %>
+
+Metadata:
+<% @installation.metadata.each do |key, value| %>
+  <%= key %>: <%= value %>
+<% end %>
+<% end %>
+<% if @installation.repo_names.any? %>
+
+Repos:
+<% @installation.repo_names.each do |repo| %>
+  - <%= repo %>
+<% end %>
+<% end %>

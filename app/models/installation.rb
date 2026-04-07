@@ -17,6 +17,7 @@ class Installation < ApplicationRecord
                  :repo_failure_modes
 
   after_create :ensure_subscription
+  after_create_commit :notify_admin
 
   def github_type
     return unless metadata.present?
@@ -44,6 +45,10 @@ class Installation < ApplicationRecord
     return true unless subscription
 
     subscription.active?
+  end
+
+  def notify_admin
+    AdminMailer.new_installation(self).deliver_later
   end
 
   def ensure_subscription
