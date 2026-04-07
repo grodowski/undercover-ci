@@ -33,4 +33,30 @@ RSpec.describe AdminMailer, type: :mailer do
       expect(mail.body.encoded).to include("organization")
     end
   end
+
+  describe "#new_user" do
+    subject(:mail) { described_class.new_user(user) }
+
+    it "sends to ADMIN_EMAIL" do
+      expect(mail.to).to eq(["admin@example.com"])
+    end
+
+    it "has correct subject" do
+      expect(mail.subject).to eq("New user: Foo")
+    end
+
+    it "includes the user name and email in the body" do
+      expect(mail.body.encoded).to include("Foo")
+      expect(mail.body.encoded).to include("foo@bar.com")
+    end
+
+    context "when the user has installations" do
+      before { installation }
+
+      it "lists installations in the body" do
+        expect(mail.body.encoded).to include("99999")
+        expect(mail.body.encoded).to include("organization")
+      end
+    end
+  end
 end
