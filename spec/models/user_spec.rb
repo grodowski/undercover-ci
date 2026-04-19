@@ -34,6 +34,26 @@ describe User, type: :model do
     expect(user.token).to eq(sekritkey)
   end
 
+  describe "#weekly_summary_enabled?" do
+    it "returns true when email is present and not opted out" do
+      user = User.create!(uid: "1", email: "foo@bar.com", token: "tok", name: "Foo")
+      expect(user.weekly_summary_enabled?).to be(true)
+    end
+
+    it "returns false when opted out" do
+      user = User.create!(
+        uid: "1", email: "foo@bar.com", token: "tok", name: "Foo",
+        email_preferences: {"weekly_summary_opt_out" => true}
+      )
+      expect(user.weekly_summary_enabled?).to be(false)
+    end
+
+    it "returns false when email is blank" do
+      user = User.create!(uid: "1", email: nil, token: "tok", name: "Foo")
+      expect(user.weekly_summary_enabled?).to be(false)
+    end
+  end
+
   it "#analytics_id" do
     user = User.create!(
       uid: "1337",

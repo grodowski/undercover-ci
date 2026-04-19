@@ -24,5 +24,6 @@ RSpec.configure do |config|
   SimpleCov.start do
     add_filter(/^\/spec\//)
     enable_coverage(:branch)
+    enable_coverage_for_eval
   end
 end

@@ -12,6 +12,8 @@ class User < ApplicationRecord
   TOKEN_KEY = ENV.fetch("USER_TOKEN_ENCRYPTION_KEY").freeze
   API_TOKEN_IV = Base64.decode64("nPDwkL9ckWPJQZevoe+efg==\n") # deterministic iv
 
+  store_accessor :email_preferences, :weekly_summary_opt_out
+
   def self.from_omniauth(auth_hash)
     user = find_or_initialize_by(uid: auth_hash[:uid])
     user.assign_attributes(
@@ -40,6 +42,10 @@ class User < ApplicationRecord
     cipher.key = key
     cipher.iv = decoded_base64[0..15]
     cipher.update(decoded_base64[16..]) + cipher.final
+  end
+
+  def weekly_summary_enabled?
+    email.present? && !weekly_summary_opt_out
   end
 
   def reset_api_token

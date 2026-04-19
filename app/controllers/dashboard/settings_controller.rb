@@ -18,6 +18,11 @@ module Dashboard
       redirect_to settings_path
     end
 
+    def email_preferences
+      current_user.update!(weekly_summary_opt_out: params[:weekly_summary_opt_out] != "1")
+      redirect_to settings_path, notice: "Email preferences saved"
+    end
+
     def update
       installation = current_user.installations.find_by!(installation_id: params[:installation_id])
 

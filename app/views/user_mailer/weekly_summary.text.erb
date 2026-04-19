@@ -1,0 +1,21 @@
+Coverage check summary — week of <%= Date.today.beginning_of_week.strftime("%b %-d") %>
+
+<% @repo_stats.each do |repo, stats| %>
+<%= repo %>
+<% if stats[:failed] > 0 %>
+  <%= stats[:failed] %> with warnings, <%= stats[:passed] %> passed
+<% else %>
+  All <%= stats[:passed] %> passed
+<% end %>
+<% if stats[:hotspots].any? %>
+  Hotspots:
+  <% stats[:hotspots].each do |(path, node_name), count| %>
+  <%= node_name %> (<%= count %>×)
+  <%= path %>
+  <% end %>
+<% end %>
+  View: <%= dashboard_url %>
+
+<% end %>
+---
+Manage email preferences: <%= settings_url %>

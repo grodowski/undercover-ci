@@ -114,6 +114,24 @@ describe "Settings" do
     end
   end
 
+  describe "PATCH /settings/email_preferences" do
+    before { get("/auth/github/callback") }
+
+    it "opts the user out of weekly summary emails" do
+      patch("/settings/email_preferences", params: {weekly_summary_opt_out: "0"})
+      expect(response).to redirect_to(settings_path)
+      expect(flash[:notice]).to eq("Email preferences saved")
+      expect(user.reload.weekly_summary_enabled?).to be(false)
+    end
+
+    it "opts the user in to weekly summary emails" do
+      user.update!(email_preferences: {"weekly_summary_opt_out" => true})
+      patch("/settings/email_preferences", params: {weekly_summary_opt_out: "1"})
+      expect(response).to redirect_to(settings_path)
+      expect(user.reload.weekly_summary_enabled?).to be(true)
+    end
+  end
+
   it "resets user access token" do
     allow(SecureRandom).to receive(:hex) { String.new("s3krit") }
     get("/auth/github/callback")
