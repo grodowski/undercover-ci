@@ -346,6 +346,7 @@ GEM
       erb
       psych (>= 4.0.0)
       tsort
+    redcarpet (3.6.1)
     redis-client (0.26.1)
       connection_pool
     regexp_parser (2.11.3)
@@ -530,6 +531,7 @@ DEPENDENCIES
   pry-rails
   puma
   rails (~> 8.0)
+  redcarpet
   redis-client
   rspec-rails
   rubocop

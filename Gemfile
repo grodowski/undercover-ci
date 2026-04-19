@@ -38,6 +38,7 @@ gem "turbolinks"
 
 # Core
 gem "git"
+gem "redcarpet"
 gem "undercover"
 
 # Github

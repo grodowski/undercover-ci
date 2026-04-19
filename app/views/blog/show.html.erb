@@ -1,0 +1,19 @@
+<% content_for(:title) { @post[:title] } %>
+<% content_for(:meta_description) { @post[:description] } %>
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <article>
+        <header class="mb-4">
+          <p class="small text-muted mb-1"><%= @post[:date]&.strftime("%B %-d, %Y") %></p>
+          <h1 class="mb-0"><%= @post[:title] %></h1>
+        </header>
+
+        <div class="blog-post-body">
+          <%= raw @post[:body] %>
+        </div>
+      </article>
+    </div>
+  </div>
+</div>

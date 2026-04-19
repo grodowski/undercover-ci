@@ -21,6 +21,7 @@ Learn how to install UndercoverCI for your repos, report coverage data and use t
             <li class=""><a href="#verifying-setup">Verify your setup</a>
             <li class=""><a href="#undercover-cli">Use Undercover CLI locally</a>
             <li class=""><a href="#coding-agents">Set up your coding agent</a>
+            <li class=""><a href="#claude-skill">Claude Code Plugin</a>
           </ul>
         </li>
         <li class=""><a href="#configuration">Configuration</a>
@@ -179,6 +180,30 @@ Learn how to install UndercoverCI for your repos, report coverage data and use t
     bundle exec undercover --compare HEAD~1 # inspect coverage w.r.t. previous commit
         </code></pre>
       </p>
+
+      <h4 id="claude-skill" class="mt-5 mb-2">Claude Code Plugin</h4>
+
+      <p>
+        <%= link_to "undercover-claude", "https://github.com/grodowski/undercover-claude", target: "_blank" %> is a Claude Code plugin that closes the undercover feedback loop directly inside your coding session. Read the <%= link_to "experiment writeup", blog_post_path("claude-code-experiment") %> to see how it compares to plain Claude Code runs.
+      </p>
+
+      <p>Features:</p>
+      <ul>
+        <li>Sets up SimpleCov and undercover automatically at the start of a new project</li>
+        <li>After every test run, checks which changed lines aren't covered and writes tests for the gaps</li>
+        <li>Repeats until <code>bundle exec undercover</code> exits 0</li>
+      </ul>
+
+      <p>Install:</p>
+      <pre><code>git clone https://github.com/grodowski/undercover-claude
+claude --plugin-dir ./undercover-claude</code></pre>
+
+      <p>
+        The plugin is pending Anthropic review. Once approved it will be installable with <code>claude plugin install undercover</code>.
+      </p>
+
+      <p>Usage - run the coverage skill from any Claude Code session:</p>
+      <pre><code>/undercover:coverage</code></pre>
 
       <hr/>
       <h2 id="configuration" class="mt-5">Configuration</h2>
