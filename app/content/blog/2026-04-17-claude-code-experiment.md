@@ -1,19 +1,22 @@
 ---
 title: Teaching Claude Code to Test What Breaks
 date: 2026-04-17
-description: A weekend experiment measuring how much the undercover-claude Claude Code plugin changes test quality. Same prompt, four runs, two models - with and without Undercover.
+description: A weekend experiment measuring how much the undercover-claude Claude Code plugin changes test quality. Same prompt, four runs, two models, with and without Undercover.
 ---
 
-In the [previous post about building gt](https://grodowski.com/2026/03/15/gt-stacked-prs) I mentioned I used [undercover-claude](https://github.com/grodowski/undercover-claude) while building it. I ran the same prompt four times across two models, with and without Undercover, to measure how much it changes. A word of caution: this is a weekend experiment and not a rigorous study, so take the numbers accordingly.
+We built the same Ruby CLI four times with Claude Code, two models with and without a coverage skill, and scored every run against a test suite the agent never saw. A word of caution: this is a weekend experiment and not a rigorous study, so take the numbers accordingly.
+
+The CLI is `gt`, a tool for managing stacked pull requests (think Graphite). Stacked PRs let you split a large change into a chain of smaller, reviewable branches that rebase onto each other. `gt` automates the branching, rebasing, and PR management from the command line. Six commands, a git sandbox for testing, GitHub API integration: real enough to stress-test an agent without becoming a research project.
+
+### The evaluation
+
+Scoring is done by a blind BDD suite the agent never sees. It runs in a fresh tmpdir repo with a bare remote, `gh` stubbed out, and `bin/gt` invoked as an external process. The agent writes its own tests during implementation, but those tests don't determine the score.
+
+After scoring, an LLM reviewer assessed each implementation: code structure, separation of concerns, error handling depth, and test quality.
 
 ### Undercover
 
 [undercover-claude](https://github.com/grodowski/undercover-claude) is a Claude Code plugin built around the [undercover gem](https://github.com/grodowski/undercover).
-
-```sh
-git clone https://github.com/grodowski/undercover-claude
-claude --plugin-dir ./undercover-claude
-```
 
 The plugin does two things. First, it sets up SimpleCov and undercover at the start of a new project before any tests are written. Second, it enforces a feedback loop: after every test run, Claude runs `bundle exec undercover` to check which changed lines aren't covered, writes tests for the gaps, and repeats until undercover exits 0.
 
@@ -45,15 +48,11 @@ Work through the commands one at a time. For each: implement, write tests, commi
 Do not move to the next command until the current one is committed.
 ```
 
-### Setup
-
-Each agent started in a clean directory with reset memory and no shared context between runs. None of them knew about the blind test suite used for scoring. Scoring is done by a blind BDD suite the agent never sees: a tmpdir repo with a bare remote, `gh` stubbed out, `bin/gt` run as an external process. Results are also reviewed qualitatively: code structure, error handling and test depth.
-
 ### What the plain runs missed
 
 The starter prompt explicitly asked for tests with a `GitSandbox` helper and required tests to pass before each commit. Uninstructed agents write tests reasonably well on their own. The plain runs produced 36-41 tests each with meaningful assertions, but the skilled agents were pushed past the point where they'd naturally stop.
 
-That stopping point matters. The plain run test files follow a consistent pattern of covering the happy path. There was no friction forcing the agent to test the errors. Opus plain produced the most idiomatic implementation of the four - a typed `Git::Error` exception class, a dedicated `GH` module that checks for `gh` availability and degrades gracefully, clean separation of concerns - and still left the entire GitHub integration untested.
+That stopping point matters. The plain run test files follow a consistent pattern of covering the happy path. There was no friction forcing the agent to test the errors. Opus plain produced the most idiomatic implementation of the four, with typed `Git::Error` exceptions, a dedicated `GH` module that degrades gracefully when `gh` isn't available, and clean separation of concerns, and still left the entire GitHub integration untested.
 
 Sonnet plain's rebase conflict implementation is another example: the defensive error path exists but is broken and untested. It swallows the rebase error, then proceeds to force push and reports success after a failed rebase, while corrupting the remote. Skilled implementations did not have this bug.
 
@@ -90,7 +89,7 @@ None of the models passed the blind suite on the first session. Every run needed
 
 The fix sessions weren't equal either, with plain agents hitting real bugs in the blind BDD suite: incorrect constant loading that was never exercised in tests, and a genuine restack logic error. The skill agents needed fixes too, but only for surface-level output formatting differences.
 
-Both skill variants wrote leaner implementations (408 vs 509 LOC for Sonnet, 379 vs 474 for Opus). The reviewer agent highlighted overly defensive (and unexercised in tests) error handling that the skilled agents removed.
+Both skill variants wrote leaner implementations (408 vs 509 LOC for Sonnet, 379 vs 474 for Opus). The qualitative review flagged overly defensive (and unexercised in tests) error handling that the skilled agents had removed.
 
 Skill runs cost roughly 2x more. The feedback loop accumulated context across turns, and cache read tokens dominated the total. Sonnet was also subjectively much slower throughout, spending noticeably more time in thinking mode.
 
@@ -98,21 +97,15 @@ One caveat on duration: all agents took the testing sandbox prompt instruction t
 
 ### Wrap up
 
-All four models landed on a similar code structure, but the skilled runs produced solutions with fewer and less severe bugs, according to the blind suite and the reviewer model.
+All four models landed on a similar code structure, but the skilled runs produced solutions with fewer and less severe bugs, per both the blind suite and the qualitative review.
 
 The plain runs finished at only 65-75% branch coverage. Every future PR that ships like that widens the gap between what the code claims to handle and what's been verified. The skill not only helped steer the LLM to keep coverage high, but also helped it identify bugs and refrain from making redundant additive changes, which models are often eager to do when left on their own.
 
 One thing I keep wondering: current models already know how to test impressively well, and the things we spell out carefully in prompts are often things they already know. The plain runs wrote tests without being told how, nor was that know-how included in the skill. So how much headroom does the skill actually have as models improve? The gap isn't about knowledge but about momentum. The skill is an active constraint, not a hint.
 
-The plugin: [github.com/grodowski/undercover-claude](https://github.com/grodowski/undercover-claude)
+---
 
-The plugin is pending Anthropic review. Once approved, you'll be able to install it with:
-
-```sh
-claude plugin install undercover
-```
-
-Until then, clone the repo and load it with `--plugin-dir`:
+The plugin is [github.com/grodowski/undercover-claude](https://github.com/grodowski/undercover-claude). It's pending Anthropic review. Once approved: `claude plugin install undercover`. Until then:
 
 ```sh
 git clone https://github.com/grodowski/undercover-claude
