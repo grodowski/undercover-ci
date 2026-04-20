@@ -24,6 +24,8 @@ Rails.application.routes.draw do
   get "/docs", to: "home#docs", as: :docs_page
   get "/subscription_confirmation", to: "home#subscription_confirmation"
 
+  get "/blog/:slug", to: "blog#show", as: :blog_post
+
   scope module: "dashboard" do
     get "/app", controller: "checks", action: "index", as: :dashboard
     resources :checks, only: :show

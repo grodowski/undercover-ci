@@ -11,6 +11,16 @@
     <%= javascript_include_tag 'analytics' %>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" id="hljs-light">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" id="hljs-dark" disabled>
+    <script>
+      (function() {
+        var theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+        if (theme === 'dark') {
+          document.getElementById('hljs-light').disabled = true;
+          document.getElementById('hljs-dark').disabled = false;
+        }
+      })();
+    </script>
     <%= render 'partials/favicons' %>
     <%= render 'partials/seo_tags' %>
     <%= render 'partials/heap_identify' %>

@@ -512,18 +512,46 @@ pre {
   }
 }
 
-// Override highlight.js background for dark mode
-:root[data-theme="dark"] {
+// Override highlight.js colors for dark mode
+@mixin hljs-dark-overrides {
   pre code.hljs {
     background: var(--card-bg) !important;
+    color: #c9d1d9 !important;
   }
+  // Catch-all for any class not listed below
+  pre code.hljs span            { color: #c9d1d9 !important; }
+  // Fix dark-on-dark colors from light theme leaking through
+  pre code.hljs .hljs-attr,
+  pre code.hljs .hljs-number,
+  pre code.hljs .hljs-literal   { color: #79c0ff !important; }
+  pre code.hljs .hljs-string    { color: #a5d6ff !important; }
+  pre code.hljs .hljs-keyword   { color: #ff7b72 !important; }
+  pre code.hljs .hljs-comment   { color: #8b949e !important; }
+  pre code.hljs .hljs-title     { color: #d2a8ff !important; }
+}
+
+:root[data-theme="dark"] { @include hljs-dark-overrides; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { @include hljs-dark-overrides; }
+}
+
+// Bootstrap table dark mode
+:root[data-theme="dark"] .table {
+  --bs-table-bg: var(--card-bg);
+  --bs-table-color: var(--text-color);
+  --bs-table-border-color: var(--border-color);
+  --bs-table-striped-bg: #3a3a3a;
+  --bs-table-hover-bg: #444;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    pre code.hljs {
-      background: var(--card-bg) !important;
-    }
+  :root:not([data-theme="light"]) .table {
+    --bs-table-bg: var(--card-bg);
+    --bs-table-color: var(--text-color);
+    --bs-table-border-color: var(--border-color);
+    --bs-table-striped-bg: #3a3a3a;
+    --bs-table-hover-bg: #444;
   }
 }
 
