@@ -5,6 +5,7 @@ module CheckRuns
     # Prevents GitHub Checks API errors with the 50 annotation limit
     # https://docs.github.com/en/rest/checks/runs?apiVersion=2022-11-28#update-a-check-run--parameters
     MAX_ANNOTATIONS = 50
+    MAX_TABLE_ROWS = 100
     DEFAULT_FAILURE_MODE = "failure"
 
     # @param undercover_warnings [Array] list of warnings reported by Undercover
@@ -139,11 +140,13 @@ module CheckRuns
           total_branches_for_node(node)
         ]
       end
-      rows += @run
-              .nodes
-              .sort_by { |node| node.flagged? ? 0 : 1 }
-              .map(&format_to_md)
-              .map { |row| row.join(" | ") }
+      all_nodes = @run.nodes.order(flagged: :desc).first(MAX_TABLE_ROWS + 1)
+      truncated = all_nodes.size > MAX_TABLE_ROWS
+      rows += all_nodes.first(MAX_TABLE_ROWS).map(&format_to_md).map { |row| row.join(" | ") }
+      if truncated
+        text += "\n\n_Showing the first #{MAX_TABLE_ROWS} results. " \
+                "See the [full report](#{details_url}) for the complete list._"
+      end
       text + rows.join("\n")
     end
 

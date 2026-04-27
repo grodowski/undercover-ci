@@ -45,6 +45,10 @@ module Logic
       checkout
 
       report = run_undercover_cmd
+      # :nocov:
+      @changeset.instance_variable_get(:@repo)&.close
+      # :nocov:
+      @changeset = nil
       warnings = report.flagged_results
       log "undercover warnings: #{warnings.size}, " \
           "total nodes: #{report.all_results.size}"
@@ -65,8 +69,7 @@ module Logic
     private
 
     def fetch_report
-      # In Rails 6 this will become `coverage_report_jov.coverage_reports.last.open`
-      @coverage_tmpfile.write(@coverage_attachment.download)
+      @coverage_attachment.download { |chunk| @coverage_tmpfile.write(chunk) }
       @coverage_tmpfile.flush
     end
 
@@ -110,9 +113,12 @@ module Logic
 
     def teardown
       @repo&.close
-      @changeset&.instance_variable_get(:@repo)&.close # TODO: hack, expose repo.close through Undercover
+      # :nocov:
+      @changeset&.instance_variable_get(:@repo)&.close
+      # :nocov:
       @coverage_tmpfile.close
       FileUtils.remove_entry(repo_path, true)
+      GC.compact
     end
 
     def repo_path

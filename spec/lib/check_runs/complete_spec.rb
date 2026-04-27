@@ -193,6 +193,64 @@ describe CheckRuns::Complete do
     expect(dummy_github).to have_received(:post).exactly(3).times
   end
 
+  it "includes a truncation notice and link when nodes exceed MAX_TABLE_ROWS" do
+    inst = Installation.create
+    check = CoverageCheck.create!(installation: inst, state: :complete)
+    (CheckRuns::Complete::MAX_TABLE_ROWS + 1).times do |i|
+      check.nodes.create!(
+        node_type: "instance method", node_name: "method_#{i}",
+        start_line: i + 1, end_line: i + 1, coverage: 1.0, flagged: false,
+        path: "app/models/foo.rb"
+      )
+    end
+
+    run = DataObjects::CheckRunInfo.new(
+      "grodowski/undercover-ci", "abc123", "installation-1", nil,
+      "2020-02-02T16:13:22Z", nil, :complete, check.id, "2020-02-02T16:20:47Z",
+      check.nodes
+    )
+    check_run_complete = described_class.new(run)
+
+    dummy_github = instance_spy(Octokit::Client)
+    allow(dummy_github).to receive_message_chain(:last_response, :status)
+    allow(check_run_complete).to receive(:installation_api_client) { dummy_github }
+
+    check_run_complete.post(undercover_report_fixture)
+
+    expect(dummy_github).to have_received(:post) do |_, payload|
+      expect(payload[:output][:text]).to include("Showing the first #{CheckRuns::Complete::MAX_TABLE_ROWS} results")
+      expect(payload[:output][:text]).to include("full report")
+    end
+  end
+
+  it "includes an annotation-limit notice when warnings exceed MAX_ANNOTATIONS" do
+    run = DataObjects::CheckRunInfo.new(
+      "grodowski/undercover-ci", "abc123", "installation-1", nil,
+      "2020-02-02T16:13:22Z", nil, :complete, check_run_fixture.id,
+      "2020-02-02T16:20:47Z", check_run_fixture.nodes
+    )
+    check_run_complete = described_class.new(run)
+
+    dummy_github = instance_spy(Octokit::Client)
+    allow(dummy_github).to receive_message_chain(:last_response, :status)
+    allow(check_run_complete).to receive(:installation_api_client) { dummy_github }
+
+    many_warnings = Array.new(CheckRuns::Complete::MAX_ANNOTATIONS + 1) do
+      undercover_report_fixture.flagged_results.first
+    end
+    large_report = instance_double(
+      Undercover::Report,
+      all_results: many_warnings,
+      flagged_results: many_warnings
+    )
+
+    check_run_complete.post(large_report)
+
+    expect(dummy_github).to have_received(:post) do |_, payload|
+      expect(payload[:output][:text]).to include("50 annotation limit")
+    end
+  end
+
   it "retries on InternalServerError, reports to Sentry, and enqueues ExpireCheckJob on final failure" do
     run = DataObjects::CheckRunInfo.new(
       "grodowski/undercover-ci",

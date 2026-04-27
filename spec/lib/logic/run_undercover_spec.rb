@@ -205,6 +205,36 @@ describe Logic::RunUndercover do
     expect(check_runs_stub).to have_been_requested.twice
   end
 
+  it "does not complete the coverage check when the GitHub post fails" do
+    coverage_check.coverage_reports.attach(
+      io: File.open("spec/fixtures/coverage.lcov"),
+      filename: "#{coverage_check.id}_b4c0n.lcov",
+      content_type: "text/plain"
+    )
+
+    stub_get_installation_token
+    stub_fetch_merge_base
+    stub_post_check_runs
+
+    repo_path = "tmp/job/#{coverage_check.id}"
+    expect(Git).to receive(:clone).with(
+      "https://x-access-token:token@github.com/author/repo.git",
+      repo_path,
+      depth: 1
+    ) do
+      FileUtils.cp_r("spec/fixtures/fake_repo/", repo_path)
+      FileUtils.mv(File.join(repo_path, "fake.git"), File.join(repo_path, ".git"))
+      double("Git::Base", fetch: true)
+    end
+
+    allow_any_instance_of(CheckRuns::Complete).to receive(:post).and_return(false)
+
+    subject
+
+    coverage_check.reload
+    expect(coverage_check.state).not_to eq(:complete)
+  end
+
   it "cancels the check on ReferenceError and returns a helpful error message" do
     allow(Rugged::Repository).to receive(:new)
       .and_raise(Rugged::ReferenceError, "revspec 'main' not found")
