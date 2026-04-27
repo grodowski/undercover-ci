@@ -62,7 +62,27 @@ Iterating on the implementation, the Sonnet + Undercover run found gaps 7 times 
 
 Running `undercover` surfaced a failure path in `gt sync` and pushed Claude to split `git pull` into separate fetch and merge steps, with fetch failures becoming non-fatal warnings. The coverage requirement surfaced a specification gap.
 
+```ruby
+def test_sync_fetch_failure_is_non_fatal
+  system("git", "remote", "remove", "origin", [:out, :err] => File::NULL)
+  make_gt_branch("feature-a", "main")
+  make_commit("a.txt", "a", "A")
+  system("git", "checkout", "feature-a", [:out, :err] => File::NULL)
+
+  e = assert_raises(SystemExit) { GT::Commands::Sync.new([]).run }
+  assert_equal 1, e.status # documents no crash, but doesn't assert the warning message
+end
+```
+
 After implementing `gt create`, undercover flagged the push failure code branch and the PR creation path that follows it. Both were unexercised: no test tried to push without a remote. Claude removed the origin remote in the sandbox to trigger the failure path and verified the local branch was still created. A new test documents that `gt create` degrades gracefully without a remote rather than crashing.
+
+```ruby
+def test_create_with_push_failure_still_succeeds
+  system("git", "remote", "remove", "origin", [:out, :err] => File::NULL)
+  GT::Commands::Create.new(["branch-e", "-m", "push test"]).run
+  assert_equal "branch-e", GT::Git.current_branch
+end
+```
 
 Finally, the plain runs' tests are mostly integration-style: build a stack, run a command, assert the outcome, while the skill runs add a second layer. Sonnet skill introduced explicit error-path tests via stubbing (e.g. `test_create_fails_when_git_add_fails`, `test_create_fails_when_commit_fails`) and push-failure degradation tests. Opus skill added dedicated `git_test.rb` and `stack_test.rb` files that unit-test internal modules directly. Those are the tests that close the branch coverage gaps in error handling.
 
@@ -70,7 +90,7 @@ Finally, the plain runs' tests are mostly integration-style: build a stack, run 
 
 | | Sonnet 4.6 high | Sonnet 4.6 high + Undercover | Opus 4.6 high | Opus 4.6 high + Undercover |
 |---|---|---|---|---|
-| Suite passing / 16 | 16 | 16 | 16 | 16 |
+| Suite passing | 16/16 | 16/16 | 16/16 | 16/16 |
 | Fix sessions | 3 | 2 | 2 | 2 |
 | Duration (incl. fixes) | 0:27 | 0:34 | 0:12 | 0:26 |
 | Turns | 221 | 292 | 148 | 245 |
@@ -85,7 +105,12 @@ Finally, the plain runs' tests are mostly integration-style: build a stack, run 
 | Undercover runs | 0 | 20 | 0 | 15 |
 | Cost | $5.12 | $9.99 | $4.76 | $13.66 |
 
-None of the models passed the blind suite initially. Every run needed at least one fix session, included in the totals.
+None of the models passed the blind suite on the first session. Every run needed at least one fix session, included in the totals.
+
+| | Sonnet 4.6 high | Sonnet 4.6 high + Undercover | Opus 4.6 high | Opus 4.6 high + Undercover |
+|---|---|---|---|---|
+| First session | 13/16 | 15/16 | crashed | 15/16 |
+| First session failures | `gt log` missing root branch, wrong default commit message, `gt sync` not pulling | `gt log` highlight format mismatch | `CLI::UI` constant crash (all tests) | `gt sync` not updating local main |
 
 The fix sessions weren't equal either. One plain agent had a naming clash between its own `CLI` class and `::CLI` module from the `cli-ui` gem, never caught by its own tests. One also failed to handle more than one `gt` stack branching out from root. One silently corrupted the remote on a failed restack. The skill agents needed fixes too, but only for surface-level output formatting differences, like a different kind of unicode arrow being used.
 
@@ -115,5 +140,7 @@ claude --plugin-dir ./undercover-claude
 [Undercover CI](https://undercover-ci.com) closes the same loop in CI as a GitHub status on every PR your team ships. Free for public repos, 14-day trial for private ones.
 
 ---
+
+*Updated 2026-04-27: added first session harness results and code samples from the skill runs.*
 
 *Originally published at [grodowski.com](https://grodowski.com/2026/04/17/claude-code-undercover-skill.html).*
