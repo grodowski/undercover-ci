@@ -120,7 +120,7 @@ module CheckRuns
     def text_for_run
       text = "Revision `#{run.sha[0..6]}` has modified the following " \
              "#{ActionController::Base.helpers.pluralize(@undercover_report.all_results.size, 'code location')}."
-      if @run.nodes.any?(&:flagged?)
+      if @run.nodes.flagged.exists?
         text += " Results marked with ⚠️ have untested lines added or changed in this commit, " \
                 "look into them!"
       end

@@ -106,6 +106,8 @@ module Logic
       @repo = Rugged::Repository.new(repo_path)
       branch = @repo.create_branch("undercover-ci", run.sha)
       @repo.checkout(branch)
+      @repo.close
+      @repo = nil
     rescue Rugged::OSError => e
       log "checkout failed with #{e}"
       raise CheckoutError
@@ -127,12 +129,17 @@ module Logic
 
     def run_undercover_cmd
       opts = build_undercover_options
-      simplecov_adapter = if opts.simplecov_resultset
-                            Undercover::SimplecovResultAdapter.parse(File.open(opts.simplecov_resultset), opts)
-                          else
-                            Undercover::LcovParser.parse(File.open(opts.lcov), opts)
-                          end
       @changeset = Undercover::Changeset.new("#{repo_path}/.git", @run.compare)
+      changed_files = @changeset.file_paths
+      simplecov_adapter = if opts.simplecov_resultset
+                            Undercover::SimplecovResultAdapter.parse(
+                              File.open(opts.simplecov_resultset), opts, only_files: changed_files
+                            )
+                          else
+                            Undercover::LcovParser.parse(
+                              File.open(opts.lcov), opts, only_files: changed_files
+                            )
+                          end
       Undercover::Report.new(@changeset, opts, simplecov_adapter).build
     end
 

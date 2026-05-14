@@ -8,31 +8,31 @@ module Logic
 
     def initialize(coverage_check, report)
       @coverage_check = coverage_check
-      @all_results = report.all_results.to_a
+      @all_results = report.all_results
     end
 
     def call
-      all_results.each { |result| build_node(result) }
-      coverage_check.update!(result: build_result)
+      flagged = false
+      rows = all_results.map do |result|
+        flagged = true if result.flagged?
+        {
+          coverage_check_id: coverage_check.id,
+          path: result.file_path,
+          node_type: result.node.human_name,
+          node_name: result.node.name,
+          start_line: result.first_line,
+          end_line: result.last_line,
+          coverage: result.coverage_f,
+          flagged: result.flagged?,
+          created_at: Time.current,
+          updated_at: Time.current
+        }
+      end
+      Node.insert_all(rows) if rows.any?
+      coverage_check.update!(result: flagged ? "failed" : "passed")
     end
 
     private
-
-    def build_result
-      all_results.any?(&:flagged?) ? "failed" : "passed"
-    end
-
-    def build_node(node_result)
-      coverage_check.nodes << Node.new(
-        path: node_result.file_path,
-        node_type: node_result.node.human_name,
-        node_name: node_result.node.name,
-        start_line: node_result.first_line,
-        end_line: node_result.last_line,
-        coverage: node_result.coverage_f,
-        flagged: node_result.flagged?
-      )
-    end
 
     attr_reader :coverage_check, :all_results
   end
