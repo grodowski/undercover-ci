@@ -1,7 +1,7 @@
 <footer class="site-footer">
   <div class="container py-5">
     <div class="row">
-      <div class="col-lg-3 col-md-4 mb-4 mb-lg-0">
+      <div class="col-lg-3 col-md-12 mb-4 mb-lg-0">
         <div class="footer-brand mb-3">
           <%= image_tag "logo/Logo_Asset_1@3x-8.png", class: 'footer-logo footer-logo-light mb-3' %>
           <%= image_tag "logo/Logo_Asset_2@3x-8.png", class: 'footer-logo footer-logo-dark mb-3' %>
@@ -21,7 +21,7 @@
         </div>
       </div>
 
-      <div class="col-lg-3 col-md-3 col-6 mb-4 mb-lg-0 offset-lg-2 offset-md-1">
+      <div class="col-lg-3 col-md-4 col-6 mb-4 mb-lg-0">
         <h6 class="footer-heading">Product</h6>
         <ul class="footer-links list-unstyled">
           <li><a href="/#how-it-works">Features</a></li>
@@ -31,7 +31,17 @@
         </ul>
       </div>
 
-      <div class="col-lg-3 col-md-3 col-6 mb-4 mb-lg-0 offset-lg-1">
+      <div class="col-lg-3 col-md-4 col-6 mb-4 mb-lg-0">
+        <h6 class="footer-heading">Reading</h6>
+        <ul class="footer-links list-unstyled">
+          <li><%= link_to "Teaching Claude Code to Test What Breaks", blog_post_path("claude-code-experiment") %></li>
+          <li><a href="https://mrgrodo.medium.com/branch-coverage-now-available-in-undercover-checks-57d88b211098" target="_blank">Branch coverage in Undercover checks</a></li>
+          <li><a href="https://medium.com/@mrgrodo/introducing-undercoverci-98c6c50793f2" target="_blank">Introducing UndercoverCI</a></li>
+          <li><a href="https://martinfowler.com/bliki/TestCoverage.html" target="_blank">Test Coverage by Martin Fowler</a></li>
+        </ul>
+      </div>
+
+      <div class="col-lg-3 col-md-4 col-6 mb-4 mb-lg-0">
         <h6 class="footer-heading">Company</h6>
         <ul class="footer-links list-unstyled">
           <li><a href="https://grodowski.github.io" target="_blank">About</a></li>
@@ -54,7 +64,7 @@
       </div>
       <div class="col-md-6 text-center text-md-end">
         <p class="footer-made-with mb-0 small text-muted">
-          Built with ❤️ for the Ruby community
+          Built in Austria with ❤️ for the Ruby community
         </p>
       </div>
     </div>

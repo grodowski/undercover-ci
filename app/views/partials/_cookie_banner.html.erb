@@ -1,0 +1,28 @@
+<div class="cookie-banner" id="cookie-banner" hidden>
+  <p class="cookie-banner-text">
+    We use minimal cookies to run this site. See our
+    <a href="<%= privacy_page_path %>" data-turbolinks="false">privacy policy</a>.
+  </p>
+  <button type="button" class="cookie-banner-accept" id="cookie-banner-accept">Got it</button>
+</div>
+
+<script>
+(function() {
+  function initCookieBanner() {
+    var banner = document.getElementById('cookie-banner');
+    if (!banner) return;
+    if (localStorage.getItem('cookie_consent') === 'accepted') return;
+    banner.hidden = false;
+    var accept = document.getElementById('cookie-banner-accept');
+    if (accept) {
+      accept.addEventListener('click', function() {
+        localStorage.setItem('cookie_consent', 'accepted');
+        banner.hidden = true;
+      });
+    }
+  }
+  document.addEventListener('turbo:load', initCookieBanner);
+  document.addEventListener('DOMContentLoaded', initCookieBanner);
+  initCookieBanner();
+})();
+</script>

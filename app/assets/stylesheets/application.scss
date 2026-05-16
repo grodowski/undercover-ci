@@ -863,7 +863,6 @@ blockquote {
 .site-footer {
   background-color: var(--jumbotron-bg);
   border-top: 1px solid var(--border-color);
-  margin-top: 5rem;
 
   .footer-logo {
     height: 30px;
@@ -939,4 +938,1300 @@ blockquote {
       display: block;
     }
   }
+}
+// ===== Homepage redesign: mock surfaces + section bands =====
+
+:root {
+  --mock-bg: #fbfcfe;
+  --mock-header-bg: #eef1f6;
+  --mock-border: rgba(8, 12, 40, 0.12);
+  --mock-border-subtle: rgba(8, 12, 40, 0.07);
+  --mock-text: #1d2230;
+  --mock-muted: #5b6472;
+  --mock-ln: #9aa3b2;
+  --mock-code: #1d2230;
+  --mock-added-text: #116329;
+  --band-tint: oklch(97% 0.009 264);
+  --band-border: oklch(90% 0.018 264);
+}
+
+:root[data-theme="dark"] {
+  --mock-bg: #0d1117;
+  --mock-header-bg: #161b22;
+  --mock-border: rgba(255, 255, 255, 0.12);
+  --mock-border-subtle: rgba(255, 255, 255, 0.06);
+  --mock-text: #c9d1d9;
+  --mock-muted: #8b949e;
+  --mock-ln: #484f58;
+  --mock-code: #c9d1d9;
+  --mock-added-text: #aff5b4;
+  --band-tint: oklch(18% 0.012 264);
+  --band-border: oklch(27% 0.022 264);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --mock-bg: #0d1117;
+    --mock-header-bg: #161b22;
+    --mock-border: rgba(255, 255, 255, 0.12);
+    --mock-border-subtle: rgba(255, 255, 255, 0.06);
+    --mock-text: #c9d1d9;
+    --mock-muted: #8b949e;
+    --mock-ln: #484f58;
+    --mock-code: #c9d1d9;
+    --mock-added-text: #aff5b4;
+    --band-tint: oklch(18% 0.012 264);
+    --band-border: oklch(27% 0.022 264);
+  }
+}
+
+// ----- Hero -----
+.hero {
+  .hero-row {
+    padding: 5rem 0 5.5rem;
+
+    @include media-breakpoint-down(lg) {
+      padding: 3.5rem 0 4rem;
+    }
+  }
+
+  .header-title {
+    font-family: var(--heading-font, 'Space Grotesk', sans-serif);
+    font-size: clamp(2.6rem, 4.4vw, 3.6rem);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -1.5px;
+
+    .small {
+      opacity: 0.88;
+      font-weight: 600;
+      letter-spacing: -1px;
+    }
+
+    @include media-breakpoint-down(sm) {
+      font-size: 2.3rem;
+      letter-spacing: -0.8px;
+    }
+  }
+
+  .hero-bullets {
+    font-size: 1.05rem;
+    line-height: 2;
+    opacity: 0.92;
+  }
+
+  .hero-cta-sub {
+    font-size: 0.9rem;
+    opacity: 0.75;
+    max-width: 420px;
+  }
+
+  .hero-video {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 22px 60px rgba(8, 12, 40, 0.4);
+  }
+}
+
+// ----- Logos band -----
+.logos-band {
+  padding: 3rem 0;
+  background-color: var(--bg-color);
+  border-bottom: 1px solid var(--border-color);
+
+  .trusted-by-subtitle {
+    opacity: 0.55;
+    margin-bottom: 2rem;
+    font-size: 1.05rem;
+  }
+}
+
+// ----- How it works -----
+.how-it-works-section {
+  border-top: 1px solid var(--border-color);
+
+  .feature-item {
+    max-width: 1080px;
+    margin: 0 auto !important;
+    padding-top: 4.5rem;
+    padding-bottom: 4.5rem;
+    border-top: 1px solid var(--border-color);
+
+    &:first-of-type {
+      padding-top: 1rem;
+      border-top: none;
+    }
+
+    &:last-of-type {
+      padding-bottom: 0;
+    }
+
+    @include media-breakpoint-down(lg) {
+      padding-top: 3.5rem;
+      padding-bottom: 3.5rem;
+    }
+  }
+
+  .feature-head {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .feature-badge {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: var(--undercover-blue);
+    color: #fff;
+    font-family: var(--heading-font, 'Space Grotesk', sans-serif);
+    font-weight: 700;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(78, 78, 242, 0.35);
+  }
+
+  h3 {
+    font-weight: 600;
+    font-size: 1.5rem;
+    line-height: 1.2;
+  }
+
+  .code-mock {
+    max-width: 480px;
+  }
+}
+
+// ----- Code mock surface -----
+.code-mock {
+  background: var(--mock-bg);
+  border: 1px solid var(--mock-border);
+  border-radius: 12px;
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  overflow: hidden;
+  max-width: 500px;
+  margin: 0 auto;
+  box-shadow: 0 14px 40px rgba(8, 12, 40, 0.12);
+  user-select: none;
+  pointer-events: none;
+}
+
+:root[data-theme="dark"] .code-mock,
+.dark-bg .code-mock {
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4);
+}
+
+.code-mock-header {
+  background: var(--mock-header-bg);
+  border-bottom: 1px solid var(--mock-border);
+  padding: 0.65rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.code-mock-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--mock-ln);
+  opacity: 0.45;
+  flex-shrink: 0;
+}
+
+.code-mock-filename {
+  color: var(--mock-muted);
+  font-size: 0.78rem;
+  margin-left: 0.4rem;
+}
+
+.diff-line {
+  display: flex;
+  align-items: stretch;
+
+  .ln {
+    min-width: 3.2ch;
+    text-align: right;
+    padding: 4px 10px;
+    color: var(--mock-ln);
+    flex-shrink: 0;
+  }
+
+  .dm {
+    width: 1.6ch;
+    padding: 4px 2px;
+    flex-shrink: 0;
+    color: var(--mock-ln);
+  }
+
+  code {
+    padding: 4px 8px;
+    color: var(--mock-code);
+    flex: 1;
+    background: transparent;
+    font-size: inherit;
+    font-family: inherit;
+    white-space: pre;
+  }
+
+  &.diff-added {
+    background: rgba(46, 160, 67, 0.13);
+    .dm { color: #3fb950; }
+    code { color: var(--mock-added-text); }
+  }
+}
+
+.code-annotation {
+  border-top: 1px solid rgba(255, 165, 0, 0.28);
+  background: rgba(255, 165, 0, 0.08);
+  padding: 0.75rem 1rem;
+
+  .annotation-header {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .annotation-app {
+    color: var(--mock-muted);
+    font-size: 0.74rem;
+  }
+
+  .annotation-title {
+    color: #d97706;
+    font-weight: 600;
+    font-size: 0.82rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .annotation-msg {
+    color: var(--mock-muted);
+    font-size: 0.76rem;
+  }
+}
+
+:root[data-theme="dark"] .code-annotation .annotation-title {
+  color: #ffa657;
+}
+
+.status-check-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--mock-border-subtle);
+
+  svg { flex-shrink: 0; }
+}
+
+.status-check-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.status-check-name {
+  color: var(--mock-text);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.status-check-desc {
+  color: var(--mock-muted);
+  font-size: 0.74rem;
+}
+
+.status-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+
+  &.pass {
+    background: rgba(46, 160, 67, 0.18);
+    color: #2ea043;
+  }
+
+  &.fail {
+    background: rgba(248, 81, 73, 0.16);
+    color: #f85149;
+  }
+}
+
+.mock-merge-box {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.8rem 1rem;
+  background: rgba(46, 160, 67, 0.07);
+  font-size: 0.76rem;
+  color: var(--mock-muted);
+
+  span { flex: 1; }
+}
+
+.mock-merge-btn {
+  background: #1f883d;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 13px;
+  font-size: 0.76rem;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: default;
+  white-space: nowrap;
+}
+
+.coverage-table-mock {
+  .cov-row {
+    display: grid;
+    grid-template-columns: 1fr 7ch;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--mock-border-subtle);
+    align-items: center;
+
+    &:last-child { border-bottom: none; }
+
+    code {
+      background: transparent;
+      color: var(--mock-code);
+      font-size: 0.82rem;
+      font-family: inherit;
+    }
+
+    span { text-align: right; font-weight: 600; font-size: 0.82rem; }
+
+    &.cov-header {
+      background: var(--mock-header-bg);
+      color: var(--mock-muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+
+      span { font-weight: 600; color: var(--mock-muted); }
+      code { color: var(--mock-muted); font-size: 0.72rem; }
+    }
+
+    &.cov-warn-row {
+      background: rgba(248, 81, 73, 0.07);
+    }
+  }
+
+  .cov-ok { color: #2ea043; }
+  .cov-med { color: #d97706; }
+  .cov-fail { color: #f85149; }
+}
+
+.commits-mock {
+  .commit-row {
+    display: grid;
+    grid-template-columns: 7ch 1fr auto;
+    gap: 0.85rem;
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--mock-border-subtle);
+    align-items: center;
+    font-size: 0.82rem;
+
+    &:last-child { border-bottom: none; }
+  }
+
+  .commit-sha {
+    color: var(--mock-link, #4e4ef2);
+    color: var(--undercover-blue);
+  }
+
+  .commit-msg {
+    color: var(--mock-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .commit-cov {
+    text-align: right;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .cov-ok { color: #2ea043; }
+  .cov-med { color: #d97706; }
+  .cov-fail { color: #f85149; }
+}
+
+// ----- Personalization band -----
+.personalization-section {
+  padding: 5.5rem 0;
+  background-color: var(--band-tint);
+  border-top: 1px solid var(--band-border);
+  border-bottom: 1px solid var(--band-border);
+
+  h2 {
+    font-weight: 600;
+    font-size: 2.4rem;
+  }
+
+  code {
+    background: var(--mock-header-bg);
+    color: var(--mock-text);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 0.88em;
+  }
+}
+
+// ----- Mega testimonial -----
+.mega-testimonial {
+  padding: 6rem 0;
+  background-color: var(--bg-color);
+
+  blockquote {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+    border: none;
+    padding: 0;
+
+    p {
+      font-family: var(--heading-font, 'Space Grotesk', sans-serif);
+      font-size: 2rem;
+      line-height: 1.4;
+      font-weight: 500;
+      color: var(--text-color);
+      margin-bottom: 2.25rem;
+
+      em { font-style: italic; color: var(--undercover-blue); }
+
+      @include media-breakpoint-down(md) {
+        font-size: 1.4rem;
+      }
+    }
+
+    footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.9rem;
+    }
+
+    .mega-avatar {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .mega-author {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+
+    .mega-name {
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: var(--text-color);
+    }
+
+    .mega-title {
+      font-size: 0.9rem;
+      color: var(--muted-text);
+    }
+  }
+}
+
+// ----- Testimonials carousel band -----
+.testimonials-section {
+  border-top: 1px solid var(--band-border);
+  border-bottom: 1px solid var(--band-border);
+  background-color: var(--bg-color);
+}
+
+// ----- Pricing + reading bands -----
+.pricing-band {
+  padding: 5.5rem 0;
+  background-color: var(--band-tint);
+  border-top: 1px solid var(--band-border);
+  border-bottom: 1px solid var(--band-border);
+
+  h2 {
+    font-weight: 600;
+    font-size: 2.4rem;
+  }
+}
+
+.reading-section {
+  padding: 5.5rem 0;
+  background-color: var(--band-tint);
+  border-top: 1px solid var(--band-border);
+  border-bottom: 1px solid var(--band-border);
+
+  h2 {
+    font-weight: 600;
+    font-size: 2.4rem;
+  }
+}
+
+.reading-grid {
+  display: grid;
+  gap: 1.25rem;
+  max-width: 960px;
+  margin: 0 auto;
+
+  @include media-breakpoint-up(md) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.reading-item {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.75rem;
+  box-shadow: 0 6px 20px rgba(8, 12, 40, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(8, 12, 40, 0.09);
+  }
+
+  .reading-title {
+    display: block;
+    font-family: var(--heading-font, 'Space Grotesk', sans-serif);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-color);
+    text-decoration: none;
+    line-height: 1.3;
+    margin-bottom: 0.85rem;
+
+    &:hover { color: var(--undercover-blue); }
+  }
+
+  .reading-quote {
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: var(--muted-text);
+    font-style: italic;
+    margin: 0 0 1rem;
+    flex: 1;
+
+    code {
+      font-style: normal;
+      background: var(--mock-header-bg);
+      color: var(--mock-text);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 0.85em;
+    }
+  }
+
+  .reading-source {
+    font-size: 0.82rem;
+    color: var(--muted-text);
+    border-top: 1px solid var(--border-color);
+    padding-top: 0.85rem;
+
+    a { color: var(--undercover-blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  }
+}
+
+.dark-bg .pricing-table { /* legacy override no longer used */ }
+
+// ----- Pricing comparison table -----
+.pricing-table-wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 3rem;
+
+  @include media-breakpoint-down(md) {
+    overflow-x: auto;
+  }
+}
+
+.pricing-table {
+  width: 100%;
+  min-width: 640px;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 18px 50px rgba(8, 12, 40, 0.14);
+
+  thead th {
+    padding: 1.75rem 1.25rem 1.5rem;
+    text-align: center;
+    vertical-align: top;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-color);
+
+    width: 24%;
+
+    &.pt-feature-col {
+      width: 28%;
+      background: transparent;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    &.pt-plan-featured {
+      background: var(--band-tint);
+      box-shadow: inset 0 3px 0 var(--undercover-blue);
+    }
+  }
+
+  .pt-plan-name {
+    display: block;
+    font-family: var(--heading-font, 'Space Grotesk', sans-serif);
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--text-color);
+  }
+
+  .pt-plan-tagline {
+    display: block;
+    font-size: 0.74rem;
+    color: var(--muted-text);
+    margin-top: 0.35rem;
+    min-height: 2.4em;
+    line-height: 1.3;
+  }
+
+  .pt-plan-price {
+    display: block;
+    font-family: var(--heading-font, 'Space Grotesk', sans-serif);
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-top: 0.5rem;
+
+    small {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--muted-text);
+    }
+  }
+
+  .pt-plan-unit {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--muted-text);
+    margin-bottom: 0.9rem;
+  }
+
+  tbody td {
+    padding: 0.85rem 1.25rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+
+    &:first-child {
+      text-align: left;
+      color: var(--muted-text);
+      font-size: 0.88rem;
+    }
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+
+  tbody td:nth-child(4) {
+    background: color-mix(in oklch, var(--band-tint) 60%, transparent);
+  }
+
+  .pt-group td {
+    background: var(--bg-color);
+    font-family: var(--heading-font, 'Space Grotesk', sans-serif);
+    font-weight: 600;
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted-text);
+    text-align: left;
+    padding: 0.7rem 1.25rem;
+  }
+
+  .pt-check {
+    color: #2ea043;
+    font-weight: 700;
+  }
+
+  .pt-none {
+    color: var(--mock-ln);
+  }
+
+  .btn {
+    margin-top: 0.25rem;
+  }
+
+  .btn-outline-secondary {
+    border: 1px solid var(--undercover-blue);
+    color: var(--undercover-blue);
+    background: transparent;
+    font-weight: 600;
+
+    &:hover {
+      background: var(--undercover-blue);
+      color: #fff;
+    }
+  }
+}
+
+.dark-bg .pricing-table {
+  --pt-surface: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.03);
+
+  thead th {
+    background: rgba(255, 255, 255, 0.02);
+    &.pt-plan-featured { background: rgba(255, 255, 255, 0.06); }
+  }
+  .pt-plan-name, .pt-plan-price { color: var(--fafa-white); }
+  tbody td { color: rgba(255, 255, 255, 0.85); }
+  .pt-group td { background: rgba(255, 255, 255, 0.02); color: rgba(255,255,255,0.6); }
+}
+
+// ----- Open source links block under pricing -----
+.oss-links {
+  max-width: 860px;
+  margin: 1rem auto 0;
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--band-border);
+  text-align: center;
+
+  .oss-links-title {
+    font-family: var(--heading-font, 'Space Grotesk', sans-serif);
+    font-weight: 600;
+    font-size: 1.25rem;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+  }
+
+  .oss-links-sub {
+    font-size: 0.95rem;
+    color: var(--muted-text);
+    margin-bottom: 1.25rem;
+  }
+
+  .oss-links-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem 0.75rem;
+
+    li a {
+      display: inline-block;
+      padding: 0.4rem 0.85rem;
+      border: 1px solid var(--border-color);
+      border-radius: 999px;
+      background: var(--card-bg);
+      color: var(--undercover-blue);
+      font-size: 0.85rem;
+      text-decoration: none;
+      transition: border-color 0.15s ease, transform 0.15s ease;
+
+      &:hover {
+        border-color: var(--undercover-blue);
+        transform: translateY(-1px);
+      }
+    }
+  }
+
+  .oss-links-contact {
+    font-size: 0.9rem;
+    color: var(--muted-text);
+
+    a { color: var(--undercover-blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  }
+}
+
+// ----- Terminal mock (shift-left / local feedback loop) -----
+.terminal-output {
+  padding: 0.85rem 1rem 1rem;
+  font-size: 0.84rem;
+  line-height: 1.6;
+
+  .t-line {
+    color: var(--mock-text);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .t-prompt {
+    color: #2ea043;
+    font-weight: 700;
+    margin-right: 0.5rem;
+  }
+
+  .t-hint {
+    color: var(--mock-muted);
+    margin-top: 0.75rem;
+    font-size: 0.78rem;
+  }
+}
+
+.t-warn-block {
+  margin: 0.75rem 0;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid rgba(248, 81, 73, 0.3);
+  border-radius: 8px;
+  background: rgba(248, 81, 73, 0.07);
+
+  .t-warn-loc {
+    color: var(--mock-muted);
+    font-size: 0.76rem;
+  }
+
+  .t-warn-name {
+    color: var(--mock-text);
+    font-weight: 600;
+    margin: 0.15rem 0;
+  }
+
+  .t-warn-msg {
+    color: #d97706;
+    font-size: 0.78rem;
+  }
+}
+
+// ===== Review pass: dark palette, fonts, spacing, contrast, sequence =====
+
+:root {
+  --heading-font: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  --border-color: rgba(0, 0, 0, 0.12);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--heading-font);
+}
+
+// Brand-tinted, higher-contrast dark palette (replaces flat #1a1a1a)
+:root[data-theme="dark"] {
+  --bg-color: #101218;
+  --text-color: #f1f3f8;
+  --card-bg: #191c24;
+  --border-color: rgba(255, 255, 255, 0.13);
+  --muted-text: #9ba4b4;
+  --jumbotron-bg: #191c24;
+  --band-tint: #15171f;
+  --band-border: rgba(255, 255, 255, 0.10);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-color: #101218;
+    --text-color: #f1f3f8;
+    --card-bg: #191c24;
+    --border-color: rgba(255, 255, 255, 0.13);
+    --muted-text: #9ba4b4;
+    --jumbotron-bg: #191c24;
+    --band-tint: #15171f;
+    --band-border: rgba(255, 255, 255, 0.10);
+  }
+}
+
+// Tighter spacing across sections
+.hero .hero-row { padding: 3.5rem 0 4rem; }
+.logos-band { padding: 2.25rem 0; }
+.how-it-works-section { padding: 4rem 0; }
+.personalization-section { padding: 4rem 0; }
+.mega-testimonial { padding: 4rem 0; }
+.mega-testimonial blockquote p { margin-bottom: 1.75rem; }
+.pricing-band { padding: 4rem 0; }
+.reading-section { padding: 4rem 0; }
+
+// More contrast
+.lead { opacity: 1; }
+.trusted-by-subtitle { opacity: 0.65; }
+
+// How it works: drop horizontal dividers, add a sequence connector under each badge
+.how-it-works-section .feature-item {
+  border-top: none;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+
+  &:first-of-type { padding-top: 0; }
+  &:last-of-type { padding-bottom: 0; }
+}
+
+.how-it-works-section .feature-badge {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: calc(100% + 7px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 2rem;
+    background: linear-gradient(var(--undercover-blue), transparent);
+    opacity: 0.4;
+  }
+}
+
+.how-it-works-section .feature-item:last-of-type .feature-badge::after {
+  display: none;
+}
+
+// ===== Garry review fixes: seam, dark contrast, sequence =====
+
+// 1. Jay testimonial becomes a brand-color spotlight (fixes white→white seam,
+//    gives the quote a deliberate moment between Ship-on-green and How it works)
+.mega-testimonial {
+  background: var(--undercover-blue);
+  background: linear-gradient(135deg, var(--undercover-blue) 0%, var(--undercover-blue-2) 100%);
+  border-top: none;
+  border-bottom: none;
+
+  blockquote p {
+    color: #ffffff;
+
+    em {
+      color: #dbe4ff;
+      font-style: italic;
+    }
+  }
+
+  .mega-name { color: #ffffff; }
+  .mega-title { color: rgba(255, 255, 255, 0.92); }
+  .mega-avatar { border: 2px solid rgba(255, 255, 255, 0.5); }
+}
+
+:root[data-theme="dark"] .mega-testimonial,
+:root:not([data-theme="light"]) .mega-testimonial {
+  background: linear-gradient(135deg, rgb(45, 45, 140) 0%, rgb(55, 90, 180) 100%);
+}
+
+// 2. Dark mode: lift band tint + borders so section rhythm is visible
+:root[data-theme="dark"] {
+  --band-tint: #1b1f2b;
+  --band-border: rgba(255, 255, 255, 0.16);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --band-tint: #1b1f2b;
+    --band-border: rgba(255, 255, 255, 0.16);
+  }
+}
+
+// 3. Sequence connector: ~2x stronger and more deliberate
+.how-it-works-section .feature-badge::after {
+  content: '';
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 3.25rem;
+  border-radius: 2px;
+  background: linear-gradient(var(--undercover-blue) 0%, var(--undercover-blue) 55%, transparent 100%);
+  opacity: 0.65;
+}
+
+.how-it-works-section .feature-item:last-of-type .feature-badge::after {
+  display: none;
+}
+
+// ===== Console aesthetic + final polish (turbopuffer-inspired) =====
+
+:root {
+  --mono-font: 'Space Mono', ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
+  --heading-font: 'Space Mono', ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--mono-font);
+  letter-spacing: -0.5px;
+}
+
+// Hero: console face, tuned for mono metrics (Space Mono tops out at 700)
+.hero .header-title {
+  font-family: var(--mono-font);
+  font-weight: 700;
+  font-size: clamp(2.2rem, 3.6vw, 3rem);
+  letter-spacing: -1px;
+  line-height: 1.12;
+
+  .small { font-weight: 400; letter-spacing: -0.5px; }
+}
+
+// Mono section headings sit better a touch smaller / tighter
+.how-it-works-section h2,
+.personalization-section h2,
+.pricing-band h2,
+.reading-section h2,
+.testimonials-section h2 {
+  font-size: 2rem;
+  letter-spacing: -0.6px;
+}
+
+.feature-badge { font-family: var(--mono-font); }
+
+// 2. Remove the messed-up connector ticks; numbered badges carry the sequence
+.how-it-works-section .feature-badge::after { display: none !important; }
+
+// 4. Pro plan: make the featured column read as elevated/selected,
+//    not recessed. Faint brand wash brighter than neighbours + clear accent.
+.pricing-table thead th.pt-plan-featured {
+  background: rgba(78, 78, 242, 0.06);
+  box-shadow: inset 0 4px 0 var(--undercover-blue);
+}
+
+.pricing-table tbody td:nth-child(4) {
+  background: rgba(78, 78, 242, 0.045);
+}
+
+.pricing-table tbody tr:last-child td:nth-child(4) {
+  border-bottom-right-radius: 14px;
+}
+
+:root[data-theme="dark"] .pricing-table thead th.pt-plan-featured,
+:root:not([data-theme="light"]) .pricing-table thead th.pt-plan-featured {
+  background: rgba(120, 140, 255, 0.14);
+}
+
+:root[data-theme="dark"] .pricing-table tbody td:nth-child(4),
+:root:not([data-theme="light"]) .pricing-table tbody td:nth-child(4) {
+  background: rgba(120, 140, 255, 0.09);
+}
+
+// 7. Jay job title: solid white for real contrast on the blue band
+.mega-testimonial .mega-title {
+  color: #ffffff !important;
+  opacity: 0.85;
+  font-weight: 500;
+  font-size: 0.92rem;
+}
+
+.mega-testimonial .mega-name {
+  font-size: 1.05rem;
+}
+
+// ----- Closing CTA (replaces the outbound reading list) -----
+.closing-cta {
+  .btn-primary {
+    background: var(--undercover-blue);
+    border-color: var(--undercover-blue);
+    padding: 0.7rem 1.75rem;
+
+    &:hover, &:focus {
+      background: #3d3de0;
+      border-color: #3d3de0;
+    }
+  }
+
+  .closing-cta-sub {
+    font-size: 0.9rem;
+    color: var(--muted-text);
+  }
+
+  .closing-cta-read {
+    margin-bottom: 0;
+
+    a {
+      font-family: var(--mono-font);
+      font-size: 0.85rem;
+      color: var(--undercover-blue);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+
+      &:hover { border-bottom-color: var(--undercover-blue); }
+    }
+  }
+}
+
+// ===== Corrections: unify Jay name/title colour, rebuild sequence connector =====
+
+// Jay: name and title the SAME colour; hierarchy via weight/size only
+.mega-testimonial .mega-name,
+.mega-testimonial .mega-title {
+  color: #ffffff !important;
+  opacity: 1;
+}
+.mega-testimonial .mega-name { font-weight: 700; font-size: 1.05rem; }
+.mega-testimonial .mega-title { font-weight: 400; font-size: 0.92rem; }
+
+// Sequence connector — rethought as a per-step timeline rail in the text
+// gutter (never overlaps copy, consistent on alternating columns).
+.how-it-works-section .feature-badge::after { display: none !important; }
+
+.how-it-works-section .feature-text {
+  position: relative;
+  padding-left: 3.75rem;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 18px;
+    top: 48px;
+    bottom: -3rem;
+    width: 2px;
+    background: linear-gradient(var(--undercover-blue) 0%, var(--undercover-blue) 60%, transparent 100%);
+    opacity: 0.35;
+  }
+}
+
+.how-it-works-section .feature-item:last-of-type .feature-text::before {
+  display: none;
+}
+
+.how-it-works-section .feature-head {
+  display: block;
+  margin-bottom: 1.1rem;
+}
+
+.how-it-works-section .feature-badge {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 0;
+}
+
+@include media-breakpoint-down(lg) {
+  .how-it-works-section .feature-text::before { bottom: -2rem; }
+}
+
+// ----- "new" pill in pricing table -----
+.pricing-table .pt-new {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-family: var(--mono-font);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: rgba(78, 78, 242, 0.12);
+  color: var(--undercover-blue);
+  vertical-align: middle;
+}
+
+// ----- Minimalistic cookie banner -----
+.cookie-banner {
+  position: fixed;
+  left: 1rem;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 1050;
+  max-width: 540px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  box-shadow: 0 8px 28px rgba(8, 12, 40, 0.16);
+
+  &[hidden] { display: none; }
+
+  .cookie-banner-text {
+    margin: 0;
+    flex: 1;
+    font-size: 0.82rem;
+    color: var(--muted-text);
+    line-height: 1.5;
+
+    a {
+      color: var(--undercover-blue);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      &:hover { border-bottom-color: var(--undercover-blue); }
+    }
+  }
+
+  .cookie-banner-accept {
+    flex-shrink: 0;
+    border: none;
+    border-radius: 7px;
+    padding: 0.45rem 1rem;
+    font-family: var(--mono-font);
+    font-size: 0.78rem;
+    font-weight: 700;
+    background: var(--undercover-blue);
+    color: #fff;
+    cursor: pointer;
+
+    &:hover { background: #3d3de0; }
+  }
+
+  @include media-breakpoint-down(sm) {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+    gap: 0.6rem;
+  }
+}
+
+// ===== Revert: drop Space Mono, restore Space Grotesk headings/hero =====
+:root {
+  --heading-font: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  --mono-font: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--heading-font);
+  letter-spacing: -0.5px;
+}
+
+.hero .header-title {
+  font-family: var(--heading-font);
+  font-weight: 800;
+  font-size: clamp(2.6rem, 4.4vw, 3.6rem);
+  letter-spacing: -1.5px;
+  line-height: 1.08;
+
+  .small { font-weight: 600; letter-spacing: -1px; }
+}
+
+.how-it-works-section h2,
+.personalization-section h2,
+.pricing-band h2,
+.reading-section h2,
+.testimonials-section h2 {
+  font-size: 2.4rem;
+  letter-spacing: -0.5px;
+}
+
+// ===== Font integrity: nested elements inherit their heading/quote font =====
+// The global `* { font-family }` rule overrides inheritance on nested
+// spans/em inside headings (e.g. the .small line in the hero h1). Force
+// heading + blockquote descendants to inherit so type is consistent.
+h1 *, h2 *, h3 *, h4 *, h5 *, h6 * {
+  font-family: inherit;
+}
+
+.mega-testimonial blockquote,
+.mega-testimonial blockquote * {
+  font-family: var(--heading-font);
+}
+
+.reading-item .reading-title,
+.closing-cta h2,
+.closing-cta h2 * {
+  font-family: var(--heading-font);
 }

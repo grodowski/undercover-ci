@@ -2,82 +2,321 @@
   Ruby test coverage toolkit ready for the vibe coding era.
 <% end %>
 
-<div class="dark-bg">
-  <div class="container py-5">
-    <div class="row justify-content-center">
-      <div class="col-lg-5 mt-3 text-left">
-        <h1 class="display-4 header-title">"I've tested all the changes!"<br/><span class="small">Sure you have, Claude. 🤖</span></h1>
-        <p class="lead my-5">
-          <strong class="lead-highlight">Verify your human and AI-written PRs with structure-aware coverage checks. </strong> Catch <strong class="lead-highlight">untested changes</strong> before you ship.
+<div class="dark-bg hero">
+  <div class="container">
+    <div class="row align-items-center hero-row">
+      <div class="col-lg-6 text-left">
+        <h1 class="display-4 header-title">"I've tested all the changes!"<br/><span class="small">Sure you have, Claude.</span></h1>
+        <p class="lead my-4">
+          We found Claude stops at <strong class="lead-highlight">75% branch coverage</strong> when making changes. Verify your human and AI-written PRs with structure-aware coverage checks, and catch <strong class="lead-highlight">untested changes</strong> before you ship.
         </p>
-        <p class="lead my-5">
+        <p class="lead hero-bullets">
           🎯 Ship every PR knowing what's tested<br/>
           🛠️ Works with all Ruby testing frameworks<br/>
-          🔓 Free forever for open source<br/>
+          🔓 Free forever for open source
         </p>
-      </div>
-      <div class="col-lg-7 pl-3 pt-lg-3 my-lg-3">
-        <div style="position: relative; padding-bottom: 64.36233611442192%; height: 0;">
-          <iframe src="https://www.loom.com/embed/0702e2e7ee4d459c8e1d044396bba906" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
-          </iframe>
+        <div class="hero-cta">
+          <% if current_user.nil? %>
+            <%= link_to "Sign Up with GitHub", "/auth/github?r=sign_up", class: "btn btn-lg btn-light font-weight-bold", method: :post %>
+            <p class="hero-cta-sub mt-3">
+              14-day free trial for private repos. <strong>No seat-based pricing.</strong> Supports Ruby and GitHub.
+            </p>
+          <% else %>
+            <%= link_to "Go to Dashboard", dashboard_path, class: "btn btn-lg btn-light" %>
+          <% end %>
         </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="col text-center my-3">
-        <% if current_user.nil? %>
-          <%= link_to "Sign Up with GitHub", "/auth/github?r=sign_up", class: "btn btn-lg btn-light font-weight-bold", method: :post %>
-          <p class="mt-2">
-            14-day free trial for private repos. <strong>No seat-based pricing.</strong><br/>
-            Supports Ruby and GitHub.
-          </p>
-        <% else %>
-          <%= link_to "Go to Dashboard", dashboard_path, class: "btn btn-lg btn-light" %>
-        <% end %>
+      <div class="col-lg-6 mt-5 mt-lg-0">
+        <div class="hero-video">
+          <div style="position: relative; padding-bottom: 64.36233611442192%; height: 0;">
+            <iframe src="https://www.loom.com/embed/0702e2e7ee4d459c8e1d044396bba906" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+            </iframe>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<div class="container how-it-works-container text-center mt-5">
-  <p class="section-subtitle trusted-by-subtitle">Leading <strong>Ruby engineering teams</strong> review test coverage with undercover</p>
-  <div class="row">
-    <div class="col-md-3 pb-5">
-      <a href="https://gitlab.com" target="_blank">
-        <picture>
-          <source srcset="<%= image_path("gitlab-logo-default-rgb.png") %>" />
-          <img class="img-fluid trusted-by-img" alt="GitLab" />
-        </picture>
-      </a>
+<div class="logos-band">
+  <div class="container text-center">
+    <p class="section-subtitle trusted-by-subtitle">Leading <strong>Ruby engineering teams</strong> review test coverage with undercover</p>
+    <div class="row justify-content-center align-items-center">
+      <div class="col-6 col-md-3 pb-4">
+        <a href="https://gitlab.com" target="_blank">
+          <picture>
+            <source srcset="<%= image_path("gitlab-logo-default-rgb.png") %>" />
+            <img class="img-fluid trusted-by-img" alt="GitLab" />
+          </picture>
+        </a>
+      </div>
+      <div class="col-6 col-md-3 pb-4">
+        <a href="https://fieldly.com" target="_blank">
+          <picture>
+            <source srcset="<%= image_path("fieldly_black.png") %>" />
+            <img class="img-fluid trusted-by-img" alt="Fieldly" />
+          </picture>
+        </a>
+      </div>
+      <div class="col-6 col-md-3 pb-4">
+        <a href="https://rainforestqa.com" target="_blank">
+          <picture>
+            <source srcset="<%= image_path("rfqa.png") %>" />
+            <img class="img-fluid trusted-by-img" alt="Rainforest QA" />
+          </picture>
+        </a>
+      </div>
+      <div class="col-6 col-md-3 pb-4">
+        <a href="https://www.sayrhino.com" target="_blank">
+          <picture>
+            <source srcset="<%= image_path("rhino.png") %>" />
+            <img class="img-fluid trusted-by-img rhino" alt="Rhino" />
+          </picture>
+        </a>
+      </div>
     </div>
-    <div class="col-md-3 pb-5">
-      <a href="https://fieldly.com" target="_blank">
-        <picture>
-          <source srcset="<%= image_path("fieldly_black.png") %>" />
-          <img class="img-fluid trusted-by-img" alt="Fieldly" />
-        </picture>
-      </a>
+  </div>
+</div>
+
+<div class="personalization-section">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6 mb-5 mb-lg-0">
+        <h2 class="mb-4">Ship on green</h2>
+        <p class="lead mb-4">No untested changes in your pull request? Merge with confidence. All code, whether written by humans or AI, is verified.</p>
+        <p class="text-muted">If there are gaps, you control the rules: require the check to pass before merging, or use SimpleCov's <code>:nocov:</code> comments to explicitly allow exceptions. You can also configure the check to be neutral and fail on specific hot code paths. Either way, you're verifying coverage as you change code, not adding it retroactively or chasing vanity metrics.</p>
+      </div>
+      <div class="col-lg-6">
+        <div class="code-mock">
+          <div class="code-mock-header">
+            <span class="code-mock-dot"></span><span class="code-mock-dot"></span><span class="code-mock-dot"></span>
+            <span class="code-mock-filename">Add subscription renewal logic · PR #847</span>
+          </div>
+          <div class="status-check-row">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3fb950" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <div class="status-check-body">
+              <span class="status-check-name">CI / rspec</span>
+              <span class="status-check-desc">All tests passed</span>
+            </div>
+            <span class="status-badge pass">Passing</span>
+          </div>
+          <div class="status-check-row">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3fb950" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <div class="status-check-body">
+              <span class="status-check-name">UndercoverCI / coverage</span>
+              <span class="status-check-desc">All changed methods are covered</span>
+            </div>
+            <span class="status-badge pass">Passing</span>
+          </div>
+          <div class="mock-merge-box">
+            <span>All checks passed. Ready to merge.</span>
+            <button class="mock-merge-btn">Merge pull request</button>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="col-md-3 pb-5">
-      <a href="https://rainforestqa.com" target="_blank">
-        <picture>
-          <source srcset="<%= image_path("rfqa.png") %>" />
-          <img class="img-fluid trusted-by-img" alt="Rainforest QA" />
-        </picture>
-      </a>
+  </div>
+</div>
+
+<div class="mega-testimonial">
+  <div class="container">
+    <blockquote>
+      <p>It's always been great as a pre-release gut-check but lately it's become absolutely <em>essential</em> for ensuring our AI agent-written PRs have the coverage we require.</p>
+      <footer>
+        <img src="<%= image_path("avatars/jay-tennier.jpg") %>" alt="Jay Tennier" class="mega-avatar">
+        <span class="mega-author">
+          <span class="mega-name">Jay Tennier</span>
+          <span class="mega-title">Engineering Manager at Rainforest QA</span>
+        </span>
+      </footer>
+    </blockquote>
+  </div>
+</div>
+
+<div id="how-it-works" class="how-it-works-section">
+  <div class="container">
+    <div class="text-center mb-5 pb-4">
+      <h2 class="mb-4">How it works</h2>
+      <p class="section-subtitle mx-auto" style="max-width: 700px;">Detect when changed code is untested before it's deployed.<br/>Stop chasing 100% and focus on what you're actually shipping.</p>
     </div>
-    <div class="col-md-3 pb-5">
-      <a href="https://www.sayrhino.com" target="_blank">
-        <picture>
-          <source srcset="<%= image_path("rhino.png") %>" />
-          <img class="img-fluid trusted-by-img rhino" alt="Rhino" />
-        </picture>
-      </a>
+
+    <div class="feature-item">
+      <div class="row align-items-center">
+        <div class="col-lg-5 mb-5 mb-lg-0">
+          <div class="feature-text">
+            <div class="feature-head">
+              <span class="feature-badge">01</span>
+              <h3 class="mb-0">Find untested code blocks</h3>
+            </div>
+            <p class="mb-3">Perfect for auto-generated code that often miss critical paths. Built on SimpleCov and code structure analysis, Undercover checks guide the programmer to test adequately.</p>
+            <p class="text-muted">Worried about too many comments? You won't receive more than one comment per method, because Undercover understands code structure and only works with the current diff. Annotations are reported on changed classes, methods or blocks where line coverage or branch coverage was missing.</p>
+          </div>
+        </div>
+        <div class="col-lg-7">
+          <div class="code-mock">
+            <div class="code-mock-header">
+              <span class="code-mock-dot"></span><span class="code-mock-dot"></span><span class="code-mock-dot"></span>
+              <span class="code-mock-filename">app/models/subscription.rb</span>
+            </div>
+            <div class="diff-line diff-added"><span class="ln">32</span><span class="dm">+</span><code>def renew!(months:)</code></div>
+            <div class="diff-line diff-added"><span class="ln">33</span><span class="dm">+</span><code>  update!(ends_at: ends_at + months.months)</code></div>
+            <div class="diff-line diff-added"><span class="ln">34</span><span class="dm">+</span><code>end</code></div>
+            <div class="code-annotation">
+              <div class="annotation-header">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffa657" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <span class="annotation-app">UndercoverCI / coverage</span>
+              </div>
+              <div class="annotation-title">Untested instance method</div>
+              <div class="annotation-msg">Subscription#renew!, branch coverage: 0%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-item">
+      <div class="row align-items-center">
+        <div class="col-lg-5 mb-5 mb-lg-0 order-lg-2">
+          <div class="feature-text">
+            <div class="feature-head">
+              <span class="feature-badge">02</span>
+              <h3 class="mb-0">Monitor your test suite health</h3>
+            </div>
+            <p class="mb-3">Lists file names, class/method names and coverage information for a commit or pull request. Methods that cause the check to fail are flagged: one or more line or branch appears in the PR diff and has to be fixed.</p>
+            <p class="text-muted">All others provide a refactoring opportunity for you to improve the test coverage if it's low somewhere outside of the diff.</p>
+          </div>
+        </div>
+        <div class="col-lg-7 order-lg-1">
+          <div class="code-mock">
+            <div class="code-mock-header">
+              <span class="code-mock-dot"></span><span class="code-mock-dot"></span><span class="code-mock-dot"></span>
+              <span class="code-mock-filename">Coverage breakdown: PR #847</span>
+            </div>
+            <div class="coverage-table-mock">
+              <div class="cov-row">
+                <code>Order#calculate_tax</code><span class="cov-ok">100%</span>
+              </div>
+              <div class="cov-row cov-warn-row">
+                <code>⚠️ Subscription#renew!</code><span class="cov-fail">0%</span>
+              </div>
+              <div class="cov-row">
+                <code>Invoice#line_items</code><span class="cov-med">67%</span>
+              </div>
+              <div class="cov-row">
+                <code>Account#deactivate!</code><span class="cov-ok">100%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-item">
+      <div class="row align-items-center">
+        <div class="col-lg-5 mb-5 mb-lg-0">
+          <div class="feature-text">
+            <div class="feature-head">
+              <span class="feature-badge">03</span>
+              <h3 class="mb-0">Track coverage over time</h3>
+            </div>
+            <p class="mb-3">View your recent commits and see how coverage evolves across your project. Filter by repository, branch and time.</p>
+            <p class="text-muted">The dashboard provides a clear timeline of your pull requests, making it easy to find changes that could be worth revisiting and improving.</p>
+          </div>
+        </div>
+        <div class="col-lg-7">
+          <div class="code-mock">
+            <div class="code-mock-header">
+              <span class="code-mock-dot"></span><span class="code-mock-dot"></span><span class="code-mock-dot"></span>
+              <span class="code-mock-filename">Recent commits — main</span>
+            </div>
+            <div class="commits-mock">
+              <div class="commit-row">
+                <span class="commit-sha">a3f1c0d</span>
+                <span class="commit-msg">Add subscription renewal logic</span>
+                <span class="commit-cov cov-med">2 warnings</span>
+              </div>
+              <div class="commit-row">
+                <span class="commit-sha">7b29e44</span>
+                <span class="commit-msg">Refactor invoice line items</span>
+                <span class="commit-cov cov-ok">0 warnings</span>
+              </div>
+              <div class="commit-row">
+                <span class="commit-sha">e80a112</span>
+                <span class="commit-msg">Tax calculation for EU orders</span>
+                <span class="commit-cov cov-ok">0 warnings</span>
+              </div>
+              <div class="commit-row">
+                <span class="commit-sha">c14d9af</span>
+                <span class="commit-msg">Account deactivation flow</span>
+                <span class="commit-cov cov-ok">0 warnings</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-item">
+      <div class="row align-items-center">
+        <div class="col-lg-5 mb-5 mb-lg-0 order-lg-2">
+          <div class="feature-text">
+            <div class="feature-head">
+              <span class="feature-badge">04</span>
+              <h3 class="mb-0">Shift left: catch gaps before you push</h3>
+            </div>
+            <p class="mb-3">Run the <code>undercover</code> gem against your diff locally, the same check that runs in CI. Wire it into your editor or coding agent so coverage gaps get fixed before the pull request, not in review.</p>
+            <p class="text-muted">Pairs with undercover-claude to give your coding agent precise, per-method targets.</p>
+          </div>
+        </div>
+        <div class="col-lg-7 order-lg-1">
+          <div class="code-mock">
+            <div class="code-mock-header">
+              <span class="code-mock-dot"></span><span class="code-mock-dot"></span><span class="code-mock-dot"></span>
+              <span class="code-mock-filename">zsh — ~/app</span>
+            </div>
+            <div class="terminal-output">
+              <div class="t-line"><span class="t-prompt">$</span> bundle exec undercover --compare HEAD~1</div>
+              <div class="t-warn-block">
+                <div class="t-warn-loc">app/models/subscription.rb:32</div>
+                <div class="t-warn-name">Subscription#renew!</div>
+                <div class="t-warn-msg">branch coverage: 0% · 1 warning</div>
+              </div>
+              <div class="t-line t-hint">Resolve or add :nocov: before pushing.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="pricing-band">
+  <div class="container">
+    <div class="text-center">
+      <h2 class="mb-3">Choose your setup</h2>
+      <p class="lead mb-5">Install the Undercover GitHub App or explore the Ruby gems family</p>
+    </div>
+    <%= render partial: 'partials/pricing_cards' %>
+
+    <div class="oss-links">
+      <h3 class="oss-links-title">Open source &amp; self-hosted</h3>
+      <p class="oss-links-sub">Undercover is built on open source and free for public repositories. It also runs locally as a fast feedback loop before you push, or in CI:</p>
+      <ul class="oss-links-list">
+        <li><a href="https://medium.com/@mrgrodo/improve-your-ruby-code-reviews-with-actionable-code-coverage-and-undercover-c4480575ea69" target="_blank">Improve your Ruby code reviews with actionable code coverage and Undercover</a></li>
+        <li><a href="https://github.com/grodowski/undercover" target="_blank">grodowski/undercover</a></li>
+        <li><a href="https://github.com/grodowski/undercover-claude" target="_blank">grodowski/undercover-claude</a></li>
+        <li><a href="https://github.com/grodowski/pronto-undercover" target="_blank">grodowski/pronto-undercover</a></li>
+        <li><a href="https://github.com/nimblehq/danger-undercover" target="_blank">nimblehq/danger-undercover</a></li>
+      </ul>
+      <p class="oss-links-contact"><a href="https://grodowski.github.io" target="_blank">Get in touch</a> for support or to discuss a custom solution.</p>
     </div>
   </div>
 </div>
 
 <div id="testimonials" class="testimonials-section">
+  <div class="text-center mb-5">
+    <h2 class="mb-3">From the Ruby community</h2>
+  </div>
   <div class="testimonials-carousel">
     <button class="carousel-arrow carousel-arrow--prev" aria-label="Previous testimonial">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -87,44 +326,6 @@
 
     <div class="carousel-track-container">
       <div class="carousel-track">
-        <div class="testimonial-card">
-          <div class="testimonial-quote">
-            <svg class="quote-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
-            </svg>
-            <p>I think it is a product that comes at the right time when more people are generating code/tests with LLMs</p>
-          </div>
-          <div class="testimonial-author">
-            <img src="<%= image_path("avatars/lucian-ghinda.jpg") %>" alt="Lucian Ghinda" class="testimonial-avatar">
-            <div class="testimonial-info">
-              <span class="testimonial-name">Lucian Ghinda</span>
-              <span class="testimonial-title">Senior Ruby Developer, curator of Short Ruby News</span>
-            </div>
-            <a href="https://bsky.app/profile/lucianghinda.com/post/3me3kr3p3hc23" target="_blank" class="testimonial-link" aria-label="View on Bluesky">
-              <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566.944 1.561 1.266.902 1.565.139 1.908 0 3.08 0 3.768c0 .69.378 5.65.624 6.479.815 2.736 3.713 3.66 6.383 3.364.136-.02.275-.039.415-.056-.138.022-.276.04-.415.056-3.912.58-7.387 2.005-2.83 7.078 5.013 5.19 6.87-1.113 7.823-4.308.953 3.195 2.05 9.271 7.733 4.308 4.267-4.308 1.172-6.498-2.74-7.078a8.741 8.741 0 0 1-.415-.056c.14.017.279.036.415.056 2.67.297 5.568-.628 6.383-3.364.246-.828.624-5.79.624-6.478 0-.69-.139-1.861-.902-2.206-.659-.298-1.664-.62-4.3 1.24C16.046 4.748 13.087 8.687 12 10.8Z"/></svg>
-            </a>
-          </div>
-        </div>
-
-        <div class="testimonial-card is-active">
-          <div class="testimonial-quote">
-            <svg class="quote-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
-            </svg>
-            <p>It's always been great as a pre-release gut-check but lately it's become absolutely <em>essential</em> for ensuring our AI agent-written PRs have the coverage we require.</p>
-          </div>
-          <div class="testimonial-author">
-            <img src="<%= image_path("avatars/jay-tennier.jpg") %>" alt="Jay Tennier" class="testimonial-avatar">
-            <div class="testimonial-info">
-              <span class="testimonial-name">Jay Tennier</span>
-              <span class="testimonial-title">Engineering Manager at Rainforest QA</span>
-            </div>
-            <a href="https://bsky.app/profile/jaytennier.bsky.social/post/3mdnygkz3is25" target="_blank" class="testimonial-link" aria-label="View on Bluesky">
-              <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566.944 1.561 1.266.902 1.565.139 1.908 0 3.08 0 3.768c0 .69.378 5.65.624 6.479.815 2.736 3.713 3.66 6.383 3.364.136-.02.275-.039.415-.056-.138.022-.276.04-.415.056-3.912.58-7.387 2.005-2.83 7.078 5.013 5.19 6.87-1.113 7.823-4.308.953 3.195 2.05 9.271 7.733 4.308 4.267-4.308 1.172-6.498-2.74-7.078a8.741 8.741 0 0 1-.415-.056c.14.017.279.036.415.056 2.67.297 5.568-.628 6.383-3.364.246-.828.624-5.79.624-6.478 0-.69-.139-1.861-.902-2.206-.659-.298-1.664-.62-4.3 1.24C16.046 4.748 13.087 8.687 12 10.8Z"/></svg>
-            </a>
-          </div>
-        </div>
-
         <div class="testimonial-card">
           <div class="testimonial-quote">
             <svg class="quote-icon" viewBox="0 0 24 24" fill="currentColor">
@@ -140,6 +341,25 @@
             </div>
             <a href="https://ruby.social/@hschne/111422104536735524" target="_blank" class="testimonial-link" aria-label="View on Mastodon">
               <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M23.268 5.313c-.35-2.578-2.617-4.61-5.304-5.004C17.51.242 15.792 0 11.813 0h-.03c-3.98 0-4.835.242-5.288.309C3.882.692 1.496 2.518.917 5.127.64 6.412.61 7.837.661 9.143c.074 1.874.088 3.745.26 5.611.118 1.24.325 2.47.62 3.68.55 2.237 2.777 4.098 4.96 4.857 2.336.792 4.849.923 7.256.38.265-.061.527-.132.786-.213.585-.184 1.27-.39 1.774-.753a.057.057 0 0 0 .023-.043v-1.809a.052.052 0 0 0-.02-.041.053.053 0 0 0-.046-.01 20.282 20.282 0 0 1-4.709.545c-2.73 0-3.463-1.284-3.674-1.818a5.593 5.593 0 0 1-.319-1.433.053.053 0 0 1 .066-.054c1.517.363 3.072.546 4.632.546.376 0 .75 0 1.125-.01 1.57-.044 3.224-.124 4.768-.422.038-.008.077-.015.11-.024 2.435-.464 4.753-1.92 4.989-5.604.008-.145.03-1.52.03-1.67.002-.512.167-3.63-.024-5.545zm-3.748 9.195h-2.561V8.29c0-1.309-.55-1.976-1.67-1.976-1.23 0-1.846.79-1.846 2.35v3.403h-2.546V8.663c0-1.56-.617-2.35-1.848-2.35-1.112 0-1.668.668-1.67 1.977v6.218H4.822V8.102c0-1.31.337-2.35 1.011-3.12.696-.77 1.608-1.164 2.74-1.164 1.311 0 2.302.5 2.962 1.498l.638 1.06.638-1.06c.66-.999 1.65-1.498 2.96-1.498 1.13 0 2.043.395 2.74 1.164.675.77 1.012 1.81 1.012 3.12z"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="testimonial-card is-active">
+          <div class="testimonial-quote">
+            <svg class="quote-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
+            </svg>
+            <p>I think it is a product that comes at the right time when more people are generating code/tests with LLMs</p>
+          </div>
+          <div class="testimonial-author">
+            <img src="<%= image_path("avatars/lucian-ghinda.jpg") %>" alt="Lucian Ghinda" class="testimonial-avatar">
+            <div class="testimonial-info">
+              <span class="testimonial-name">Lucian Ghinda</span>
+              <span class="testimonial-title">Senior Ruby Developer, curator of Short Ruby News</span>
+            </div>
+            <a href="https://bsky.app/profile/lucianghinda.com/post/3me3kr3p3hc23" target="_blank" class="testimonial-link" aria-label="View on Bluesky">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566.944 1.561 1.266.902 1.565.139 1.908 0 3.08 0 3.768c0 .69.378 5.65.624 6.479.815 2.736 3.713 3.66 6.383 3.364.136-.02.275-.039.415-.056-.138.022-.276.04-.415.056-3.912.58-7.387 2.005-2.83 7.078 5.013 5.19 6.87-1.113 7.823-4.308.953 3.195 2.05 9.271 7.733 4.308 4.267-4.308 1.172-6.498-2.74-7.078a8.741 8.741 0 0 1-.415-.056c.14.017.279.036.415.056 2.67.297 5.568-.628 6.383-3.364.246-.828.624-5.79.624-6.478 0-.69-.139-1.861-.902-2.206-.659-.298-1.664-.62-4.3 1.24C16.046 4.748 13.087 8.687 12 10.8Z"/></svg>
             </a>
           </div>
         </div>
@@ -196,7 +416,6 @@
     <button class="carousel-dot is-active" aria-label="Go to testimonial 2"></button>
     <button class="carousel-dot" aria-label="Go to testimonial 3"></button>
     <button class="carousel-dot" aria-label="Go to testimonial 4"></button>
-    <button class="carousel-dot" aria-label="Go to testimonial 5"></button>
   </div>
 </div>
 
@@ -284,170 +503,17 @@
 })();
 </script>
 
-<div id="how-it-works" class="how-it-works-section">
+<div class="reading-section closing-cta">
   <div class="container">
-    <div class="text-center mb-5 pb-4">
-      <h2 class="mb-4">How it works</h2>
-      <p class="section-subtitle mx-auto" style="max-width: 700px;">Detect when changed code is untested before it's deployed.<br/>Stop chasing 100% and focus on what you're actually shipping.</p>
-    </div>
-
-    <div class="feature-item">
-      <div class="row align-items-center">
-        <div class="col-lg-5 mb-5 mb-lg-0">
-          <h3 class="mb-4 d-flex align-items-center">
-            <svg class="feature-icon me-2" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9 11l3 3L22 4"/>
-              <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
-            </svg>
-            Find untested code blocks
-          </h3>
-          <p class="mb-3">Perfect for auto-generated code that often miss critical paths. Built on SimpleCov and code structure analysis, Undercover checks guide the programmer to test adequately.</p>
-          <p class="text-muted">Worried about too many comments? You won't receive more than one comment per method, because Undercover understands code structure and only works with the current diff. Annotations are reported on changed classes, methods or blocks where line coverage or branch coverage was missing.</p>
-        </div>
-        <div class="col-lg-7">
-          <picture>
-            <source srcset="<%= image_path("feature-inline-comment.png") %>">
-            <img class="img-fluid screenshot-with-border-radius shadow-sm" alt="Undercover GitHub comment">
-          </picture>
-        </div>
-      </div>
-    </div>
-
-    <div class="feature-item">
-      <div class="row align-items-center">
-        <div class="col-lg-5 mb-5 mb-lg-0 order-lg-2">
-          <h3 class="mb-4 d-flex align-items-center">
-            <svg class="feature-icon me-2" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="20 6 9 17 4 12"/>
-            </svg>
-            Ship on green
-          </h3>
-          <p class="mb-3">No untested changes in your pull request? Merge with confidence. All code, whether written by humans or AI, is verified.</p>
-          <p class="text-muted">If there are gaps, you control the rules: require the check to pass before merging, or use SimpleCov's <code>:nocov:</code> comments to explicitly allow exceptions. Either way, you understand what's covered.</p>
-        </div>
-        <div class="col-lg-7 order-lg-1">
-          <picture>
-            <source srcset="<%= image_path("feature-status-check.png") %>">
-            <img class="img-fluid screenshot-with-border-radius shadow-sm feature-screenshot-small" alt="Commit status check from Undercover">
-          </picture>
-        </div>
-      </div>
-    </div>
-
-    <div class="feature-item">
-      <div class="row align-items-center">
-        <div class="col-lg-5 mb-5 mb-lg-0">
-          <h3 class="mb-4 d-flex align-items-center">
-            <svg class="feature-icon me-2" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-            </svg>
-            Monitor your test suite health
-          </h3>
-          <p class="mb-3">Lists file names, class/method names and coverage information for a commit or pull request. Methods that cause the check to fail are flagged with a warning emoji (⚠️) - one or more line or branch appears in the PR diff and has to be fixed.</p>
-          <p class="text-muted">All others provide a refactoring opportunity for you to improve the test coverage if it's low somewhere outside of the diff.</p>
-        </div>
-        <div class="col-lg-7">
-          <picture>
-            <source srcset="<%= image_path("location-breakdown.png") %>">
-            <img class="img-fluid screenshot-with-border-radius shadow-sm" alt="Check summary when coverage fails">
-          </picture>
-        </div>
-      </div>
-    </div>
-
-    <div class="feature-item">
-      <div class="row align-items-center">
-        <div class="col-lg-5 mb-5 mb-lg-0 order-lg-2">
-          <h3 class="mb-4 d-flex align-items-center">
-            <svg class="feature-icon me-2" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 3v18h18"/>
-              <path d="M18 17V9"/>
-              <path d="M13 17V5"/>
-              <path d="M8 17v-3"/>
-            </svg>
-            Track coverage over time
-          </h3>
-          <p class="mb-3">View your recent commits and see how coverage evolves across your project. Filter by repository, branch and time.</p>
-          <p class="text-muted">The dashboard provides a clear timeline of your pull requests, making it easy to find changes that could be worth revisiting and improving.</p>
-        </div>
-        <div class="col-lg-7 order-lg-1">
-          <picture>
-            <source srcset="<%= image_path("recent_commits.png") %>">
-            <img class="img-fluid screenshot-with-border-radius shadow-sm" alt="Recent commits dashboard showing coverage over time">
-          </picture>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<div class="dark-bg">
-  <div class="py-5">
     <div class="text-center">
-      <h2 class="top-space">Choose your setup</h2>
-      <p class="lead mb-5">Install the Undercover GitHub App or explore the Ruby gems family</p>
-    </div>
-    <%= render partial: 'partials/pricing_cards' %>
-  </div>
-</div>
-
-<div class="container">
-  <div class="text-center">
-    <h2 class="mt-5 mb-3 top-space">Why Undercover?</h2>
-    <p class="lead mb-5">Updates and links to read about Ruby test coverage strategy</p>
-  </div>
-
-  <div class="card-deck">
-    <div class="card mb-4 shadow-lg pt-3">
-      <div class="text-left card-body">
-        <div class="mb-2">
-          <%= link_to "Teaching Claude Code to Test What Breaks", blog_post_path("claude-code-experiment"), class: "lead" %>
-        </div>
-        <blockquote>
-          <i class="mb-0">I built the same Ruby CLI gem four times with Claude Code - two models, with and without the undercover-claude skill. A narrow experiment, but the skill consistently pushed Claude past its natural stopping point and surfaced real bugs that plain runs shipped untested.</i>
-          <footer class="blockquote-footer mt-4"><a href="https://twitter.com/@mrgrodo">@mrgrodo</a> in <%= link_to "Teaching Claude Code to Test What Breaks", blog_post_path("claude-code-experiment") %></footer>
-        </blockquote>
-      </div>
-    </div>
-  </div>
-  <div class="card-deck">
-    <div class="card mb-4 shadow-lg pt-3">
-      <div  class="text-left card-body">
-        <div class="mb-2">
-          <a class="lead" href="https://mrgrodo.medium.com/branch-coverage-now-available-in-undercover-checks-57d88b211098" target="_blank">Branch coverage now available in Undercover checks</a>
-        </div>
-        <blockquote>
-          <i class="mb-0">The purpose of branch coverage is to check whether every conditional branch in a given line of code has been tested and Ruby has this feature since <code>2.5</code>. Ruby’s <code>simplecov</code> can report branch coverage too and now so does undercover with the new <code>0.4</code> release!</i>
-          <footer class="blockquote-footer mt-4"><a href="https://twitter.com/@mrgrodo">@mrgrodo</a> in <a href="https://mrgrodo.medium.com/branch-coverage-now-available-in-undercover-checks-57d88b211098" target="_blank"><cite title="Branch coverage now available in Undercover checks">Branch coverage now available in Undercover checks</cite></a></footer>
-        </blockquote>
-      </div>
-    </div>
-  </div>
-  <div class="card-deck">
-    <div class="card mb-4 shadow-lg pt-3">
-      <div  class="text-left card-body">
-        <div class="mb-2">
-          <a class="lead" href="https://medium.com/@mrgrodo/introducing-undercoverci-98c6c50793f2" target="_blank">Introducing UndercoverCI</a>
-        </div>
-        <blockquote>
-          <i class="mb-0">Today, I’m launching UndercoverCI— a CI robot who protects your Ruby codebase from untested code changes. Take a moment to learn why you should add it to your team’s code review workflow.</i>
-          <i class="mb-0">Adding UndercoverCI to your code review workflow will prevent untested code changes from slipping into production without anyone noticing.</i>
-          <footer class="blockquote-footer mt-4"><a href="https://twitter.com/@mrgrodo">@mrgrodo</a> in <a href="https://medium.com/@mrgrodo/introducing-undercoverci-98c6c50793f2" target="_blank"><cite title="Introducing UndercoverCI">Introducing UndercoverCI</cite></a></footer>
-        </blockquote>
-      </div>
-    </div>
-
-    <div class="card mb-4 shadow-lg pt-3">
-      <div  class="text-left card-body">
-        <div class="mb-2">
-          <a class="lead" href="https://martinfowler.com/bliki/TestCoverage.html" target="_blank">Test Coverage</a>
-        </div>
-        <blockquote>
-          <i class="mb-0">So what is the value of coverage analysis again? Well it helps you find which bits of your code aren't being tested. It's worth running coverage tools every so often and looking at these bits of untested code. Do they worry you that they aren't being tested?</i>
-          <footer class="blockquote-footer mt-4"><a href="https://martinfowler.com">Martin Fowler</a> in <a href="https://martinfowler.com/bliki/TestCoverage.html" target="_blank"><cite title="TestCoverage">TestCoverage (2012)</cite></a></footer>
-        </blockquote>
-      </div>
+      <h2 class="mb-3">Verify your next pull request</h2>
+      <p class="lead mb-4">Catch untested changes before you ship, human or AI written.</p>
+      <% if current_user.nil? %>
+        <%= link_to "Sign Up with GitHub", "/auth/github?r=sign_up", class: "btn btn-lg btn-primary font-weight-bold", method: :post %>
+        <p class="closing-cta-sub mt-3">14-day free trial for private repos. No seat-based pricing. Supports Ruby and GitHub.</p>
+      <% else %>
+        <%= link_to "Go to Dashboard", dashboard_path, class: "btn btn-lg btn-primary" %>
+      <% end %>
     </div>
   </div>
 </div>

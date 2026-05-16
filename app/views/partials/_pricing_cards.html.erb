@@ -1,94 +1,121 @@
-<div class="container mb-5">
-  <div class="row">
-    <div class="col-md-4">
-      <div class="card mb-4 shadow-sm">
-        <div class="card-header text-center">
-          <h2 class="mb-0">Open Source</h2>
-        </div>
-        <div class="card-body text-left">
-          <p>Undercover CI is built on <b>open-source</b> and is free to use for non-profit public GitHub repositories. <%= link_to "Sign Up with GitHub", "/auth/github?r=sign_up", method: :post %> to get started.</p>
-          <p>If a hosted GitHub App integration won't work for you, check out these links to get started and with local and CI/CD workflows:</p>
-          <ul>
-            <p>🔗 <a href="https://medium.com/@mrgrodo/improve-your-ruby-code-reviews-with-actionable-code-coverage-and-undercover-c4480575ea69">Improve your Ruby code reviews with actionable code coverage and Undercover</a>
-            <p>🔗 <a href="https://github.com/grodowski/undercover">grodowski/undercover</a></p>
-            <p>🔗 <a href="https://github.com/grodowski/undercover-claude" target="_blank">grodowski/undercover-claude</a></p>
-            <p>🔗 <a href="https://github.com/grodowski/pronto-undercover">grodowski/pronto-undercover</a></p>
-            <p>🔗 <a href="https://github.com/nimblehq/danger-undercover">nimblehq/danger-undercover</a></p>
-          </ul>
-          <p>
-            <a href="https://grodowski.github.io" target="_blank">Get in touch</a> to get support or discuss a custom solution.
-          </p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card mb-4 shadow-sm">
-        <div class="card-header text-center">
-          <h2 class="mb-0">Essentials</h4>
-        </div>
-        <div class="card-body text-left">
-          <div class="mb-4">
-            <h4>$69 per month*</h4>
-          </div>
-          <p>Startups and small engineering teams.</p>
-          <hr/>
-          <p>♾️ Unlimited users</p>
-          <p>💬 GitHub Checks annotations with coverage warnings and diff summary</p>
-          <p>🌳 Branch coverage</p>
-          <p>📊 Dashboards to track PR trends</p>
-          <p>📦 1000 completed checks per month for private repos</p>
-          <p>⏱️ Up to 3 concurrent coverage checks at a time</p>
-          <br/>
+<div class="pricing-table-wrap">
+  <table class="pricing-table">
+    <thead>
+      <tr>
+        <th class="pt-feature-col"></th>
+        <th>
+          <span class="pt-plan-name">Open Source</span>
+          <span class="pt-plan-tagline">Public repos &amp; OSS maintainers</span>
+          <span class="pt-plan-price">Free</span>
+          <span class="pt-plan-unit">forever</span>
+          <%= link_to "Get started", "/auth/github?r=sign_up", class: "btn btn-sm btn-outline-secondary", method: :post %>
+        </th>
+        <th>
+          <span class="pt-plan-name">Essentials</span>
+          <span class="pt-plan-tagline">Small to mid-size engineering teams</span>
+          <span class="pt-plan-price">$69<small>/mo</small></span>
+          <span class="pt-plan-unit">per GitHub org</span>
           <% if current_user.nil? %>
-            <p class="text-center">
-              <%= link_to "Sign Up with GitHub", "/auth/github?r=sign_up", class: "btn btn-md btn-primary", method: :post %>
-            </p>
+            <%= link_to "Start free trial", "/auth/github?r=sign_up", class: "btn btn-sm btn-primary", method: :post %>
           <% else %>
-            <p class="text-center">
-              <%= link_to "Start subscription", settings_path, class: "btn btn-md btn-primary" %>
-            </p>
+            <%= link_to "Subscribe", settings_path, class: "btn btn-sm btn-primary" %>
           <% end %>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card mb-4 shadow-lg">
-        <div class="card-header text-center">
-          <h2 class="mb-0">Pro</h2>
-        </div>
-        <div class="card-body text-left">
-          <div class="mb-4">
-            <h4>$279 per month*</h4>
-          </div>
-          <p>Medium to large engineering teams.</p>
-          <hr/>
-          <p>Includes everything in Essentials, plus:</p>
+        </th>
+        <th class="pt-plan-featured">
+          <span class="pt-plan-name">Pro</span>
+          <span class="pt-plan-tagline">Large organizations</span>
+          <span class="pt-plan-price">$279<small>/mo</small></span>
+          <span class="pt-plan-unit">per GitHub org</span>
+          <% if current_user.nil? %>
+            <%= link_to "Start free trial", "/auth/github?r=sign_up", class: "btn btn-sm btn-primary", method: :post %>
+          <% else %>
+            <%= link_to "Subscribe", settings_path, class: "btn btn-sm btn-primary" %>
+          <% end %>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="pt-group"><td colspan="4">Coverage</td></tr>
+      <tr>
+        <td>GitHub Check annotations</td>
+        <td class="pt-check">✓</td>
+        <td class="pt-check">✓</td>
+        <td class="pt-check">✓</td>
+      </tr>
+      <tr>
+        <td>Branch coverage</td>
+        <td class="pt-check">✓</td>
+        <td class="pt-check">✓</td>
+        <td class="pt-check">✓</td>
+      </tr>
+      <tr>
+        <td>ERB view coverage <span class="pt-new">new</span></td>
+        <td class="pt-check">✓</td>
+        <td class="pt-check">✓</td>
+        <td class="pt-check">✓</td>
+      </tr>
+      <tr>
+        <td>Coverage dashboards</td>
+        <td class="pt-check">✓</td>
+        <td class="pt-check">✓</td>
+        <td class="pt-check">✓</td>
+      </tr>
 
-          <p></p>
-          <p>♾️ Unlimited check builds for private repos</p>
-          <p>♾️ Unlimited concurrent check builds</p>
-          <p>⚙️ API Access</p>
-          <p>📧 24h email support turnaround time</p>
-          <br/>
-          <% if current_user.nil? %>
-            <p class="text-center">
-              <%= link_to "Sign Up with GitHub", "/auth/github?r=sign_up", class: "btn btn-md btn-primary", method: :post %>
-            </p>
-          <% else %>
-            <p class="text-center">
-              <%= link_to "Start subscription", settings_path, class: "btn btn-md btn-primary" %>
-            </p>
-          <% end %>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col text-center my-3">
-      <p class="small mt-2">
-        * VAT not included, try free for 14 days,<br/>
-        yearly discounts available for all plans by default
-      </p>
-    </div>
-  </div>
+      <tr class="pt-group"><td colspan="4">Scale</td></tr>
+      <tr>
+        <td>Public repositories</td>
+        <td class="pt-check">✓</td>
+        <td class="pt-check">✓</td>
+        <td class="pt-check">✓</td>
+      </tr>
+      <tr>
+        <td>Private repositories</td>
+        <td class="pt-none">—</td>
+        <td class="pt-check">✓</td>
+        <td class="pt-check">✓</td>
+      </tr>
+      <tr>
+        <td>Unlimited team size</td>
+        <td class="pt-check">✓</td>
+        <td class="pt-check">✓</td>
+        <td class="pt-check">✓</td>
+      </tr>
+      <tr>
+        <td>Monthly check builds</td>
+        <td class="pt-none">—</td>
+        <td>1,000</td>
+        <td>Unlimited</td>
+      </tr>
+      <tr>
+        <td>Concurrent builds</td>
+        <td class="pt-none">—</td>
+        <td>3</td>
+        <td>Unlimited</td>
+      </tr>
+
+      <tr class="pt-group"><td colspan="4">Support</td></tr>
+      <tr>
+        <td>API access</td>
+        <td class="pt-none">—</td>
+        <td class="pt-none">—</td>
+        <td class="pt-check">✓</td>
+      </tr>
+      <tr>
+        <td>Email support</td>
+        <td class="pt-none">—</td>
+        <td class="pt-check">✓</td>
+        <td>24h SLA</td>
+      </tr>
+      <tr>
+        <td>Free trial</td>
+        <td class="pt-none">—</td>
+        <td>14 days</td>
+        <td>14 days</td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="text-center small mt-3" style="color: var(--muted-text);">
+    Pricing is per GitHub organization, not per seat. VAT not included. Yearly discounts available by default.
+    <a href="https://grodowski.github.io" target="_blank">Get in touch</a> for custom solutions or self-hosted setups.
+  </p>
 </div>
