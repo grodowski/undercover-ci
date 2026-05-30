@@ -35,6 +35,12 @@ describe "GitHub auth" do
   context "without a GitHub email" do
     let(:mock_auth) { OmniAuth.config.mock_auth[:github].merge!("info" => {"email" => nil}) }
 
+    after do
+      OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(
+        YAML.load_file("spec/fixtures/auth_hash.yaml")
+      )
+    end
+
     it "works" do
       expect do
         get "/auth/github/callback"
