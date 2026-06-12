@@ -15,6 +15,7 @@ RSpec.configure do |config|
   # Seed global randomisation in specs using the rspec seed
   Kernel.srand config.seed
 
+  SimpleCov::Formatter::Undercover.output_filename = "undercover_coverage.json"
   SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new(
     [
       SimpleCov::Formatter::Undercover,
