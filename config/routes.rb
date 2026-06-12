@@ -38,6 +38,7 @@ Rails.application.routes.draw do
       collection do
         post :access_token
         patch :update
+        patch :email_preferences
       end
     end
   end

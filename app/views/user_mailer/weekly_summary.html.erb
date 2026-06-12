@@ -1,0 +1,64 @@
+<div style="font-family: -apple-system, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+  <h2 style="font-size: 18px;">Coverage check summary</h2>
+  <p style="color: #666; font-size: 13px;">
+    Week of <%= Date.today.beginning_of_week.strftime("%b %-d") %> –
+    <%= Date.today.end_of_week.strftime("%b %-d, %Y") %>
+  </p>
+
+  <% @repo_stats.each do |repo, stats| %>
+    <% total = stats[:passed] + stats[:failed] %>
+    <% passed_pct = total > 0 ? (stats[:passed].to_f / total * 100).round : 100 %>
+    <% failed_pct = 100 - passed_pct %>
+
+    <div style="margin: 20px 0; padding: 16px; border: 1px solid #e8e8e8; border-radius: 6px;">
+      <div style="font-weight: 600; margin-bottom: 8px;"><%= repo %></div>
+
+      <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; background: #f3f4f6; border-radius: 4px; margin-bottom: 8px;">
+        <tr>
+          <td style="padding: 0; height: 10px;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+              <tr>
+                <% if stats[:passed] > 0 %>
+                  <td style="width: <%= passed_pct %>%; background: #22c55e; height: 10px; border-radius: <%= stats[:failed] == 0 ? '4px' : '4px 0 0 4px' %>;"></td>
+                <% end %>
+                <% if stats[:failed] > 0 %>
+                  <td style="width: <%= failed_pct %>%; background: #f97316; height: 10px; border-radius: <%= stats[:passed] == 0 ? '4px' : '0 4px 4px 0' %>;"></td>
+                <% end %>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+      <div style="font-size: 13px; color: #666;">
+        <% if stats[:failed] > 0 %>
+          <span style="color: #28a745;">&#9632;</span> <%= stats[:passed] %> passed &nbsp;
+          <span style="color: #fd7e14;">&#9632;</span> <%= stats[:failed] %> with warnings
+        <% else %>
+          <span style="color: #28a745;">&#9632;</span> All <%= stats[:passed] %> passed
+        <% end %>
+      </div>
+
+      <% if stats[:hotspots].any? %>
+        <div style="margin-top: 12px;">
+          <div style="font-size: 12px; font-weight: 600; color: #555; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">Hotspots</div>
+          <% stats[:hotspots].each do |(path, node_name), count| %>
+            <div style="margin-bottom: 6px;">
+              <span style="font-size: 13px; font-weight: 500;"><%= node_name %></span>
+              <span style="font-size: 12px; color: #f97316; margin-left: 4px;"><%= count %>×</span>
+              <div style="font-size: 11px; color: #999; font-family: monospace; margin-top: 1px;"><%= path %></div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <a href="<%= dashboard_url %>" style="display: inline-block; margin-top: 10px; font-size: 13px; color: #0d6efd;">
+        View checks &rarr;
+      </a>
+    </div>
+  <% end %>
+
+  <p style="font-size: 12px; color: #999; margin-top: 24px; border-top: 1px solid #eee; padding-top: 16px;">
+    <a href="<%= settings_url %>" style="color: #999;">Manage email preferences</a>
+  </p>
+</div>

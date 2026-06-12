@@ -19,6 +19,7 @@ module V1
       if Rails.application.config.active_storage.service.in? %i[local test]
         redirect_to url_for(@coverage_check.coverage_reports.last)
       else
+        # TODO: last can be nil https://undercover-ci.sentry.io/issues/7413033813/?project=1521153&query=is%3Aunresolved&referrer=issue-stream
         redirect_to @coverage_check.coverage_reports.last.url
       end
     end

@@ -114,4 +114,20 @@
   </div>
 </div>
 
+<div class="card bg-light my-2">
+  <div class="card-header">Email Preferences</div>
+  <div class="card-body">
+    <%= form_with url: email_preferences_settings_path, method: :patch, local: true do |form| %>
+      <div class="form-check mb-3">
+        <%= form.check_box :weekly_summary_opt_out,
+              { checked: !current_user.weekly_summary_opt_out },
+              "1", "0" %>
+        <%= form.label :weekly_summary_opt_out, "Weekly summary email" %>
+        <div class="form-text">Sent every Monday with a summary of check activity across your repos.</div>
+      </div>
+      <%= form.submit "Save preferences", class: "btn btn-sm btn-outline-primary" %>
+    <% end %>
+  </div>
+</div>
+
 <%= link_to "Add account", dash_installation_url, class: "btn btn-primary" %>
