@@ -4,7 +4,7 @@ date: 2026-06-11
 description: Feedback loops for agentic coding were a hot topic at latest RubyConf in Vienna. UndercoverCI shares recipes to help your team ship diffs without testing gaps.
 ---
 
-My highlight for the month of May was RubyConf Austria! Combining a full time role, work on undercover, social life and training adds up to... me being a rare guest on programming conferences. But what an event this was, hats off to Muhamed, Hans and team, as well as all speakers and performing musicians for pulling this off.
+My highlight for the month of May was RubyConf Austria! Combining a full time role, work on undercover, social life and training adds up to... me being a rare guest on programming conferences. But what an event this was, hats off to Muhamed, Hans, Zehra, Christoph and Zuzanna, as well as all the speakers and performing musicians for pulling this off.
 
 ![panel_haus_der_musik](rubyconf_vie_panel.jpeg)
 
