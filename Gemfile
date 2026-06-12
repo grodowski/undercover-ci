@@ -77,8 +77,7 @@ end
 group :test do
   gem "capybara", ">= 2.15"
   gem "selenium-webdriver"
-  gem "simplecov"
-  gem "simplecov-html"
+  gem "simplecov", ">= 1.0.0.rc2"
   gem "timecop"
   gem "webdrivers"
 end
