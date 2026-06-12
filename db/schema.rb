@@ -10,10 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_02_16_162610) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_08_000000) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_stat_statements"
-  enable_extension "plpgsql"
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -117,6 +117,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_16_162610) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.string "api_token"
+    t.jsonb "email_preferences", default: {}
     t.index ["api_token"], name: "index_users_on_api_token"
     t.index ["uid"], name: "index_users_on_uid", unique: true
   end
