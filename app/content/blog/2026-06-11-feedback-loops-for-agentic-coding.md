@@ -4,7 +4,7 @@ date: 2026-06-11
 description: Feedback loops for agentic coding were a hot topic at latest RubyConf in Vienna. UndercoverCI shares recipes to help your team ship diffs without testing gaps.
 ---
 
-My highlight for the month of May was RubyConf Vienna! Combining a full time role, work on undercover, social life and training adds up to... me being a rare guest on programming conferences. But what an event this was, hats off to Muhamed, Hans and team, as well as all speakers and performing musicians for pulling this off.
+My highlight for the month of May was RubyConf Austria! Combining a full time role, work on undercover, social life and training adds up to... me being a rare guest on programming conferences. But what an event this was, hats off to Muhamed, Hans and team, as well as all speakers and performing musicians for pulling this off.
 
 ![panel_haus_der_musik](rubyconf_vie_panel.jpeg)
 
@@ -117,7 +117,7 @@ Run undercover after each change with the correct args and fills gaps.
 
 Pulls the coverage check's annotations, adds the missing tests and verifies locally.
 
-Go check out the [readme]() for setup instructions and more details.
+Go check out the [undercover-claude readme](https://github.com/grodowski/undercover-claude) for setup instructions and more details.
 
 ## 4. PR feedback with UndercoverCI
 
