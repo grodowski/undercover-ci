@@ -39,14 +39,29 @@ class BlogController < ApplicationController
   end
 
   class BootstrapRenderer < Redcarpet::Render::HTML
+    def initialize(options = {})
+      super
+      @view_context = options.delete(:view_context)
+    end
+
     def table(header, body)
       "<table class=\"table table-sm table-bordered\"><thead>#{header}</thead><tbody>#{body}</tbody></table>"
+    end
+
+    def image(link, title, alt)
+      # Convert blog image paths to asset pipeline URLs
+      image_url = if link.start_with?("http://", "https://", "/")
+                    link
+                  else
+                    @view_context.image_path("blog/#{link}")
+                  end
+      "<img src=\"#{image_url}\" alt=\"#{alt}\" title=\"#{title}\" />"
     end
   end
 
   def render_markdown(text)
     Redcarpet::Markdown.new(
-      BootstrapRenderer.new(hard_wrap: true),
+      BootstrapRenderer.new(hard_wrap: true, view_context: view_context),
       fenced_code_blocks: true,
       tables: true,
       autolink: true,

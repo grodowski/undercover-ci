@@ -2235,3 +2235,26 @@ h1 *, h2 *, h3 *, h4 *, h5 *, h6 * {
 .closing-cta h2 * {
   font-family: var(--heading-font);
 }
+
+// ===== Blog post images: keep them modest and centered, never full-bleed =====
+.blog-post-body img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  margin: 1.75rem auto;
+  border-radius: 8px;
+}
+
+.blog-post-body h2,
+.blog-post-body h3 {
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+}
+
+.blog-post-body .post-caption {
+  margin-top: -1.25rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--muted-text);
+}
