@@ -1,24 +1,28 @@
 ---
 title: 4 ways to steer your agents towards better tests with Undercover CI
 date: 2026-06-11
-description: Feedback loops for agentic coding were a hot topic at latest RubyConf in Vienna. UndercoverCI shares recipes to help your team ship diffs without testing gaps.
+description: AI agents write code fast but skip tests. Here are 4 ways to catch untested code, from CLI checks to CI enforcement with Undercover CI.
 ---
 
-My highlight for the month of May was RubyConf Austria! Combining a full time role, work on undercover, social life and training adds up to... me being a rare guest on programming conferences. But what an event this was, hats off to Muhamed, Hans, Zehra, Christoph and Zuzanna, as well as all the speakers and performing musicians for pulling this off.
+As agents write more and more of the code, our job has shifted towards ownership: less time spent writing, more reviewing diffs, catching architectural gaps, ensuring quality doesn't slip.
+
+I'd like to walk you through my daily-driver test coverage tooling: how I keep the feedback loop tight when agents are doing the heavy lifting.
+
+This was a hot topic at the amazing RubyConf Austria earlier this year:
 
 ![panel_haus_der_musik](rubyconf_vie_panel.jpeg)
 
-<p class="post-caption">Hans Schnedlitz, Armin Ronacher, Chad Fowler, Obie Fernandez and José Valim discussing the future of coding.</p>
+<p class="post-caption">Hans Schnedlitz, Armin Ronacher, Chad Fowler, Obie Fernandez and José Valim discussing the future of coding with AI.</p>
 
-The main theme, including a large portion of the hallway track, was the paradigm shift we're experiencing with agentic coding: what it means for Ruby, for our craft and the tools we use. The conclusion among speakers, panelists and participants was that while agents are improving constantly, our role and responsibility shifts to being the gatekeepers of what gets accepted and owning the code changes landing in production every day. In exactly that spirit, I'd like to walk you through my daily-driver test coverage tooling.
+## But does the loop work?
 
-## But does it work?
-
-In my previous post "Teaching Claude Code to Test What Breaks" I ran a contrived experiment to check whether a test coverage harness with `undercover` will have any effects on the code produced by Opus and Sonnet models. Agents were prompted to implement a sample but complex-enough CLI app. All were asked to supply tests, but only half followed the workflow of writing tests *and* reviewing their coverage prescibed by the `/coverage` skill.
+In my previous post "Teaching Claude Code to Test What Breaks" I ran a contrived experiment to check whether a test coverage harness with `undercover` will have any effects on the code produced by Opus and Sonnet models. Agents were prompted to implement a sample but complex-enough CLI app. All were asked to supply tests, but only half followed the workflow of writing tests *and* reviewing their coverage prescribed by the `/coverage` skill.
 
 **TLDR: the feedback loop produced fewer LOC overall, overly defensive and redundant blocks were removed (good) and there were fewer and more surface level bugs. Check out the [original writeup](https://undercover-ci.com/blog/claude-code-experiment) for more details.**
 
-Of course there is a cost: more time, tokens and turns. I think it's a worthy investment, because Claude Code, being trained to complete the given task, may as well say "good enough" to tests with < 75% branch coverage. In fact, I've just finished iterating on a PR stack today at `$main_job`, where a similar feedback loop was employed in a GPT 5.5 `pi` agent. Here is how it could work for your team.
+Of course there is a cost: more time, tokens and turns. I think it's a worthy investment, because Claude Code, being trained to complete the given task, may as well say "good enough" to tests with < 75% branch coverage. In fact, I've just finished iterating on a PR stack today at work, where a similar feedback loop was employed in a GPT 5.5 `pi` agent.
+
+These four approaches build on each other: from running a command yourself (try it when reviewing your next PR!), to guiding your agents running the loop itself and enforcing coverage across your whole team with a GitHub Check.
 
 ## 1. Pre-commit coverage check
 
@@ -30,21 +34,7 @@ undercover: ✅ No coverage is missing in latest changes
 Undercover finished in 0.0974s
 ```
 
-A more condensed and agent-friendly option: `--format json`, recently added in `undercover v0.8.5`.
-
-```bash
-undercover -c master --simplecov coverage/undercover_coverage.json --format json
-{
-  "warnings": [],
-  "summary": {
-    "total_warnings": 0,
-    "files_affected": 0
-  }
-}
-Undercover finished in 0.0798s
-```
-
-A failure with 1 warnings:
+A failure with 1 warning, using a less verbose and agent-friendly option: `--format json`, recently added in `undercover v0.8.5`:
 
 ```
 undercover -c master --simplecov coverage/coverage.json --format json
@@ -141,10 +131,4 @@ To:
 
 ✨
 
-There's a final plot twist and caveat here. I wanted to use the Claude for Slack app and ask `@Claude` to address coverage feedback in the above PR. Unfortunately, it didn't go smoothly. The GitHub MCP accessible to Claude for Slack trim down Check API responses and don't include annotations and summaries, resulting in the agent guessing.
-
-Why wasn't this an issue for the local agent? It could read check annotations and summaries with a direct `gh api` call.
-
-So stay tuned, maybe Claude or the GitHub MCP will change soon, or I will add a dedicated MCP for UndercoverCI to expose check results to agents: let me know if you would be interested to use it.
-
-Thank you for reading! Would you like to implement a similar feeback loop at your engineering organization? Feel free to reach out at [jan@undercover-ci.com](mailto:jan@undercover-ci.com).
+That's the full loop, from a local and timely coverage check to a team-wide enforcement with Undercover CI. Want to set it up for your team? Reach out at [jan@undercover-ci.com](mailto:jan@undercover-ci.com) or just get started [here](https://undercover-ci.com).
