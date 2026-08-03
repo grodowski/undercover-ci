@@ -452,7 +452,6 @@ GEM
       rack (>= 3.2.0)
       redis-client (>= 0.29.0)
     simplecov (1.0.3)
-    simplecov-html (0.13.2)
     simplecov_json_formatter (0.1.4)
     snaky_hash (2.0.3)
       hashie (>= 0.1.0, < 6)
@@ -555,7 +554,6 @@ DEPENDENCIES
   sentry-sidekiq
   sidekiq
   simplecov
-  simplecov-html
   spring
   spring-watcher-listen (~> 2.1.0)
   sprockets
