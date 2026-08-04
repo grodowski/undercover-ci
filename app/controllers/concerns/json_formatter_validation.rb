@@ -14,7 +14,7 @@ module JsonFormatterValidation
       missing_keys = %w[meta coverage] - input_json.keys
       raise Invalid, "Missing JSON keys: #{missing_keys.join(', ')}. #{ERROR_HELP}" if missing_keys.any?
 
-      return if input_json["coverage"].values.all? { _1.is_a?(Hash) && _1.key?("lines") }
+      return if input_json["coverage"].values.all? { it.is_a?(Hash) && it.key?("lines") }
 
       raise Invalid, "Missing/malformed coverage data. #{ERROR_HELP}"
     end

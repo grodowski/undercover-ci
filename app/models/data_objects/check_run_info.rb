@@ -70,7 +70,7 @@ module DataObjects
     def error_message
       return unless state == :canceled
 
-      failed_transition = state_log.find { _1["to"] == "canceled" }
+      failed_transition = state_log.find { it["to"] == "canceled" }
       failed_transition["via"] if failed_transition
     end
 
