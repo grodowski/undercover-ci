@@ -24,6 +24,7 @@ RSpec.configure do |config|
   )
   SimpleCov.start do
     add_filter(/^\/spec\//)
+    add_filter("sidekiq_admin.ru")
     enable_coverage(:branch)
   end
 end
