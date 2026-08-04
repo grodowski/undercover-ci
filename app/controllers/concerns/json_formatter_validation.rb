@@ -3,7 +3,8 @@
 module JsonFormatterValidation
   extend ActiveSupport::Concern
 
-  Invalid = Class.new(StandardError)
+  class Invalid < StandardError
+  end
   ERROR_HELP = "Did you use SimpleCov::Formatter::Undercover?"
 
   included do

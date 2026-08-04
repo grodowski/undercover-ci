@@ -4,7 +4,7 @@ module V1
   class GithubWebhooksController < ApiController
     skip_before_action :verify_authenticity_token
 
-    WEBHOOK_SECRET = ENV.fetch("GITHUB_WEBHOOK_SECRET")
+    WEBHOOK_SECRET = ENV.fetch("GITHUB_WEBHOOK_SECRET", nil)
     EVENT_TYPES = [
       EVENT_TYPE_CHECK_SUITE = "check_suite", # DONE
       EVENT_TYPE_CHECK_RUN = "check_run", # TODO
@@ -19,7 +19,7 @@ module V1
     end
 
     def create
-      @event_type = request.headers.fetch("HTTP_X_GITHUB_EVENT")
+      @event_type = request.headers["HTTP_X_GITHUB_EVENT"]
       process_webhook
       head(:ok)
     end

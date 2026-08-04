@@ -5,9 +5,14 @@ module Logic
     include GithubRequests
     include ClassLoggable
 
-    RunError = Class.new(StandardError)
-    CheckoutError = Class.new(RunError)
-    CloneError = Class.new(RunError)
+    class RunError < StandardError
+    end
+
+    class CheckoutError < RunError
+    end
+
+    class CloneError < RunError
+    end
 
     def self.call(coverage_check)
       new(coverage_check).run_undercover

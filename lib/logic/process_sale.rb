@@ -4,7 +4,8 @@ module Logic
   class ProcessSale
     include ClassLoggable
 
-    Error = Class.new(StandardError)
+    class Error < StandardError
+    end
 
     def self.call(gumroad_sale)
       new(gumroad_sale).call
