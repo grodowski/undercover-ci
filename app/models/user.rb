@@ -9,7 +9,7 @@ class User < ApplicationRecord
 
   after_create_commit :notify_admin
 
-  TOKEN_KEY = ENV.fetch("USER_TOKEN_ENCRYPTION_KEY").freeze
+  TOKEN_KEY = ENV["USER_TOKEN_ENCRYPTION_KEY"].freeze
   API_TOKEN_IV = Base64.decode64("nPDwkL9ckWPJQZevoe+efg==\n") # deterministic iv
 
   def self.from_omniauth(auth_hash)

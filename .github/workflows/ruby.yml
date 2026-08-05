@@ -30,7 +30,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.4.5'
+          ruby-version: '3.4.10'
       - name: Build and test with Rake (rspec, rubocop, undercover)
         env:
           RAILS_ENV: test
@@ -51,4 +51,4 @@ jobs:
           ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- \
             --repo grodowski/undercover-ci \
             --commit ${{ github.event.pull_request.head.sha || github.sha }} \
-            --simplecov coverage/coverage.json
+            --simplecov coverage/undercover-ci-coverage.json

@@ -2,9 +2,9 @@
 
 module GithubRequests
   PRIVATE_KEY = OpenSSL::PKey::RSA.new(
-    ENV.fetch("GITHUB_PRIVATE_KEY").gsub('\n', "\n")
+    ENV["GITHUB_PRIVATE_KEY"].gsub('\n', "\n")
   )
-  APP_IDENTIFIER = ENV.fetch("GITHUB_APP_IDENTIFIER")
+  APP_IDENTIFIER = ENV.fetch("GITHUB_APP_IDENTIFIER", nil)
 
   def installation_token(installation_id)
     app_api_client unless @github_app_client

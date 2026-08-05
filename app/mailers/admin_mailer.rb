@@ -5,7 +5,7 @@ class AdminMailer < ApplicationMailer
     @installation = installation
 
     mail(
-      to: ENV.fetch("ADMIN_EMAIL"),
+      to: ENV.fetch("ADMIN_EMAIL", nil),
       subject: "New installation: #{installation.installation_id}"
     )
   end
@@ -14,7 +14,7 @@ class AdminMailer < ApplicationMailer
     @user = user
 
     mail(
-      to: ENV.fetch("ADMIN_EMAIL"),
+      to: ENV.fetch("ADMIN_EMAIL", nil),
       subject: "New user: #{user.name}"
     )
   end

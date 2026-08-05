@@ -15,6 +15,7 @@ RSpec.configure do |config|
   # Seed global randomisation in specs using the rspec seed
   Kernel.srand config.seed
 
+  SimpleCov::Formatter::Undercover.output_filename = "undercover-ci-coverage.json"
   SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new(
     [
       SimpleCov::Formatter::Undercover,
@@ -23,6 +24,7 @@ RSpec.configure do |config|
   )
   SimpleCov.start do
     add_filter(/^\/spec\//)
+    add_filter("sidekiq_admin.ru")
     enable_coverage(:branch)
   end
 end

@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module Logic
-  StateTransisionError = Class.new(StandardError)
+  class StateTransisionError < StandardError
+  end
 
   class StateMachine
     attr_reader :record

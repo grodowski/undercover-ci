@@ -34,7 +34,7 @@ class Installation < ApplicationRecord
   end
 
   def repo_names
-    (repos || []).map { _1["full_name"] }
+    (repos || []).map { it["full_name"] }
   end
 
   def subscription

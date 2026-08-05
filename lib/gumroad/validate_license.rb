@@ -4,8 +4,11 @@ require "net/http"
 require "uri"
 
 module Gumroad
-  RequestError = Class.new(StandardError)
-  LicenseInvalid = Class.new(StandardError)
+  class RequestError < StandardError
+  end
+
+  class LicenseInvalid < StandardError
+  end
 
   class ValidateLicense
     include ClassLoggable

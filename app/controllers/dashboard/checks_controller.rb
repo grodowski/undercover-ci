@@ -22,8 +22,7 @@ module Dashboard
     def show
       @check = current_user.coverage_checks.with_counts.includes(:nodes).find(params[:id])
 
-      @flagged_nodes = @check.nodes.select(&:flagged?)
-      @unflagged_nodes = @check.nodes.reject(&:flagged?)
+      @flagged_nodes, @unflagged_nodes = @check.nodes.partition(&:flagged?)
     end
 
     private

@@ -22,9 +22,9 @@ module DataObjects
   CheckRunInfo = Struct.new(*CHECK_RUN_INFO_ATTRIBUTES) do
     def self.from_webhook(payload)
       payload = OpenStruct.new(payload)
-      installation_id = payload.installation.fetch("id")
-      full_name = payload.repository.fetch("full_name")
-      sha = payload.check_suite.fetch("head_sha")
+      installation_id = payload.installation["id"]
+      full_name = payload.repository["full_name"]
+      sha = payload.check_suite["head_sha"]
       compare = find_base_sha(payload)
       new(full_name, sha, compare, installation_id, nil, payload)
     end
@@ -50,8 +50,8 @@ module DataObjects
       pr_base_sha = payload.check_suite.dig("pull_requests", 0, "base", "sha")
       if pr_base_sha
         pr_base_sha
-      elsif payload.check_suite.fetch("head_branch") != payload.repository.fetch("default_branch")
-        payload.repository.fetch("default_branch")
+      elsif payload.check_suite["head_branch"] != payload.repository["default_branch"]
+        payload.repository["default_branch"]
       else
         # This used to be `payload.check_suite.fetch("before")` which didn't work
         # for force pushes, as the check suite delivered from GitHub kept the old base sha.
@@ -70,7 +70,7 @@ module DataObjects
     def error_message
       return unless state == :canceled
 
-      failed_transition = state_log.find { _1["to"] == "canceled" }
+      failed_transition = state_log.find { it["to"] == "canceled" }
       failed_transition["via"] if failed_transition
     end
 

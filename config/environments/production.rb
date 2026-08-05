@@ -79,7 +79,7 @@ Rails.application.configure do # rubocop:disable Metrics/BlockLength
 
   config.action_mailer.perform_caching = false
   config.action_mailer.delivery_method = :postmark
-  config.action_mailer.postmark_settings = {api_token: ENV.fetch("POSTMARK_API_TOKEN")}
+  config.action_mailer.postmark_settings = {api_token: ENV.fetch("POSTMARK_API_TOKEN", nil)}
   config.action_mailer.raise_delivery_errors = true
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
