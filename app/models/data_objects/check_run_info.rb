@@ -21,12 +21,36 @@ module DataObjects
   # TODO: consider refactoring into OpenStruct/Class with named attrs
   CheckRunInfo = Struct.new(*CHECK_RUN_INFO_ATTRIBUTES) do
     def self.from_webhook(payload)
+      return from_pull_request(payload) if pull_request_webhook?(payload)
+
       payload = OpenStruct.new(payload)
       installation_id = payload.installation["id"]
       full_name = payload.repository["full_name"]
       sha = payload.check_suite["head_sha"]
       compare = find_base_sha(payload)
       new(full_name, sha, compare, installation_id, nil, payload)
+    end
+
+    def self.from_pull_request(payload)
+      payload = OpenStruct.new(payload)
+      pull_request = payload.pull_request
+      installation_id = payload.installation["id"]
+      full_name = payload.repository["full_name"]
+      sha = pull_request["head"]["sha"]
+      compare = pull_request["base"]["sha"] || payload.repository["default_branch"]
+      new(full_name, sha, compare, installation_id, nil, payload)
+    end
+
+    def self.pull_request_webhook?(payload)
+      return false unless payload.respond_to?(:dig) && payload.dig("pull_request")
+
+      head_repo = payload.dig("pull_request", "head", "repo", "full_name")
+      base_repo = payload.dig("pull_request", "base", "repo", "full_name") ||
+                  payload.dig("repository", "full_name")
+
+      return true if head_repo.blank? || base_repo.blank?
+
+      head_repo != base_repo
     end
 
     def self.from_coverage_check(db_check)
