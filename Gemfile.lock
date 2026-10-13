@@ -1,17 +1,17 @@
 GIT
   remote: https://github.com/grodowski/undercover.git
-  revision: d8d2922dbaf38e8af66698d0a1a9d9240c65bacb
-  branch: only-files
+  revision: c6ac9583634b1e1b54002dade1ee0e4cca218c16
+  ref: c6ac9583634b1e1b54002dade1ee0e4cca218c16
   specs:
     undercover (0.8.5)
       base64
       benchmark
-      bigdecimal
+      erubi (>= 1.13)
       imagen (>= 0.2.0)
       rainbow (>= 2.1, < 4.0)
       rugged (>= 0.27, < 1.10)
-      simplecov
-      simplecov_json_formatter
+      simplecov (>= 1.0)
+      simplecov_json_formatter (~> 0.1)
 
 GIT
   remote: https://github.com/ruby/net-pop.git

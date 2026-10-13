@@ -39,7 +39,7 @@ gem "turbolinks"
 # Core
 gem "git"
 gem "redcarpet"
-gem "undercover", github: "grodowski/undercover", branch: "only-files"
+gem "undercover", github: "grodowski/undercover", ref: "c6ac9583634b1e1b54002dade1ee0e4cca218c16"
 
 # Github
 gem "jwt"
