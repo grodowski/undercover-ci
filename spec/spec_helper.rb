@@ -26,5 +26,6 @@ RSpec.configure do |config|
     add_filter(/^\/spec\//)
     add_filter("sidekiq_admin.ru")
     enable_coverage(:branch)
+    enable_coverage(:eval)
   end
 end
