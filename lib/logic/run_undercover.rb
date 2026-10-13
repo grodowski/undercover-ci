@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "open3"
+
 module Logic
   class RunUndercover # rubocop:disable Metrics/ClassLength
     include GithubRequests
@@ -12,6 +14,9 @@ module Logic
     end
 
     class CloneError < RunError
+    end
+
+    class GitError < StandardError
     end
 
     def self.call(coverage_check)
@@ -46,10 +51,10 @@ module Logic
       CheckRuns::Run.new(run).post
 
       update_compare_to_merge_base(run)
-      clone_repo
-      checkout
+      timed(:clone_repo) { clone_repo }
+      timed(:checkout) { checkout }
 
-      report = run_undercover_cmd
+      report = timed(:run_undercover_cmd) { run_undercover_cmd }
       # :nocov:
       @changeset.instance_variable_get(:@repo)&.close
       # :nocov:
@@ -88,38 +93,70 @@ module Logic
       raise # retry
     end
 
-    # https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#http-based-git-access-by-an-installation
+    # Fetches only the two commits and their trees. File contents are downloaded on demand,
+    # so checkout and the diff only pull the files the pull request changed.
     def clone_repo
-      FileUtils.mkdir_p(repo_path)
       FileUtils.remove_entry(repo_path, true)
+      FileUtils.mkdir_p(repo_path)
 
-      i_token = CheckRuns::InstallationAccessToken.new(run).get
-      git = Git.clone("https://x-access-token:#{i_token}@github.com/#{run.full_name}.git", repo_path, depth: 1)
+      @token = CheckRuns::InstallationAccessToken.new(run).get
+      git("init", "-q")
+      git("remote", "add", "origin", remote_url)
+      git("fetch", "-q", "--filter=blob:none", "--depth=1", "--no-tags", "origin", run.compare, run.sha)
 
-      git.fetch("origin", ref: run.compare, depth: 1) unless run.compare == "HEAD~1"
-      git.fetch("origin", ref: run.sha, depth: 2)
-
-      list_branches = `cd #{repo_path} && git branch -a`
-      crumb = Sentry::Breadcrumb.new(category: "clone_repo", message: list_branches.to_json, level: "info")
+      crumb = Sentry::Breadcrumb.new(category: "clone_repo", message: [run.compare, run.sha].to_json, level: "info")
       Sentry.add_breadcrumb(crumb)
-    rescue Git::Error => e
-      log "clone_repo failed with #{e}"
+    rescue GitError => e
+      log "clone_repo failed with #{e.message}"
       raise CloneError
     end
 
+    # https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#http-based-git-access-by-an-installation
+    def remote_url
+      "https://x-access-token:#{@token}@github.com/#{run.full_name}.git"
+    end
+
+    # Writes only the changed files and .undercover to disk. Rugged can't download missing
+    # file contents, so the last diff fetches the base side of every changed file in one go.
     def checkout
-      @repo = Rugged::Repository.new(repo_path)
-      branch = @repo.create_branch("undercover-ci", run.sha)
-      @repo.checkout(branch)
-      @repo.close
-      @repo = nil
-    rescue Rugged::OSError => e
-      log "checkout failed with #{e}"
+      write_sparse_checkout(changed_paths)
+      git("checkout", "-q", "-b", "undercover-ci", run.sha)
+      git("diff", "--no-renames", "--numstat", run.compare, run.sha)
+    rescue GitError => e
+      log "checkout failed with #{e.message}"
       raise CheckoutError
     end
 
+    # Compares trees only, so no file contents are needed yet
+    def changed_paths
+      git("diff", "--name-only", "--no-renames", "-z", run.compare, run.sha).split("\0")
+    end
+
+    def write_sparse_checkout(paths)
+      git("config", "core.sparseCheckout", "true")
+      git("config", "core.sparseCheckoutCone", "false")
+      patterns = ["/.undercover", *paths.map { |path| "/#{path.gsub(/[\\*?\[\]!#]/) { "\\#{it}" }}" }]
+      File.write(File.join(repo_path, ".git/info/sparse-checkout"), "#{patterns.join("\n")}\n")
+    end
+
+    def git(*args)
+      out, err, status = Open3.capture3({"GIT_TERMINAL_PROMPT" => "0"}, "git", "-C", repo_path, *args)
+      raise GitError, redact("git #{args.first}: #{err.strip}") unless status.success?
+
+      out
+    end
+
+    # The token is part of the remote URL, which git may print
+    def redact(message)
+      message.gsub(@token, "[REDACTED]")
+    end
+
+    def timed(step)
+      started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      yield.tap { log "#{step} took #{(Process.clock_gettime(Process::CLOCK_MONOTONIC) - started).round(1)}s" }
+    end
+
     def teardown
-      @repo&.close
       # :nocov:
       @changeset&.instance_variable_get(:@repo)&.close
       # :nocov:
@@ -134,7 +171,7 @@ module Logic
 
     def run_undercover_cmd
       opts = build_undercover_options
-      @changeset = Undercover::Changeset.new("#{repo_path}/.git", @run.compare)
+      @changeset = Undercover::Changeset.new("#{repo_path}/.git", run.compare, commits_only: true)
       changed_files = @changeset.file_paths
       simplecov_adapter = if opts.simplecov_resultset
                             Undercover::SimplecovResultAdapter.parse(
