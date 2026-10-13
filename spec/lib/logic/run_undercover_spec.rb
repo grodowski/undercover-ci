@@ -15,12 +15,14 @@ describe Logic::RunUndercover do
     installation = Installation.create!(installation_id: "123123", users: [user])
     CoverageCheck.create!(
       installation:,
-      head_sha: "b8f95245", # commit sha from fake_repo feature branch
+      head_sha: "b8f95245da7a39788914d388c2fc53781bef0402", # commit sha from fake_repo feature branch
       repo: {"full_name" => "author/repo", "default_branch" => "master"},
       state: :in_progress
     )
   end
   subject { described_class.call(coverage_check) }
+
+  after { FileUtils.rm_rf(@remote_tmp) if @remote_tmp }
 
   it "logs and returns when CoverageCheck is not in in_progress state" do
     coverage_check.coverage_reports.attach(
@@ -47,8 +49,8 @@ describe Logic::RunUndercover do
     stub_get_installation_token
     stub_post_check_runs
     stub_fetch_merge_base
-    allow(Git).to receive(:clone).and_raise(Git::Error)
-    expect_any_instance_of(described_class).to receive(:teardown).once
+    allow_any_instance_of(described_class).to receive(:remote_url).and_return("file:///nonexistent/repo.git")
+    expect_any_instance_of(described_class).to receive(:teardown).once.and_call_original
     expect { subject }.to raise_error(Logic::RunUndercover::CloneError)
 
     # check that state has been updated
@@ -59,7 +61,7 @@ describe Logic::RunUndercover do
     expect { subject }.to raise_error(Logic::RunUndercover::RunError, /coverage_reports can't be blank/)
   end
 
-  it "raises a CloneError when Git.clone fails to clone to trigger a retry" do
+  it "raises a CloneError when the fetch fails to trigger a retry, without logging the token" do
     coverage_check.coverage_reports.attach(
       io: File.open("spec/fixtures/coverage.lcov"),
       filename: "#{coverage_check.id}_b4c0n.lcov",
@@ -68,13 +70,18 @@ describe Logic::RunUndercover do
     stub_get_installation_token
     stub_post_check_runs
     stub_fetch_merge_base
-    allow(Git).to receive(:clone).and_raise(Git::Error)
-    expect_any_instance_of(described_class).to receive(:teardown).once
+    allow_any_instance_of(described_class)
+      .to receive(:remote_url).and_return("file:///nonexistent/x-access-token:token@github.com/author/repo.git")
+    expect_any_instance_of(described_class).to receive(:teardown).once.and_call_original
+    allow(Rails.logger).to receive(:info)
 
     expect { subject }.to raise_error(Logic::RunUndercover::CloneError)
+    expect(Rails.logger).to have_received(:info)
+      .with(a_string_matching(/clone_repo failed with git fetch: .*\[REDACTED\]/))
+    expect(Rails.logger).not_to have_received(:info).with(a_string_including(":token@"))
   end
 
-  it "raises a CheckoutError when rugged fails to initialize to trigger a retry" do
+  it "raises a CheckoutError when git checkout fails to trigger a retry" do
     coverage_check.coverage_reports.attach(
       io: File.open("spec/fixtures/coverage.lcov"),
       filename: "#{coverage_check.id}_b4c0n.lcov",
@@ -83,9 +90,15 @@ describe Logic::RunUndercover do
     stub_get_installation_token
     stub_post_check_runs
     stub_fetch_merge_base
-    allow(Git).to receive(:clone) { double("Git::Base", fetch: true) }
-    expect_any_instance_of(described_class).to receive(:teardown).once
-    allow(Rugged::Repository).to receive(:new).and_raise(Rugged::OSError)
+    use_fake_remote
+    allow(Open3).to receive(:capture3).and_call_original
+    allow(Open3).to receive(:capture3).with(anything, "git", "-C", anything, "checkout", any_args)
+                                      .and_return([
+                                                    "",
+                                                    "error: boom",
+                                                    instance_double(Process::Status, success?: false)
+                                                  ])
+    expect_any_instance_of(described_class).to receive(:teardown).once.and_call_original
 
     expect { subject }.to raise_error(Logic::RunUndercover::CheckoutError)
   end
@@ -103,7 +116,7 @@ describe Logic::RunUndercover do
     expect(Rails.logger).to receive(:info)
       .once
       .with(a_string_matching(/\[Logic::RunUndercover\] update_compare_to_merge_base failed/))
-    expect_any_instance_of(described_class).to receive(:teardown).once
+    expect_any_instance_of(described_class).to receive(:teardown).once.and_call_original
 
     expect { subject }.to raise_error(Octokit::ServiceUnavailable)
   end
@@ -119,23 +132,18 @@ describe Logic::RunUndercover do
     stub_fetch_merge_base
     check_runs_stub = stub_post_check_runs
 
+    use_fake_remote
     repo_path = "tmp/job/#{coverage_check.id}"
-    expect(Git).to receive(:clone).with(
-      "https://x-access-token:token@github.com/author/repo.git",
-      repo_path,
-      depth: 1
-    ) do
-      FileUtils.cp_r("spec/fixtures/fake_repo/", repo_path) # fake clone, yay!
-      # need to replace the git dir with a default name, since RunUndercover#run_undercover_cmd
-      # does not respect custom git dirs
-      FileUtils.mv(
-        File.join(repo_path, "fake.git"),
-        File.join(repo_path, ".git")
-      )
-      double("Git::Base", fetch: true)
+    allow_any_instance_of(described_class).to receive(:run_undercover_cmd).and_wrap_original do |method, *args|
+      @sparse_patterns = File.read(File.join(repo_path, ".git/info/sparse-checkout"))
+      @promisor = `git -C #{repo_path} config remote.origin.promisor`.strip
+      method.call(*args)
     end
 
     subject
+
+    expect(@sparse_patterns).to eq("/.undercover\n/foo.rb\n")
+    expect(@promisor).to eq("true")
 
     coverage_check.reload
     expect(coverage_check.state).to eq(:complete)
@@ -184,19 +192,7 @@ describe Logic::RunUndercover do
     stub_fetch_merge_base
     check_runs_stub = stub_post_check_runs
 
-    repo_path = "tmp/job/#{coverage_check.id}"
-    expect(Git).to receive(:clone).with(
-      "https://x-access-token:token@github.com/author/repo.git",
-      repo_path,
-      depth: 1
-    ) do
-      FileUtils.cp_r("spec/fixtures/fake_repo/", repo_path)
-      FileUtils.mv(
-        File.join(repo_path, "fake.git"),
-        File.join(repo_path, ".git")
-      )
-      double("Git::Base", fetch: true)
-    end
+    use_fake_remote
 
     subject
 
@@ -216,16 +212,7 @@ describe Logic::RunUndercover do
     stub_fetch_merge_base
     stub_post_check_runs
 
-    repo_path = "tmp/job/#{coverage_check.id}"
-    expect(Git).to receive(:clone).with(
-      "https://x-access-token:token@github.com/author/repo.git",
-      repo_path,
-      depth: 1
-    ) do
-      FileUtils.cp_r("spec/fixtures/fake_repo/", repo_path)
-      FileUtils.mv(File.join(repo_path, "fake.git"), File.join(repo_path, ".git"))
-      double("Git::Base", fetch: true)
-    end
+    use_fake_remote
 
     allow_any_instance_of(CheckRuns::Complete).to receive(:post).and_return(false)
 
@@ -249,7 +236,8 @@ describe Logic::RunUndercover do
     check_runs_stub = stub_post_check_runs
     stub_fetch_merge_base
     expect_any_instance_of(described_class).to receive(:clone_repo).once
-    expect_any_instance_of(described_class).to receive(:teardown).once
+    expect_any_instance_of(described_class).to receive(:checkout).once
+    expect_any_instance_of(described_class).to receive(:teardown).once.and_call_original
 
     perform_enqueued_jobs { subject }
 
@@ -258,6 +246,19 @@ describe Logic::RunUndercover do
 
     expect(WebMock).to have_requested(:post, "https://api.github.com/repos/author/repo/check-runs")
       .with(body: /revspec 'main' not found/).times(1)
+  end
+
+  # A copy of spec/fixtures/fake_repo standing in for GitHub, with partial clone enabled so
+  # file contents really are left out of the fetch and downloaded on demand
+  def use_fake_remote
+    @remote_tmp = Dir.mktmpdir
+    remote = File.join(@remote_tmp, "remote.git")
+    FileUtils.cp_r("spec/fixtures/fake_repo/fake.git", remote)
+    %w[uploadpack.allowFilter uploadpack.allowAnySHA1InWant].each do |key|
+      system("git", "--git-dir", remote, "config", key, "true", exception: true)
+    end
+    allow_any_instance_of(described_class).to receive(:remote_url).and_return("file://#{remote}")
+    remote
   end
 
   def stub_get_installation_token
@@ -292,6 +293,18 @@ describe Logic::RunUndercover do
     WebMock
       .stub_request(:get, /https:\/\/api.github.com\/repos\/author\/repo\/compare\/\w+\.\.\.\w+/)
       .to_return(status: 503)
+  end
+
+  it "authenticates the remote with the installation token" do
+    coverage_check.coverage_reports.attach(
+      io: File.open("spec/fixtures/coverage.lcov"),
+      filename: "#{coverage_check.id}_b4c0n.lcov",
+      content_type: "text/plain"
+    )
+    runner = described_class.new(coverage_check)
+    runner.instance_variable_set(:@token, "t0k3n")
+
+    expect(runner.__send__(:remote_url)).to eq("https://x-access-token:t0k3n@github.com/author/repo.git")
   end
 
   describe "#build_undercover_options" do

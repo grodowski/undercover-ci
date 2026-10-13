@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/grodowski/undercover.git
-  revision: c6ac9583634b1e1b54002dade1ee0e4cca218c16
-  ref: c6ac9583634b1e1b54002dade1ee0e4cca218c16
+  revision: 0b3a2bfda0c1b2f4bca117629f97dc64079a4e0e
+  ref: 0b3a2bfda0c1b2f4bca117629f97dc64079a4e0e
   specs:
     undercover (0.8.5)
       base64
@@ -175,11 +175,6 @@ GEM
       net-http (>= 0.5.0)
     ffi (1.17.4-arm64-darwin)
     ffi (1.17.4-x86_64-linux-gnu)
-    git (5.0.1)
-      activesupport (>= 5.0)
-      addressable (~> 2.8)
-      process_executer (~> 4.0)
-      rchardet (~> 1.9)
     globalid (1.4.0)
       activesupport (>= 6.1)
     groupdate (6.8.0)
@@ -302,8 +297,6 @@ GEM
       prettyprint
     prettyprint (0.2.0)
     prism (1.9.0)
-    process_executer (4.0.4)
-      track_open_instances (~> 0.1)
     pry (0.14.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
@@ -364,7 +357,6 @@ GEM
       logger
       prism (>= 1.6.0)
       tsort
-    rchardet (1.10.2)
     rdoc (8.0.0)
       erb
       prism (>= 1.6.0)
@@ -472,7 +464,6 @@ GEM
     tilt (2.3.0)
     timecop (0.9.11)
     timeout (0.6.1)
-    track_open_instances (0.1.15)
     tsort (0.2.0)
     turbolinks (5.2.1)
       turbolinks-source (~> 5.2)
@@ -522,7 +513,6 @@ DEPENDENCIES
   capybara (>= 2.15)
   chartkick
   coffee-rails (~> 5.0)
-  git
   groupdate
   jbuilder (~> 2.15)
   jquery-rails

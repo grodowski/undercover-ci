@@ -17,8 +17,7 @@ class RunnerJob < ApplicationJob
            Logic::RunUndercover::CloneError,
            Octokit::Error,
            Rugged::OSError,
-           Faraday::Error,
-           Git::FailedError
+           Faraday::Error
 
   retry_on RunnerJob::Throttled,
            wait: ->(executions) { calculate_wait_time(executions - 1) },
