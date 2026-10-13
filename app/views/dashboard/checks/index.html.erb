@@ -79,6 +79,9 @@
             <td><%= check.repo_full_name %></td>
             <td>
               <code><%= pull_request_or_commit_link(check) %></code>
+              <% if check.head_branch.present? %>
+                <span class="d-block small text-muted"><%= check.head_branch %></span>
+              <% end %>
             </td>
             <td>
               <%= coverage_result_badge(check) %>

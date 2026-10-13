@@ -108,6 +108,27 @@ describe Logic::RunUndercover do
     expect { subject }.to raise_error(Octokit::ServiceUnavailable)
   end
 
+  it "fetches the pull request ref when the check came from a fork pull request" do
+    coverage_check.update!(pull_request_number: 42)
+    coverage_check.coverage_reports.attach(
+      io: File.open("spec/fixtures/coverage.lcov"),
+      filename: "#{coverage_check.id}_b4c0n.lcov",
+      content_type: "text/plain"
+    )
+    stub_get_installation_token
+    stub_post_check_runs
+    stub_fetch_merge_base
+
+    git = double("Git::Base")
+    expect(git).to receive(:fetch).with("origin", ref: "953a8049abaaa57f8db4ff97a55114283355d17e", depth: 1)
+    expect(git).to receive(:fetch).with("origin", ref: "refs/pull/42/head", depth: 2)
+    allow(Git).to receive(:clone).and_return(git)
+    allow(Rugged::Repository).to receive(:new).and_raise(Rugged::OSError)
+    expect_any_instance_of(described_class).to receive(:teardown).once
+
+    expect { subject }.to raise_error(Logic::RunUndercover::CheckoutError)
+  end
+
   it "clones the repository and runs the undercover command" do
     coverage_check.coverage_reports.attach(
       io: File.open("spec/fixtures/coverage.lcov"),

@@ -11,6 +11,127 @@ describe "Coverage Upload" do
     expect(response.status).to eq(404)
   end
 
+  it "creates a check for a fork pull request when the upload carries a verified pull request number" do
+    user = User.create!(uid: "1337", email: "foo@bar.com", token: "sekritkey", name: "Foo Bar")
+    Installation.create!(
+      installation_id: "123123",
+      users: [user],
+      repos: [{"full_name" => "user/repository"}],
+      settings: {"repo_fork_checks" => {"user/repository" => true}}
+    )
+    stub_installation_token
+    stub_pull_request_ref
+    stub_repository
+    contents = File.read("spec/fixtures/coverage.lcov")
+
+    post path,
+         params: {
+           repo: "user/repository",
+           sha: "b4c0n",
+           pull_request_number: "42",
+           lcov_base64: Base64.encode64(contents)
+         }
+
+    expect(response.status).to eq(201)
+    check = CoverageCheck.last
+    expect(check.pull_request_number).to eq(42)
+    expect(check.state).to eq(:queued)
+    expect(check.coverage_reports).not_to be_empty
+  end
+
+  it "backfills the pull request number of a check created before the pull request existed" do
+    check = make_coverage_check
+    stub_installation_token
+    stub_pull_request_ref
+    contents = File.read("spec/fixtures/coverage.lcov")
+
+    post path,
+         params: {
+           repo: check.repo_full_name,
+           sha: check.head_sha,
+           pull_request_number: "42",
+           lcov_base64: Base64.encode64(contents)
+         }
+
+    expect(response.status).to eq(201)
+    expect(check.reload.pull_request_number).to eq(42)
+  end
+
+  it "does not backfill an unverified pull request number" do
+    check = make_coverage_check
+    stub_installation_token
+    stub_pull_request_ref(head_sha: "n0tthesame")
+    contents = File.read("spec/fixtures/coverage.lcov")
+
+    post path,
+         params: {
+           repo: check.repo_full_name,
+           sha: check.head_sha,
+           pull_request_number: "42",
+           lcov_base64: Base64.encode64(contents)
+         }
+
+    expect(response.status).to eq(201)
+    expect(check.reload.pull_request_number).to be_nil
+  end
+
+  it "does not backfill a pull request number that is not positive" do
+    check = make_coverage_check
+    contents = File.read("spec/fixtures/coverage.lcov")
+
+    post path,
+         params: {
+           repo: check.repo_full_name,
+           sha: check.head_sha,
+           pull_request_number: "0",
+           lcov_base64: Base64.encode64(contents)
+         }
+
+    expect(response.status).to eq(201)
+    expect(check.reload.pull_request_number).to be_nil
+  end
+
+  it "does not backfill a check that already knows its pull request" do
+    check = make_coverage_check
+    check.update!(check_suite: {"pull_requests" => [{"number" => 7}]})
+    contents = File.read("spec/fixtures/coverage.lcov")
+
+    post path,
+         params: {
+           repo: check.repo_full_name,
+           sha: check.head_sha,
+           pull_request_number: "42",
+           lcov_base64: Base64.encode64(contents)
+         }
+
+    expect(response.status).to eq(201)
+    expect(check.reload.pull_request_number).to be_nil
+  end
+
+  it "renders 404 when a fork upload cannot be verified against the pull request head" do
+    user = User.create!(uid: "1337", email: "foo@bar.com", token: "sekritkey", name: "Foo Bar")
+    Installation.create!(
+      installation_id: "123123",
+      users: [user],
+      repos: [{"full_name" => "user/repository"}],
+      settings: {"repo_fork_checks" => {"user/repository" => true}}
+    )
+    stub_installation_token
+    stub_pull_request_ref(head_sha: "n0tthesame")
+
+    post path, params: {repo: "user/repository", sha: "b4c0n", pull_request_number: "42"}
+
+    expect(response.status).to eq(404)
+    expect(CoverageCheck.count).to eq(0)
+  end
+
+  it "does not create a check on delete" do
+    delete path, params: {repo: "user/repository", sha: "b4c0n", pull_request_number: "42"}
+
+    expect(response.status).to eq(404)
+    expect(CoverageCheck.count).to eq(0)
+  end
+
   it "stores the LCOV in active storage" do
     check = make_coverage_check
     contents = File.read("spec/fixtures/coverage.lcov")
@@ -246,6 +367,32 @@ describe "Coverage Upload" do
 
       expect(response.status).to eq(404)
     end
+  end
+
+  def stub_installation_token
+    WebMock
+      .stub_request(:post, "https://api.github.com/app/installations/123123/access_tokens")
+      .to_return(status: 200, body: {token: "token"}.to_json, headers: {"Content-Type" => "application/json"})
+  end
+
+  def stub_pull_request_ref(head_sha: "b4c0n")
+    WebMock
+      .stub_request(:get, "https://api.github.com/repos/user/repository/git/ref/pull/42/head")
+      .to_return(
+        status: 200,
+        body: {ref: "refs/pull/42/head", object: {sha: head_sha}}.to_json,
+        headers: {"Content-Type" => "application/json"}
+      )
+  end
+
+  def stub_repository
+    WebMock
+      .stub_request(:get, "https://api.github.com/repos/user/repository")
+      .to_return(
+        status: 200,
+        body: {id: 1, full_name: "user/repository", default_branch: "main", visibility: "public"}.to_json,
+        headers: {"Content-Type" => "application/json"}
+      )
   end
 
   def make_coverage_check

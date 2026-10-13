@@ -97,7 +97,7 @@ module Logic
       git = Git.clone("https://x-access-token:#{i_token}@github.com/#{run.full_name}.git", repo_path, depth: 1)
 
       git.fetch("origin", ref: run.compare, depth: 1) unless run.compare == "HEAD~1"
-      git.fetch("origin", ref: run.sha, depth: 2)
+      git.fetch("origin", ref: head_ref, depth: 2)
 
       list_branches = `cd #{repo_path} && git branch -a`
       crumb = Sentry::Breadcrumb.new(category: "clone_repo", message: list_branches.to_json, level: "info")
@@ -105,6 +105,13 @@ module Logic
     rescue Git::Error => e
       log "clone_repo failed with #{e}"
       raise CloneError
+    end
+
+    # A fork's head sha is only reachable through the pull request ref of the base repo
+    def head_ref
+      return run.sha unless run.pull_request_number
+
+      "refs/pull/#{run.pull_request_number}/head"
     end
 
     def checkout

@@ -98,9 +98,16 @@ module V1
     end
 
     def find_coverage_check
-      check_params = params.require(%i[repo sha])
-      @coverage_check = CoverageCheck.where("repo @> ?", {full_name: check_params.first}.to_json)
-                                     .where(head_sha: check_params[1]).first!
+      repo_full_name, sha = params.require(%i[repo sha])
+      @coverage_check = Logic::ResolveCoverageCheck.call(repo_full_name, sha, uploaded_pull_request_number)
+      raise ActiveRecord::RecordNotFound unless @coverage_check
+    end
+
+    # Only an upload may start or update a check, never a cancellation
+    def uploaded_pull_request_number
+      return unless action_name == "create"
+
+      params[:pull_request_number].presence
     end
 
     def check_subscription

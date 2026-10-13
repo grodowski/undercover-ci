@@ -23,11 +23,41 @@ LCOV_DEPRECATION_NOTICE = "⚠️ The LCOV coverage format is being deprecated a
                           "SimpleCov::Formatter::Undercover: " \
                           "https://undercover-ci.com/docs#reporting"
 
-Options = Struct.new(:commit, :lcov, :simplecov, :repo, :url, :cancel) do
+# Environment variables that identify a pull request build, mapped to the number within them
+PULL_REQUEST_ENV_VARS = {
+  "GITHUB_REF" => /\Arefs\/pull\/(\d+)\//, # GitHub Actions
+  "CIRCLE_PULL_REQUEST" => /\/pull\/(\d+)\z/, # CircleCI
+  "CI_MERGE_REQUEST_IID" => /\A(\d+)\z/ # GitLab CI
+}.freeze
+
+Options = Struct.new(:commit, :lcov, :simplecov, :repo, :url, :cancel, :pull_request) do
   def valid?
     commit && !commit.empty? &&
       repo && !repo.empty? &&
       ((lcov && !lcov.empty?) || (simplecov && !simplecov.empty?))
+  end
+
+  def pull_request_valid?
+    pull_request.nil? || pull_request.match?(/\A\d+\z/)
+  end
+
+  def detected_pull_request_number
+    PULL_REQUEST_ENV_VARS.each do |name, pattern|
+      match = ENV.fetch(name, nil).to_s.match(pattern)
+      return match[1] if match
+    end
+    nil
+  end
+
+  # Missing --pull-request is only a problem on a pull request build, where it is the
+  # difference between a check on a fork's pull request and no check at all
+  def pull_request_warning
+    number = detected_pull_request_number
+    return if pull_request || number.nil?
+
+    "⚠️ This looks like a build of pull request ##{number}, but --pull-request was not set. " \
+      "Pull requests opened from forks need it to report coverage, e.g. --pull-request #{number}. " \
+      "See https://undercover-ci.com/docs#configuration"
   end
 end
 
@@ -45,6 +75,11 @@ class UndercoverCiCoverageUpload
       end
       opts.on("--commit COMMIT", "Commit SHA") do |v|
         @options.commit = v
+      end
+      # optional argument, so a CI template that expands to nothing (a push build) is not an error
+      opts.on("--pull-request [NUMBER]", "Pull request number, required for pull requests from forks") do |v|
+        value = v.to_s.strip
+        @options.pull_request = value.empty? ? nil : value
       end
       opts.on("--cancel", "Cancel coverage check") do |v|
         @options.cancel = v
@@ -76,6 +111,14 @@ class UndercoverCiCoverageUpload
       return self
     end
 
+    unless @options.pull_request_valid?
+      error("--pull-request must be a number, got #{@options.pull_request.inspect}")
+      return self
+    end
+
+    warning = @options.pull_request_warning
+    warn(warning) if warning
+
     puts LCOV_DEPRECATION_NOTICE if @options.lcov
 
     file = @options.simplecov || @options.lcov
@@ -94,8 +137,9 @@ class UndercoverCiCoverageUpload
         repo: @options.repo,
         sha: @options.commit,
         file_base64: coverage_data_base64,
-        file_type: @options.lcov ? :lcov : :json
-      }.to_json
+        file_type: @options.lcov ? :lcov : :json,
+        pull_request_number: @options.pull_request
+      }.compact.to_json
     )
   end
 

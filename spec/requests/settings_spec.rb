@@ -57,6 +57,29 @@ describe "Settings" do
       expect(installation.reload.settings["repo_branch_filters"]["owner/repo"]).to eq("main|develop")
     end
 
+    it "updates fork checks for repository" do
+      patch(
+        "/settings", params: {
+          installation_id: "1337",
+          repo_full_name: "owner/repo",
+          fork_checks: "1"
+        }
+      )
+
+      expect(response).to redirect_to(settings_path)
+      expect(installation.reload.settings["repo_fork_checks"]["owner/repo"]).to eq(true)
+
+      patch(
+        "/settings", params: {
+          installation_id: "1337",
+          repo_full_name: "owner/repo",
+          fork_checks: "0"
+        }
+      )
+
+      expect(installation.reload.settings["repo_fork_checks"]).not_to have_key("owner/repo")
+    end
+
     it "updates failure_mode for repository" do
       patch(
         "/settings", params: {

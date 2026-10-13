@@ -2,24 +2,30 @@
 
 module ApplicationHelper
   def pull_request_or_commit_link(coverage_check)
-    repo = coverage_check.repo_full_name
     pr = coverage_check.check_suite&.dig("pull_requests", 0)
+    # a check started by a fork's coverage upload knows its number but no branch names
+    number = pr ? pr["number"] : coverage_check.pull_request_number
+
+    head_label = if number
+                   "##{number} @ #{coverage_check.head_sha[0..7]}"
+                 else
+                   coverage_check.head_sha[0..7]
+                 end
+    base_label = pr ? pr["base"]["ref"] : coverage_check.base_ref_or_branch
 
     # rubocop:disable Style/StringConcatenation
-    if pr
-      pr_number = pr["number"]
-      base_vs_compare = content_tag("code", "#{pr['head']['ref']} @ #{coverage_check.head_sha[0..7]}") +
-                        " 👉 " +
-                        content_tag("code", pr["base"]["ref"])
-      url = "https://github.com/#{repo}/pull/#{pr_number}/checks"
-    else
-      base_vs_compare = content_tag("code", coverage_check.head_sha[0..7]) +
-                        " 👉 " +
-                        content_tag("code", coverage_check.base_ref_or_branch)
-      url = "https://github.com/#{repo}/commit/#{coverage_check.head_sha}"
-    end
+    link_to(
+      content_tag("code", head_label) + " 👉 " + content_tag("code", base_label),
+      check_github_url(coverage_check, number)
+    )
     # rubocop:enable Style/StringConcatenation
-    link_to base_vs_compare, url
+  end
+
+  def check_github_url(coverage_check, number)
+    repo = coverage_check.repo_full_name
+    return "https://github.com/#{repo}/pull/#{number}/checks" if number
+
+    "https://github.com/#{repo}/commit/#{coverage_check.head_sha}"
   end
 
   def coverage_result_badge(check)
