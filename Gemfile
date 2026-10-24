@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-ruby "3.4.10"
+ruby "3.4.12"
 source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
