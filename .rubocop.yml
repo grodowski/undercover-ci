@@ -1,6 +1,6 @@
 AllCops:
   EnabledByDefault: true
-  TargetRubyVersion: 3.4.10
+  TargetRubyVersion: 3.4.12
   SuggestExtensions: false
   Exclude:
     - db/migrate/*
