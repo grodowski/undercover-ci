@@ -23,15 +23,34 @@ LCOV_DEPRECATION_NOTICE = "⚠️ The LCOV coverage format is being deprecated a
                           "SimpleCov::Formatter::Undercover: " \
                           "https://undercover-ci.com/docs#reporting"
 
-Options = Struct.new(:commit, :lcov, :simplecov, :repo, :url, :cancel) do
+Options = Struct.new(:commit, :lcov, :simplecov, :repo, :url, :cancel, :pull_request, :pull_request_base_ref) do
   def valid?
     commit && !commit.empty? &&
       repo && !repo.empty? &&
       ((lcov && !lcov.empty?) || (simplecov && !simplecov.empty?))
   end
+
+  def self.presence(value)
+    value = value.to_s.strip
+    value.empty? ? nil : value
+  end
+
+  # GitHub Actions pull request builds run on refs/pull/N/merge
+  def pull_request_param
+    pull_request || ENV.fetch("GITHUB_REF", nil).to_s[/\Arefs\/pull\/(\d+)\//, 1]
+  end
+
+  # Only meaningful with a pull request number. GitHub Actions sets GITHUB_BASE_REF on pull request builds.
+  def base_ref_param
+    pull_request_param && (pull_request_base_ref || Options.presence(ENV.fetch("GITHUB_BASE_REF", nil)))
+  end
+
+  def pull_request_valid?
+    pull_request.nil? || pull_request.match?(/\A\d+\z/)
+  end
 end
 
-class UndercoverCiCoverageUpload
+class UndercoverCiCoverageUpload # rubocop:disable Metrics/ClassLength
   attr_reader :exitcode, :options
 
   def initialize(argv = ARGV)
@@ -45,6 +64,13 @@ class UndercoverCiCoverageUpload
       end
       opts.on("--commit COMMIT", "Commit SHA") do |v|
         @options.commit = v
+      end
+      # optional argument, so a CI template that expands to nothing (a push build) is not an error
+      opts.on("--pull-request [NUMBER]", "Pull request number, defaults to $GITHUB_REF on GitHub Actions") do |v|
+        @options.pull_request = Options.presence(v)
+      end
+      opts.on("--pull-request-base-ref [BRANCH]", "Pull request target branch, defaults to $GITHUB_BASE_REF") do |v|
+        @options.pull_request_base_ref = Options.presence(v)
       end
       opts.on("--cancel", "Cancel coverage check") do |v|
         @options.cancel = v
@@ -76,6 +102,11 @@ class UndercoverCiCoverageUpload
       return self
     end
 
+    unless @options.pull_request_valid?
+      error("--pull-request must be a number, got #{@options.pull_request.inspect}")
+      return self
+    end
+
     puts LCOV_DEPRECATION_NOTICE if @options.lcov
 
     file = @options.simplecov || @options.lcov
@@ -94,8 +125,10 @@ class UndercoverCiCoverageUpload
         repo: @options.repo,
         sha: @options.commit,
         file_base64: coverage_data_base64,
-        file_type: @options.lcov ? :lcov : :json
-      }.to_json
+        file_type: @options.lcov ? :lcov : :json,
+        pull_request_number: @options.pull_request_param,
+        pull_request_base_ref: @options.base_ref_param
+      }.compact.to_json
     )
   end
 

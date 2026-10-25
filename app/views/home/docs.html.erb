@@ -273,6 +273,18 @@ claude --plugin-dir ./undercover-claude</code></pre>
         GitHub Actions or <code>$TRAVIS_COMMIT</code> for TravisCI.</li> Consult your CI service documentation to get the
         right head SHA value for your build environment.
 
+        <h6 class="mb-2 mt-3"><code>--pull-request</code></h6>
+        The pull request number, detected automatically on GitHub Actions pull request builds.
+        Required to run coverage checks on pull requests opened from forks, because GitHub sends no
+        <code>check_suite</code> event for those and the upload itself has to start the check. Fork pull request
+        checks are opt-in per repository in <%= link_to "settings", settings_path %>.
+        The value is optional, so the same build command works for push builds where it expands to nothing.
+
+        <h6 class="mb-2 mt-3"><code>--pull-request-base-ref</code></h6>
+        The branch the pull request targets, sent with <code>--pull-request</code> so a fork's pull request is compared
+        against the right branch. Defaults to <code>$GITHUB_BASE_REF</code> on GitHub Actions; elsewhere the default
+        branch is used when it's not set.
+
         <h6 class="mb-2 mt-3"><code>--cancel</code></h6>
         Cancel coverage check represented by the given <code>--commit</code>. The check will be passing and marked as completed + skipped on your GitHub commit or pull request.
 
