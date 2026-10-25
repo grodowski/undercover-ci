@@ -14,7 +14,8 @@ class Installation < ApplicationRecord
                  :expire_check_job_wait_minutes,
                  :max_concurrent_checks,
                  :repo_branch_filters,
-                 :repo_failure_modes
+                 :repo_failure_modes,
+                 :repo_fork_checks
 
   after_create :ensure_subscription
   after_create_commit :notify_admin
@@ -76,6 +77,21 @@ class Installation < ApplicationRecord
 
   def repo_branch_filters = super || {}
   def repo_failure_modes = super || {}
+  def repo_fork_checks = super || {}
+
+  def fork_checks_enabled?(repo_full_name)
+    repo_fork_checks[repo_full_name] == true
+  end
+
+  def set_repo_fork_checks(repo_full_name, enabled)
+    checks = repo_fork_checks.dup
+    if enabled
+      checks[repo_full_name] = true
+    else
+      checks.delete(repo_full_name)
+    end
+    self.repo_fork_checks = checks
+  end
 
   def set_repo_failure_mode(repo_full_name, failure_mode)
     failure_mode = failure_mode&.to_sym || :failure

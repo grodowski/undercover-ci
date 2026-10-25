@@ -33,6 +33,7 @@ module Dashboard
 
       installation.set_repo_failure_mode(params[:repo_full_name], params[:failure_mode].presence)
       installation.set_repo_branch_filter(params[:repo_full_name], params[:branch_filter_regex])
+      installation.set_repo_fork_checks(params[:repo_full_name], params[:fork_checks] == "1")
       installation.save!
       redirect_to settings_path, notice: "Saved settings for #{params[:repo_full_name]}"
     end

@@ -42,6 +42,10 @@ class CoverageCheck < ApplicationRecord
 
   delegate :max_concurrent_checks, to: :installation
 
+  def self.for_repo_sha(repo_full_name, sha)
+    where("repo @> ?", {full_name: repo_full_name}.to_json).find_by(head_sha: sha)
+  end
+
   def self.to_chartkick
     group(:result).group_by_day(:created_at).count
   end
@@ -50,6 +54,13 @@ class CoverageCheck < ApplicationRecord
     return true if repo_public?
 
     installation.active?
+  end
+
+  def expire_check_wait
+    return ExpireCheckJob::INACTIVE_WAIT unless installation_active?
+    return installation.expire_check_job_wait_minutes.minutes if installation.expire_check_job_wait_minutes
+
+    ExpireCheckJob::DEFAULT_WAIT
   end
 
   def state
@@ -72,6 +83,15 @@ class CoverageCheck < ApplicationRecord
     repo["visibility"] == "public"
   end
 
+  # The default branch, when an upload-created check had no valid target branch to compare against
+  def compare_fallback
+    default_branch if pull_request_number && base_sha.blank?
+  end
+
+  def head_branch
+    check_suite && check_suite["head_branch"]
+  end
+
   def pull_requests
     return [] unless check_suite
 
@@ -79,7 +99,9 @@ class CoverageCheck < ApplicationRecord
   end
 
   def base_ref_or_branch
-    base_sha.try(:[], 0..7) || default_branch
+    return default_branch if base_sha.blank?
+
+    base_sha.match?(/\A\h{40}\z/) ? base_sha[0..7] : base_sha
   end
 
   def failure_mode

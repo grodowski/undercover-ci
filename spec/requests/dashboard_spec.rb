@@ -115,6 +115,13 @@ describe "Dashboard spec" do
         expect(response.body).not_to include("OLD_SHA")
       end
 
+      it "renders the head branch next to the check" do
+        get("/app", params: {date_range: "last_90d"})
+
+        expect(response.body).to include("<span class=\"d-block small text-muted\">main</span>")
+        expect(response.body).to include("<span class=\"d-block small text-muted\">feature</span>")
+      end
+
       it "filters by repository name" do
         get("/app", params: {repository_name: "owner/repo1", date_range: "last_90d"})
         expect(response.body).to include("OLD_SHA")
