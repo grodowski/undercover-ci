@@ -152,7 +152,8 @@ GEM
     drb (2.2.3)
     erb (6.0.7)
     erubi (1.13.1)
-    execjs (2.9.1)
+    execjs (2.10.2)
+      json (>= 2)
     faraday (2.13.2)
       faraday-net_http (>= 2.0, < 3.5)
       json
