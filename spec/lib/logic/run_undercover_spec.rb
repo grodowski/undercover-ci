@@ -342,9 +342,9 @@ describe Logic::RunUndercover do
       CONFIG
       File.write(File.join(repo_path, ".undercover"), config_content)
 
-      opts = runner.__send__(:build_undercover_options)
+      opts = nil
+      expect { opts = runner.__send__(:build_undercover_options) }.to output(/--ruby-syntax is ignored/).to_stderr
 
-      expect(opts.syntax_version).to eq("ruby24")
       expect(opts.max_warnings_limit).to eq(51) # CI override
       expect(opts.glob_allow_filters).to eq(["*.rb", "*.rake"])
       expect(opts.glob_reject_filters).to eq(["test/*", "spec/*"])
@@ -368,7 +368,6 @@ describe Logic::RunUndercover do
       expect(opts.lcov).to eq(runner.instance_variable_get(:@coverage_tmpfile).path)
       expect(opts.path).to eq(repo_path)
       expect(opts.max_warnings_limit).to eq(51)
-      expect(opts.syntax_version).to eq("ruby25")
     end
 
     it "handles .undercover file with only CI-controlled options" do
