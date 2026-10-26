@@ -2,7 +2,7 @@
 
 API_MIME_TYPES = %w[*/* application/json].freeze
 
-# rubocop:disable Metrics/BlockLength
+# rubocop:disable-next Metrics/BlockLength
 Rails.application.routes.draw do
   namespace :v1, constraints: ->(req) { req.format.to_s.in?(API_MIME_TYPES) } do
     post "/hooks", to: "github_webhooks#create"
@@ -44,4 +44,3 @@ Rails.application.routes.draw do
 
   root to: "home#index"
 end
-# rubocop:enable Metrics/BlockLength
