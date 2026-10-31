@@ -6,6 +6,7 @@ module CheckRuns
     # https://docs.github.com/en/rest/checks/runs?apiVersion=2022-11-28#update-a-check-run--parameters
     MAX_ANNOTATIONS = 50
     MAX_TABLE_ROWS = 100
+    MAX_SKIPPED_PATHS = 3
     DEFAULT_FAILURE_MODE = "failure"
 
     # @param undercover_warnings [Array] list of warnings reported by Undercover
@@ -113,8 +114,44 @@ module CheckRuns
 
     def summary_for_run
       complete_message = run.num_warnings.zero? ? "🚀 Ship it!" : "🚨"
-      num = ActionController::Base.helpers.pluralize(run.num_warnings, "warning")
-      "#{complete_message} UndercoverCI has detected #{num} in this changeset."
+      num = pluralize(run.num_warnings, "warning")
+      summary = "#{complete_message} UndercoverCI has detected #{num} in this changeset."
+      summary += " ℹ️ Some changed files were not checked, see the details below." if skipped_files_notes.any?
+      summary
+    end
+
+    def skipped_files_notes
+      @skipped_files_notes ||= [
+        skipped_files_note(@undercover_report.erb_files_without_coverage) do |count|
+          "Skipped #{pluralize(count, 'ERB template')}: the coverage report has no ERB coverage. " \
+            "Add `enable_coverage(:eval)` to `SimpleCov.start` to check them."
+        end,
+        skipped_files_note(@undercover_report.erb_parse_failures) do |count|
+          "Skipped #{pluralize(count, 'ERB template')} that could not be parsed."
+        end,
+        skipped_files_note(globbed_out_files_when_nothing_checked) do |count|
+          "No changed files were checked: #{count == 1 ? 'the only one was' : "all #{count} were"} excluded by " \
+            "the include/exclude globs (`--include-files`/`--exclude-files`). " \
+            "Globs are matched relative to the directory SimpleCov covered."
+        end
+      ].compact
+    end
+
+    def skipped_files_note(paths)
+      return if paths.empty?
+
+      lines = paths.first(MAX_SKIPPED_PATHS).map { |path| "- `#{path}`" }
+      lines << "- and #{paths.size - MAX_SKIPPED_PATHS} more" if paths.size > MAX_SKIPPED_PATHS
+      "ℹ️ #{yield(paths.size)}\n#{lines.join("\n")}"
+    end
+
+    # Most PRs touch files the globs reject (README, YAML), so only explain them when nothing was checked
+    def globbed_out_files_when_nothing_checked
+      @undercover_report.all_results.empty? ? @undercover_report.globbed_out_files : []
+    end
+
+    def pluralize(count, word)
+      ActionController::Base.helpers.pluralize(count, word)
     end
 
     def text_for_run
@@ -129,6 +166,7 @@ module CheckRuns
         text += "⚠️ Due to GitHub's 50 annotation limit, only the first 50 warnings are shown in the pull request " \
                 "diff. Please inspect the table below and the full report at #{details_url}."
       end
+      skipped_files_notes.each { |note| text += "\n\n#{note}" }
       text += "\n\n"
       rows = ["file | name | coverage | branches", ":--- | :--- | ---: | ---:"]
       format_to_md = proc do |node|

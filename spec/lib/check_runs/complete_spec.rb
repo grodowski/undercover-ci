@@ -241,7 +241,10 @@ describe CheckRuns::Complete do
     large_report = instance_double(
       Undercover::Report,
       all_results: many_warnings,
-      flagged_results: many_warnings
+      flagged_results: many_warnings,
+      globbed_out_files: [],
+      erb_files_without_coverage: [],
+      erb_parse_failures: []
     )
 
     check_run_complete.post(large_report)
@@ -280,6 +283,108 @@ describe CheckRuns::Complete do
     check_run_complete.post(undercover_report_fixture)
 
     expect(dummy_github).to have_received(:post).exactly(3).times
+  end
+
+  describe "skipped files" do
+    let(:run) do
+      DataObjects::CheckRunInfo.new(
+        "grodowski/undercover-ci", "abc123", "installation-1", nil,
+        "2020-02-02T16:13:22Z", nil, :complete, 1337, "2020-02-02T16:20:47Z",
+        check_run_fixture(result: :passed).nodes
+      )
+    end
+    let(:dummy_github) { instance_spy(Octokit::Client) }
+
+    def post_output(report)
+      check_run_complete = described_class.new(run)
+      allow(dummy_github).to receive_message_chain(:last_response, :status)
+      allow(check_run_complete).to receive(:installation_api_client) { dummy_github }
+      check_run_complete.post(report)
+      output = nil
+      expect(dummy_github).to have_received(:post) do |_, payload|
+        expect(payload[:conclusion]).to eq("success")
+        output = payload[:output]
+      end
+      output
+    end
+
+    it "adds no note when nothing was skipped" do
+      output = post_output(undercover_report_fixture)
+
+      expect(output[:summary]).to eq("🚀 Ship it! UndercoverCI has detected 0 warnings in this changeset.")
+      expect(output[:text]).not_to include("ℹ️")
+    end
+
+    it "explains ERB templates skipped for missing ERB coverage" do
+      output = post_output(undercover_report_fixture(erb_files_without_coverage: ["app/views/a.html.erb"]))
+
+      expect(output[:summary]).to eq(
+        "🚀 Ship it! UndercoverCI has detected 0 warnings in this changeset. " \
+        "ℹ️ Some changed files were not checked, see the details below."
+      )
+      expect(output[:text]).to eq(<<~TEXT.chomp)
+        Revision `abc123` has modified the following 3 code locations.
+
+        ℹ️ Skipped 1 ERB template: the coverage report has no ERB coverage. Add `enable_coverage(:eval)` to `SimpleCov.start` to check them.
+        - `app/views/a.html.erb`
+
+        file | name | coverage | branches
+        :--- | :--- | ---: | ---:
+      TEXT
+    end
+
+    it "lists ERB templates that could not be parsed" do
+      output = post_output(undercover_report_fixture(erb_parse_failures: ["app/views/a.html.erb"]))
+
+      expect(output[:summary]).to end_with("ℹ️ Some changed files were not checked, see the details below.")
+      expect(output[:text]).to eq(<<~TEXT.chomp)
+        Revision `abc123` has modified the following 3 code locations.
+
+        ℹ️ Skipped 1 ERB template that could not be parsed.
+        - `app/views/a.html.erb`
+
+        file | name | coverage | branches
+        :--- | :--- | ---: | ---:
+      TEXT
+    end
+
+    it "ignores files rejected by the globs when other files were checked" do
+      output = post_output(undercover_report_fixture(globbed_out_files: ["README.md", "config/a.yml"]))
+
+      expect(output[:summary]).to eq("🚀 Ship it! UndercoverCI has detected 0 warnings in this changeset.")
+      expect(output[:text]).not_to include("ℹ️")
+    end
+
+    it "explains changed files rejected by the globs when nothing was checked" do
+      report = undercover_report_fixture(globbed_out_files: ["lib/a.rb", "lib/b.rb"], checked: false)
+      output = post_output(report)
+
+      expect(output[:summary]).to end_with("ℹ️ Some changed files were not checked, see the details below.")
+      expect(output[:text]).to eq(<<~TEXT.chomp)
+        Revision `abc123` has modified the following 0 code locations.
+
+        ℹ️ No changed files were checked: all 2 were excluded by the include/exclude globs (`--include-files`/`--exclude-files`). Globs are matched relative to the directory SimpleCov covered.
+        - `lib/a.rb`
+        - `lib/b.rb`
+
+        file | name | coverage | branches
+        :--- | :--- | ---: | ---:
+      TEXT
+    end
+
+    it "lists both notes and caps the paths" do
+      erb = Array.new(5) { |i| "app/views/#{i}.html.erb" }
+      output = post_output(
+        undercover_report_fixture(erb_files_without_coverage: erb, globbed_out_files: ["lib/a.rb"], checked: false)
+      )
+
+      expect(output[:text]).to include("ℹ️ Skipped 5 ERB templates")
+      expect(output[:text]).to include(
+        "- `app/views/2.html.erb`\n- and 2 more\n\nℹ️ No changed files were checked: the only one was"
+      )
+      expect(output[:text]).not_to include("app/views/3.html.erb")
+      expect(output[:text]).to include("- `lib/a.rb`")
+    end
   end
 
   def check_run_fixture(result: :failed)
@@ -322,7 +427,12 @@ describe CheckRuns::Complete do
     end
   end
 
-  def undercover_report_fixture
+  def undercover_report_fixture(
+    globbed_out_files: [],
+    erb_files_without_coverage: [],
+    erb_parse_failures: [],
+    checked: true
+  )
     mock_node = double(
       kind: :instance_method, human_name: "instance method", name: "method", first_line: 1, last_line: 6,
       source_lines_with_numbers: (1..6).zip(Array.new(6, "test_line")), empty_def?: false
@@ -344,6 +454,11 @@ describe CheckRuns::Complete do
       Undercover::Result.new(mock_node, mock_adapter_res2, "spec/fixtures/application_record.rb"),
       Undercover::Result.new(mock_node, mock_adapter_res, "spec/fixtures/application_record.rb")
     ]
-    instance_double(Undercover::Report, all_results: results, flagged_results: results[0..1])
+    results = [] unless checked
+    instance_double(
+      Undercover::Report,
+      all_results: results, flagged_results: results[0..1], globbed_out_files:, erb_files_without_coverage:,
+      erb_parse_failures:
+    )
   end
 end
