@@ -130,8 +130,8 @@ module CheckRuns
           "Skipped #{pluralize(count, 'ERB template')} that could not be parsed."
         end,
         skipped_files_note(globbed_out_files_when_nothing_checked) do |count|
-          "No changed files were checked: #{count == 1 ? 'the only one was' : "all #{count} were"} excluded by " \
-            "the include/exclude globs (`--include-files`/`--exclude-files`). " \
+          "No changed files were checked. The include/exclude globs (`--include-files`/`--exclude-files`) " \
+            "excluded #{pluralize(count, 'changed file')}. " \
             "Globs are matched relative to the directory SimpleCov covered."
         end
       ].compact

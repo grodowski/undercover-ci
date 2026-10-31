@@ -363,7 +363,7 @@ describe CheckRuns::Complete do
       expect(output[:text]).to eq(<<~TEXT.chomp)
         Revision `abc123` has modified the following 0 code locations.
 
-        ℹ️ No changed files were checked: all 2 were excluded by the include/exclude globs (`--include-files`/`--exclude-files`). Globs are matched relative to the directory SimpleCov covered.
+        ℹ️ No changed files were checked. The include/exclude globs (`--include-files`/`--exclude-files`) excluded 2 changed files. Globs are matched relative to the directory SimpleCov covered.
         - `lib/a.rb`
         - `lib/b.rb`
 
@@ -380,8 +380,9 @@ describe CheckRuns::Complete do
 
       expect(output[:text]).to include("ℹ️ Skipped 5 ERB templates")
       expect(output[:text]).to include(
-        "- `app/views/2.html.erb`\n- and 2 more\n\nℹ️ No changed files were checked: the only one was"
+        "- `app/views/2.html.erb`\n- and 2 more\n\nℹ️ No changed files were checked."
       )
+      expect(output[:text]).to include("excluded 1 changed file.")
       expect(output[:text]).not_to include("app/views/3.html.erb")
       expect(output[:text]).to include("- `lib/a.rb`")
     end
