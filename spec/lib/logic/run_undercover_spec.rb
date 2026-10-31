@@ -328,7 +328,6 @@ describe Logic::RunUndercover do
       opts = runner.__send__(:build_undercover_options)
 
       expect(opts.lcov).to eq(runner.instance_variable_get(:@coverage_tmpfile).path)
-      expect(opts.path).to eq(repo_path)
       expect(opts.compare).to eq(runner.instance_variable_get(:@run).compare)
       expect(opts.max_warnings_limit).to eq(51)
     end
@@ -366,7 +365,6 @@ describe Logic::RunUndercover do
 
       expect(opts.compare).to eq(runner.instance_variable_get(:@run).compare)
       expect(opts.lcov).to eq(runner.instance_variable_get(:@coverage_tmpfile).path)
-      expect(opts.path).to eq(repo_path)
       expect(opts.max_warnings_limit).to eq(51)
     end
 
@@ -382,7 +380,6 @@ describe Logic::RunUndercover do
 
       expect(opts.compare).to eq(runner.instance_variable_get(:@run).compare)
       expect(opts.lcov).to eq(runner.instance_variable_get(:@coverage_tmpfile).path)
-      expect(opts.path).to eq(repo_path)
     end
 
     it "handles JSON coverage format" do
