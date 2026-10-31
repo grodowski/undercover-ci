@@ -102,7 +102,7 @@ module Logic
       @token = CheckRuns::InstallationAccessToken.new(run).get
       git("init", "-q")
       git("remote", "add", "origin", remote_url)
-      git("fetch", "-q", "--filter=blob:none", "--depth=1", "--no-tags", "origin", run.compare, run.sha)
+      fetch_commits
 
       crumb = Sentry::Breadcrumb.new(category: "clone_repo", message: [run.compare, run.sha].to_json, level: "info")
       Sentry.add_breadcrumb(crumb)
@@ -116,9 +116,22 @@ module Logic
       "https://x-access-token:#{@token}@github.com/#{run.full_name}.git"
     end
 
+    # A fork's head commit is on no branch of the base repo, only on its pull request ref.
+    # If that ref has moved on since the upload, the sha is fetched directly.
+    def fetch_commits
+      fetch = ["fetch", "-q", "--filter=blob:none", "--depth=1", "--no-tags", "origin", run.compare]
+      return git(*fetch, run.sha) unless run.pull_request_number
+
+      pull_ref = "refs/remotes/origin/pull/#{run.pull_request_number}"
+      git(*fetch, "+refs/pull/#{run.pull_request_number}/head:#{pull_ref}")
+      git(*fetch[0...-1], run.sha) unless git("rev-parse", pull_ref).strip == run.sha
+    end
+
     # Writes only the changed files and .undercover to disk. Rugged can't download missing
     # file contents, so the last diff fetches the base side of every changed file in one go.
     def checkout
+      # Symlinks become plain files, so a pull request can't point analysis at files outside the checkout
+      git("config", "core.symlinks", "false")
       write_sparse_checkout(changed_paths)
       git("checkout", "-q", "-b", "undercover-ci", run.sha)
       git("diff", "--no-renames", "--numstat", run.compare, run.sha)

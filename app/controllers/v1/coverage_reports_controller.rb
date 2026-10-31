@@ -6,6 +6,10 @@ require "securerandom"
 module V1
   class CoverageReportsController < ApiController
     include JsonFormatterValidation
+    include CoverageUploadRateLimit
+
+    # A conservative subset of git's branch name rules
+    BRANCH_NAME = /\A(?![-.\/])(?!.*(?:\.\.|\/\/|\/\.))(?!.*(?:\.lock|[.\/])\z)[A-Za-z0-9._\/-]{1,255}\z/
 
     protect_from_forgery with: :null_session
     before_action :find_coverage_check
@@ -98,9 +102,25 @@ module V1
     end
 
     def find_coverage_check
-      check_params = params.require(%i[repo sha])
-      @coverage_check = CoverageCheck.where("repo @> ?", {full_name: check_params.first}.to_json)
-                                     .where(head_sha: check_params[1]).first!
+      repo_full_name, sha = params.require(%i[repo sha])
+      pull_request_number = uploaded_pull_request_number
+      @coverage_check = Logic::ResolveCoverageCheck.call(
+        repo_full_name, sha, pull_request_number, (uploaded_pull_request_base_ref if pull_request_number)
+      )
+      raise ActiveRecord::RecordNotFound unless @coverage_check
+    end
+
+    # Only an upload may start or update a check, never a cancellation
+    def uploaded_pull_request_number
+      return unless action_name == "create"
+
+      number = params[:pull_request_number].to_s
+      number.to_i if number.match?(/\A[1-9]\d{0,8}\z/)
+    end
+
+    def uploaded_pull_request_base_ref
+      base_ref = params[:pull_request_base_ref]
+      base_ref if base_ref.is_a?(String) && base_ref.match?(BRANCH_NAME)
     end
 
     def check_subscription

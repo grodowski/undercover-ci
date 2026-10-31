@@ -114,7 +114,10 @@ module CheckRuns
     def summary_for_run
       complete_message = run.num_warnings.zero? ? "🚀 Ship it!" : "🚨"
       num = ActionController::Base.helpers.pluralize(run.num_warnings, "warning")
-      "#{complete_message} UndercoverCI has detected #{num} in this changeset."
+      summary = "#{complete_message} UndercoverCI has detected #{num} in this changeset."
+      return summary unless run.compare_fallback
+
+      "#{summary}\nCompared against #{run.compare_fallback} (pull request target branch unknown)."
     end
 
     def text_for_run

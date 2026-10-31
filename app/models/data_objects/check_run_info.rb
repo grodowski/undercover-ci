@@ -16,6 +16,8 @@ module DataObjects
     nodes
     state_log
     failure_mode
+    pull_request_number
+    compare_fallback
   ].freeze
 
   # TODO: consider refactoring into OpenStruct/Class with named attrs
@@ -42,7 +44,9 @@ module DataObjects
         db_check.state_log.last&.fetch("ts"),
         db_check.nodes, # TODO: wrap AR models with a dedicated read model
         db_check.state_log,
-        db_check.failure_mode
+        db_check.failure_mode,
+        db_check.pull_request_number,
+        db_check.compare_fallback
       )
     end
 
