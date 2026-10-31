@@ -203,10 +203,8 @@ module Logic
         opts.simplecov_resultset = nil
         opts.lcov = @coverage_tmpfile.path
       end
-      opts.path = repo_path
       opts.compare = @run.compare
       opts.max_warnings_limit = 51
-      opts.git_dir = ".git"
 
       opts
     end
