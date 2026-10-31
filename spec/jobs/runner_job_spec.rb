@@ -32,6 +32,10 @@ describe RunnerJob do
     expect { described_class.perform_now(check.id) }.to have_enqueued_job(described_class)
   end
 
+  it "reports errors to sentry from the third sidekiq attempt" do
+    expect(described_class.get_sidekiq_options["attempt_threshold"]).to eq(3)
+  end
+
   def make_check(installation, state: :queued)
     CoverageCheck.create!(
       installation:,
