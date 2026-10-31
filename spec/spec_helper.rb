@@ -26,5 +26,7 @@ RSpec.configure do |config|
     skip(/^\/spec\//)
     skip("sidekiq_admin.ru")
     enable_coverage(:branch)
+    enable_coverage(:eval)
+    coverage(:branch, ignore: :implicit_else)
   end
 end
