@@ -38,6 +38,16 @@ describe "Settings" do
     Rails.application.env_config["omniauth.auth"] = OmniAuth.config.mock_auth[:github]
   end
 
+  describe "GET /settings" do
+    it "labels the fork checks checkbox with a per-repository id" do
+      get("/auth/github/callback")
+
+      get("/settings")
+
+      expect(response.body).to include('id="fork-checks-1337-0"', 'for="fork-checks-1337-0"')
+    end
+  end
+
   describe "PATCH /settings" do
     before do
       get("/auth/github/callback")

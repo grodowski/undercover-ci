@@ -46,6 +46,12 @@ class CoverageCheck < ApplicationRecord
     where("repo @> ?", {full_name: repo_full_name}.to_json).find_by(head_sha: sha)
   end
 
+  # Serializes check creation for a commit between the check_suite webhook and coverage uploads.
+  # Call inside a transaction, the lock is released on commit.
+  def self.lock_repo_sha(repo_full_name, sha)
+    connection.execute(sanitize_sql_array(["SELECT pg_advisory_xact_lock(hashtext(?))", "#{repo_full_name}@#{sha}"]))
+  end
+
   def self.to_chartkick
     group(:result).group_by_day(:created_at).count
   end

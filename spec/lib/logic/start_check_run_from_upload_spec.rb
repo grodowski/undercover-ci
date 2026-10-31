@@ -151,6 +151,13 @@ describe Logic::StartCheckRunFromUpload do
         .with(a_string_including("against the default branch, base ref develop not found"))
     end
 
+    it "fails instead of falling back when GitHub errors" do
+      stub_branch(503)
+
+      expect { subject }.to raise_error(Octokit::ServiceUnavailable)
+      expect(CoverageCheck.count).to eq(0)
+    end
+
     it "does not look up the default branch" do
       expect(described_class.call("author/repo", sha, 42, "main").base_sha).to eq("main")
     end

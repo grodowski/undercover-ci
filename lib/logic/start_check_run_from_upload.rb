@@ -39,19 +39,12 @@ module Logic
 
       base_sha = compare_base(installation, repository)
       CoverageCheck.transaction do
-        lock_repo_sha
+        CoverageCheck.lock_repo_sha(repo_full_name, sha)
         CoverageCheck.for_repo_sha(repo_full_name, sha) || build_coverage_check(installation, repository, base_sha)
       end
     end
 
     private
-
-    # Concurrent uploads for the same commit wait here, so only the first one creates a check
-    def lock_repo_sha
-      CoverageCheck.connection.execute(
-        CoverageCheck.sanitize_sql_array(["SELECT pg_advisory_xact_lock(hashtext(?))", "#{repo_full_name}@#{sha}"])
-      )
-    end
 
     def build_coverage_check(installation, repository, base_sha)
       coverage_check = installation.coverage_checks.create!(
@@ -66,13 +59,14 @@ module Logic
 
     # The target branch, which RunUndercover turns into the merge base. A branch the repo doesn't
     # have would fail every compare call, so the check falls back to the default branch instead.
+    # Other GitHub errors fail the upload, so a retry compares against the right branch.
     def compare_base(installation, repository)
       return if pull_request_base_ref.blank?
       return pull_request_base_ref if pull_request_base_ref == repository["default_branch"]
 
       client(installation).get("/repos/#{repo_full_name}/branches/#{pull_request_base_ref}")
       pull_request_base_ref
-    rescue Octokit::Error => e
+    rescue Octokit::NotFound => e
       log "comparing #{repo_full_name} pull/#{pull_request_number} against the default branch, " \
           "base ref #{pull_request_base_ref} not found: #{e.class}"
       nil

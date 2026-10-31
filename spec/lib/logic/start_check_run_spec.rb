@@ -46,6 +46,26 @@ describe Logic::StartCheckRun do
     expect { described_class.call(check_run_info) }.not_to change(CoverageCheck, :count)
   end
 
+  it "reuses a check an upload created before the webhook arrived" do
+    CoverageCheck.create!(
+      installation:, head_sha: "b4c0n1", base_sha: "main", pull_request_number: 42,
+      repo: {"full_name" => "author/repo"}, state: :awaiting_coverage
+    )
+
+    expect(CreateCheckRunJob).not_to receive(:perform_later)
+    expect { described_class.call(check_run_info) }.not_to change(CoverageCheck, :count)
+  end
+
+  it "takes the same advisory lock as uploads before creating a check" do
+    installation.itself
+    allow(CoverageCheck.connection).to receive(:execute).and_call_original
+
+    described_class.call(check_run_info)
+
+    expect(CoverageCheck.connection).to have_received(:execute)
+      .with("SELECT pg_advisory_xact_lock(hashtext('author/repo@b4c0n1'))")
+  end
+
   context "with a check_suite payload from GitHub" do
     let(:check_run_info) do
       DataObjects::CheckRunInfo.new("author/repo", "b4c0n1", "c0mp4r3", "123123", nil, payload)
