@@ -355,6 +355,17 @@ describe CheckRuns::Complete do
       expect(output[:text]).not_to include("ℹ️")
     end
 
+    it "ignores lockfiles, docs and specs rejected by the globs when nothing was checked" do
+      report = undercover_report_fixture(
+        globbed_out_files: ["Gemfile.lock", "README.md", "spec/a_spec.rb", "apps/dash/test/b_test.rb"],
+        checked: false
+      )
+      output = post_output(report)
+
+      expect(output[:summary]).to eq("🚀 Ship it! UndercoverCI has detected 0 warnings in this changeset.")
+      expect(output[:text]).not_to include("ℹ️")
+    end
+
     it "explains changed files rejected by the globs when nothing was checked" do
       report = undercover_report_fixture(globbed_out_files: ["lib/a.rb", "lib/b.rb"], checked: false)
       output = post_output(report)

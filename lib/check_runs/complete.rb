@@ -145,9 +145,17 @@ module CheckRuns
       "ℹ️ #{yield(paths.size)}\n#{lines.join("\n")}"
     end
 
-    # Most PRs touch files the globs reject (README, YAML), so only explain them when nothing was checked
+    # Lockfiles, docs and specs are rejected on every PR; only Ruby code undercover would check by default
+    # hints at misconfigured globs, e.g. a monorepo app path repeated in them
     def globbed_out_files_when_nothing_checked
-      @undercover_report.all_results.empty? ? @undercover_report.globbed_out_files : []
+      return [] unless @undercover_report.all_results.empty?
+
+      @undercover_report.globbed_out_files.select { |path| checked_by_default_globs?(path) }
+    end
+
+    def checked_by_default_globs?(path)
+      Undercover::Options::DEFAULT_FILE_INCLUDE_GLOBS.any? { |glob| File.fnmatch(glob, File.basename(path)) } &&
+        Undercover::Options::DEFAULT_FILE_EXCLUDE_GLOBS.none? { |glob| File.fnmatch(glob, path) }
     end
 
     def pluralize(count, word)
