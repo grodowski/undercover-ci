@@ -55,9 +55,9 @@ module Logic
       timed(:checkout) { checkout }
 
       report = timed(:run_undercover_cmd) { run_undercover_cmd }
-      # :nocov:
+      # simplecov:disable
       @changeset.instance_variable_get(:@repo)&.close
-      # :nocov:
+      # simplecov:enable
       @changeset = nil
       warnings = report.flagged_results
       log "undercover warnings: #{warnings.size}, " \
@@ -157,9 +157,9 @@ module Logic
     end
 
     def teardown
-      # :nocov:
+      # simplecov:disable
       @changeset&.instance_variable_get(:@repo)&.close
-      # :nocov:
+      # simplecov:enable
       @coverage_tmpfile.close
       FileUtils.remove_entry(repo_path, true)
       GC.compact

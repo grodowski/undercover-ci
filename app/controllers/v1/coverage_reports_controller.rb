@@ -61,9 +61,9 @@ module V1
         validate_formatted_json(parsed)
         true
       else
-        # :nocov:
+        # simplecov:disable
         false
-        # :nocov:
+        # simplecov:enable
       end
     rescue JsonFormatterValidation::Invalid, Undercover::LcovParseError => e
       @error_message = e.message

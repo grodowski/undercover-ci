@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# :nocov:
+# simplecov:disable
 module Gumroad
   module ValidateAll
     extend ClassLoggable
@@ -42,4 +42,4 @@ module Gumroad
     end
   end
 end
-# :nocov:
+# simplecov:enable

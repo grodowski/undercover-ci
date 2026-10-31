@@ -4,7 +4,7 @@ module V1
   class GumroadPingController < ApiController
     skip_before_action :verify_authenticity_token
 
-    # :nocov:
+    # simplecov:disable
     def create
       sale = DataObjects::Gumroad::Sale.new(params)
       unless sale.valid_request?
@@ -21,6 +21,6 @@ module V1
       end
       head :ok
     end
-    # :nocov:
+    # simplecov:enable
   end
 end
