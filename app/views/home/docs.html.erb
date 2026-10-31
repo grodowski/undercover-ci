@@ -18,6 +18,7 @@ Learn how to install UndercoverCI for your repos, report coverage data and use t
             <li class=""><a href="#installation">Installation</a>
             <li class=""><a href="#reporting">Report test coverage</a>
             <li class=""><a href="#branch-cov">Branch coverage</a></li>
+            <li class=""><a href="#view-coverage">View coverage (beta)</a></li>
             <li class=""><a href="#verifying-setup">Verify your setup</a>
             <li class=""><a href="#undercover-cli">Use Undercover CLI locally</a>
             <li class=""><a href="#coding-agents">Set up your coding agent</a>
@@ -119,6 +120,47 @@ Learn how to install UndercoverCI for your repos, report coverage data and use t
       <p>UndercoverCI and <code>undercover</code> CLI (starting with version <code>>= 0.4.0</code>) both accept coverage reports with branch coverage data.</p> The <a href="#reporting">configuration example</a> already shows how to enable branch coverage in SimpleCov, which is all you need to receive more fine-grained coverage checks.
 
       <p>If you decide to enable branch coverage reporting, every changed line of code with at least one uncovered branch will be flagged and result in a GitHub annotation for the entire method. This is a more rigorous approach compared to just validating line-by-line test coverage.</p>
+
+      <h4 id="view-coverage" class="mt-5 mb-2">View coverage (beta)</h4>
+
+      <p>Starting with <code>undercover</code> 0.9.0, UndercoverCI can also check ERB templates changed in a pull request. Your test suite needs Ruby 3.2+ and SimpleCov 1.0+. On older versions, pin <code>undercover ~> 0.8.0</code> and keep checking Ruby code only.</p>
+
+      <p>
+        1. Enable eval coverage in <code>SimpleCov.start</code>. Templates are only measured when this is on. Keep <code>enable_coverage(:branch)</code> if you use branch coverage.
+        <pre><code>
+          SimpleCov.start do
+            enable_coverage(:branch)
+            enable_coverage(:eval)
+          end
+        </code></pre>
+        If you merge reports from <a href="#parallel-tests">parallel tests</a>, add <code>enable_coverage(:eval)</code> to the <code>SimpleCov.collate</code> block too.
+      </p>
+
+      <p>
+        2. Opt in with a <a href="#undercover-configuration-file"><code>.undercover</code></a> file in the repository root. <code>-f</code> replaces undercover's default include list and <code>-x</code> replaces the default exclude list, so list everything explicitly:
+        <pre><code>
+          -f *.rb,*.rake,*.ru,Rakefile,*.erb
+        </code></pre>
+        If you need extra excludes, e.g. generator templates that tests never render, add them to the defaults:
+        <pre><code>
+          -x test/*,spec/*,db/*,config/*,*_test.rb,*_spec.rb,vendor/*,*/templates/*
+        </code></pre>
+      </p>
+
+      <p>
+        <code>if</code>, <code>unless</code>, <code>case</code>, loops and <code>do ... end</code> blocks inside templates, including block helpers like <code>&lt;%= form_with ... do |f| %&gt;</code>, are checked alongside Ruby methods and reported on the template's own line numbers.
+        If the uploaded report has no eval coverage at all, changed templates are skipped rather than flagged at 0%. Templates that can't be parsed are skipped as well.
+      </p>
+
+      <p>Known limitations:</p>
+      <ul>
+        <li>Lines outside any if/case/loop/block aren't checked individually. A template that's never rendered and has no control flow isn't flagged.</li>
+        <li><code>||</code> and <code>&amp;&amp;</code> fallbacks aren't measured by Ruby's coverage.</li>
+        <li>With Rails 8.1, <code>config.action_view.annotate_rendered_view_with_filenames = true</code> shifts template line numbers by one. Turn it off in the test environment.</li>
+        <li>ERB rendered outside Rails (stdlib <code>ERB.new</code>) needs a filename set.</li>
+      </ul>
+
+      <p>View coverage is in beta; please report issues on <a href="https://github.com/grodowski/undercover/issues" target="_blank">GitHub</a>.</p>
 
       <h4 id="undercover-cli" class="mt-5 mb-2">Shorten the feedback loop with the local CLI</h4>
 
@@ -299,17 +341,17 @@ claude --plugin-dir ./undercover-claude</code></pre>
       </p>
 
       <p>
-        In order to acknowledge an untested change and remove the UndercoverCI warning with the intention to improve later (or never), you can wrap the code block with the <code>:nocov:</code> syntax, e.g.
+        In order to acknowledge an untested change and remove the UndercoverCI warning with the intention to improve later (or never), you can wrap the code block with SimpleCov's <code>simplecov:disable</code> and <code>simplecov:enable</code> comments, e.g.
 
         <pre><code>
-          # :nocov:
+          # simplecov:disable
           def skip_this_method
             never_reached
           end
-          # :nocov:
+          # simplecov:enable
         </code></pre>
 
-        Read more about the <code>:nocov:</code> syntax in <a href="https://github.com/simplecov-ruby/simplecov#ignoringskipping-code" target="_blank">SimpleCov's readme</a>.
+        SimpleCov 1.0 deprecates the older <code># :nocov:</code> syntax; it still works for now. Read more about skipping code in <a href="https://github.com/simplecov-ruby/simplecov#ignoringskipping-code" target="_blank">SimpleCov's readme</a>.
       </p>
 
       <h4 id="undercover-configuration-file" class="mt-5 mb-2">Configuration File</h4>
@@ -327,6 +369,10 @@ claude --plugin-dir ./undercover-claude</code></pre>
 
       <p>
         UndercoverCI will automatically detect and apply these settings when analyzing your coverage reports. Commonly used options include <code>--exclude-files</code> and <code>--include-files</code> for controlling which files are analyzed. Note that options meant for local undercover usage (like coverage file paths and git settings) will be overridden by UndercoverCI's own configuration. For a complete list of available options, see the <a href="https://github.com/grodowski/undercover#configuration-file" target="_blank">undercover gem documentation</a>.
+      </p>
+
+      <p>
+        In a monorepo, keep <code>.undercover</code> in the repository root, but write <code>--include-files</code> and <code>--exclude-files</code> globs relative to the directory SimpleCov covered. If tests run in <code>apps/dash</code>, use <code>lib/**/*.rb</code> rather than <code>apps/dash/lib/**/*.rb</code>. This changed in <code>undercover</code> 0.9.0, so drop the app directory from existing globs.
       </p>
 
       <h4 id="branch-filtering" class="mt-5 mb-2">Branch filtering</h4>
