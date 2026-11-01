@@ -42,6 +42,11 @@ class CoverageCheck < ApplicationRecord
 
   delegate :max_concurrent_checks, to: :installation
 
+  # SQL for #head_branch, until the branch gets a column of its own
+  HEAD_BRANCH_SQL = "COALESCE(check_suite->>'head_branch', pull_request_head_ref)"
+
+  scope :on_branch, ->(branch) { where("#{HEAD_BRANCH_SQL} = ?", branch) }
+
   def self.for_repo_sha(repo_full_name, sha)
     where("repo @> ?", {full_name: repo_full_name}.to_json).find_by(head_sha: sha)
   end

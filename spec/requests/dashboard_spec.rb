@@ -134,6 +134,18 @@ describe "Dashboard spec" do
         expect(response.body).not_to include("RECENT_S")
       end
 
+      it "filters by and suggests the branch of a check created by an upload" do
+        CoverageCheck.create!(
+          head_sha: "FORK_SHA", installation: inst, created_at: 1.day.ago,
+          repo: {"full_name" => "owner/repo2"}, pull_request_number: 7, pull_request_head_ref: "fork-branch"
+        )
+
+        get("/app", params: {branch_name: "fork-branch"})
+
+        expect(response.body).to include("FORK_SHA", '<option value="fork-branch">')
+        expect(response.body).not_to include("RECENT_S")
+      end
+
       it "filters by branch name" do
         get("/app", params: {branch_name: "feature"})
         expect(response.body).to include("RECENT_S")
