@@ -68,7 +68,7 @@ describe Logic::MergeOutcomes::Report do
     text = report((1..5).map { pr(it, :merged_with_warnings) }).to_s
 
     expect(text).to include("- 5 merged with untested code:\n")
-    expect(text.scan(%r{https://github.com/acme/api/pull/\d+\n}).size).to eq(5)
+    expect(text.scan(/https:\/\/github.com\/acme\/api\/pull\/\d+\n/).size).to eq(5)
   end
 
   it "is notable only with merged pull requests" do
