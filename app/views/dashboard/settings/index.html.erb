@@ -74,19 +74,20 @@
                     <%= form.label "Neutral, displays PR annotations treated as a success for dependent checks (🟡)", class: "form-check-label small" %>
                   </div>
                 </div>
-                <div class="pb-3">
+                <div class="pb-3 critical-paths">
                   <label class="form-label" for="critical_paths_<%= inst.installation_id %>_<%= index %>">
                     Critical paths
-                    <a href="/docs#critical-paths" target="_blank" class="text-decoration-none ms-1 text-muted" title="Learn more about critical paths">
-                      (docs)
-                    </a>
                   </label>
-                  <p class="text-muted mb-2 small">One glob per line, relative to the repository root. Any untested change matching them fails the check, even in neutral mode.</p>
+                  <p class="text-muted mb-2 small">
+                    Untested changes in these paths fail the check, everything else stays neutral.
+                    One glob per line, relative to the repository root.
+                    <a href="/docs#critical-paths" target="_blank" class="text-muted">Examples in the docs</a>
+                  </p>
                   <%= form.text_area :critical_paths,
                                      id: "critical_paths_#{inst.installation_id}_#{index}",
                                      value: inst.repo_critical_paths[repo["full_name"]]&.join("\n"),
-                                     rows: 3,
-                                     placeholder: "app/models/billing/**/*\nlib/payments/**/*.rb",
+                                     rows: 6,
+                                     placeholder: "# billing code\napp/models/billing/**/*\n# one app in a monorepo\napps/payments/**/*\n# all Ruby, views stay neutral\n**/*.rb",
                                      class: "form-control form-control-sm font-monospace" %>
                 </div>
                 <div class="text-end">

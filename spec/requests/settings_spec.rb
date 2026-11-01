@@ -160,7 +160,10 @@ describe "Settings" do
 
     textarea = Nokogiri::HTML(response.body).at_css("textarea[name=critical_paths]")
     expect(textarea.text.strip).to eq("app/models/billing/**/*\nlib/auth/*.rb")
-    expect(textarea["placeholder"]).to eq("app/models/billing/**/*\nlib/payments/**/*.rb")
+    expect(textarea["placeholder"]).to eq(
+      "# billing code\napp/models/billing/**/*\n# one app in a monorepo\napps/payments/**/*\n" \
+      "# all Ruby, views stay neutral\n**/*.rb"
+    )
     expect(response.body).to include("relative to the repository root")
   end
 

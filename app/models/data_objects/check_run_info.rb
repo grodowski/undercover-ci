@@ -69,7 +69,10 @@ module DataObjects
       @num_warnings ||= nodes.flagged.size
     end
 
+    # With the failure mode every warning already fails the check, so critical paths only apply to neutral checks
     def critical?(path)
+      return false unless failure_mode == "neutral"
+
       (critical_paths || []).any? { File.fnmatch?(it, path, File::FNM_PATHNAME | File::FNM_EXTGLOB) }
     end
 

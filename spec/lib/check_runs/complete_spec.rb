@@ -187,6 +187,7 @@ describe CheckRuns::Complete do
         node_type: "instance method", node_name: "charge", start_line: 1, end_line: 3,
         coverage: 0.0, flagged: true, path: "app/models/billing/invoice.rb"
       )
+      run.failure_mode = "neutral"
       run.critical_paths = ["app/models/{billing,payments}/**/*"]
 
       payload = post_payload

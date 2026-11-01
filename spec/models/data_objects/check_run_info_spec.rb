@@ -66,6 +66,7 @@ describe DataObjects::CheckRunInfo do
     end
 
     it "matches paths relative to the repository root" do
+      run.failure_mode = "neutral"
       run.critical_paths = ["app/models/billing/**/*", "lib/{auth,payments}/*.rb"]
 
       expect(run.critical?("app/models/billing/invoice.rb")).to be true
@@ -75,6 +76,13 @@ describe DataObjects::CheckRunInfo do
       expect(run.critical?("lib/payments/stripe/card.rb")).to be false
       expect(run.critical?("lib/mailers/receipt.rb")).to be false
       expect(run.critical?("apps/dash/app/models/billing/invoice.rb")).to be false
+    end
+
+    it "ignores critical paths outside the neutral failure mode" do
+      run.failure_mode = "failure"
+      run.critical_paths = ["app/models/billing/**/*"]
+
+      expect(run.critical?("app/models/billing/invoice.rb")).to be false
     end
   end
 end

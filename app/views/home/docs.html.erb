@@ -425,11 +425,11 @@ claude --plugin-dir ./undercover-claude</code></pre>
 
       <h4 id="critical-paths" class="mt-5 mb-2">Critical paths</h4>
       <p>
-        Critical paths fail the check (🔴) when untested changes touch code you care about most, such as billing or authentication, even if the repository's failure mode is neutral (🟡). Warnings in critical paths are annotated as failures in the pull request diff and marked <code>(critical)</code> in the check run table. When the failure mode is already "Failure", critical paths only change how warnings are displayed.
+        Critical paths let a neutral (🟡) repository fail the check (🔴) when untested changes touch code you care about most, such as billing or authentication. Everything else stays neutral. Warnings in critical paths are annotated as failures in the pull request diff and marked <code>(critical)</code> in the check run table. With the "Failure" mode every warning already fails the check, so critical paths only apply to neutral repositories.
       </p>
 
       <p>
-        To configure critical paths, go to your Settings page, expand the configuration section for a repository and enter one glob per line in the "Critical paths" field. Blank lines and lines starting with <code>#</code> are ignored, up to <%= Installation::MAX_CRITICAL_PATHS %> patterns are allowed.
+        To configure critical paths, go to your Settings page, expand the configuration section for a repository, select "Neutral" and enter one glob per line in the "Critical paths" field. Blank lines and lines starting with <code>#</code> are ignored, up to <%= Installation::MAX_CRITICAL_PATHS %> patterns are allowed.
       </p>
 
       <p>
