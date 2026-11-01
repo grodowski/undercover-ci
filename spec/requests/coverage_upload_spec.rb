@@ -390,9 +390,28 @@ describe "Coverage Upload" do
     expect(response.status).to eq(201)
   end
 
-  it "raises a state machine error when check is complete" do
+  %i[complete queued].each do |state|
+    it "responds already_uploaded and keeps the check when it is #{state}" do
+      check = make_coverage_check
+      check.update!(state:)
+      contents = "SF:./foo.rb\nDA:1,1"
+
+      post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
+
+      expect(response.status).to eq(422)
+      expect(JSON.parse(response.body)).to eq(
+        "error" => "Coverage for #{check.head_sha} has already been uploaded to check #{check.id}.",
+        "code" => "already_uploaded"
+      )
+      check.reload
+      expect(check.state).to eq(state)
+      expect(check.coverage_reports).to be_empty
+    end
+  end
+
+  it "raises a state machine error when check has not started" do
     check = make_coverage_check
-    check.update!(state: :complete)
+    check.update!(state: :created)
     contents = "SF:./foo.rb\nDA:1,1"
 
     post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}

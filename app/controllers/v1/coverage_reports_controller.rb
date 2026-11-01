@@ -4,7 +4,7 @@ require "base64"
 require "securerandom"
 
 module V1
-  class CoverageReportsController < ApiController
+  class CoverageReportsController < ApiController # rubocop:disable Metrics/ClassLength
     include JsonFormatterValidation
     include CoverageUploadRateLimit
     include CoverageUploadParams
@@ -22,12 +22,16 @@ module V1
         # Undercover::LcovParser closes the io internally 😭
         input_io = StringIO.new(decoded)
 
-        @coverage_check.transaction do
-          attach_report(input_io, file_type)
-          Logic::UpdateCoverageCheckState.new(@coverage_check).enqueue
-          # Wait 5 seconds to let ActiveStorage process the attachment
-          RunnerJob.set(wait: 5.seconds).perform_later(@coverage_check.id)
+        begin
+          @coverage_check.transaction do
+            attach_report(input_io, file_type)
+            Logic::UpdateCoverageCheckState.new(@coverage_check).enqueue
+            # Wait 5 seconds to let ActiveStorage process the attachment
+            RunnerJob.set(wait: 5.seconds).perform_later(@coverage_check.id)
+          end
         rescue Logic::StateTransisionError => _e
+          return render_already_uploaded if @coverage_check.state.in?(%i[queued complete])
+
           @error_message = "Coverage check #{@coverage_check.id} has already completed. " \
                            "Please push a new commit to restart."
         end
@@ -51,6 +55,14 @@ module V1
     end
 
     private
+
+    # Another CI run for the same commit got here first, e.g. a workflow on both push and pull_request
+    def render_already_uploaded
+      render json: {
+        error: "Coverage for #{@coverage_check.head_sha} has already been uploaded to check #{@coverage_check.id}.",
+        code: "already_uploaded"
+      }, status: :unprocessable_content
+    end
 
     def validate_input(input_io)
       case file_type
