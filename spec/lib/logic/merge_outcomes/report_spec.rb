@@ -25,7 +25,7 @@ describe Logic::MergeOutcomes::Report do
       pr(1, :passed),
       pr(2, :passed, caught: true),
       pr(3, :passed, caught: true),
-      pr(4, :merged_with_warnings, names: %w[charge block charge refund void sync]),
+      pr(4, :merged_with_warnings, names: %w[charge block charge refund]),
       pr(5, :merged_before_check),
       pr(6, :no_coverage),
       pr(7, :no_check),
@@ -45,7 +45,7 @@ describe Logic::MergeOutcomes::Report do
       - 8 pull requests merged
       - 3 fully tested when they merged
       - 1 merged with untested code:
-        - https://github.com/acme/api/pull/4 (charge, refund, void)
+        - https://github.com/acme/api/pull/4 (charge, block in app/block.rb, refund)
       - 1 merged before the coverage check finished
       - 1 merged without a coverage result
       - 1 merged without a coverage check
@@ -64,13 +64,11 @@ describe Logic::MergeOutcomes::Report do
     expect(text).not_to include("red to green", "untested code", "before the coverage check", "without a coverage")
   end
 
-  it "lists up to 3 pull requests with untested code and skips unnamed blocks" do
-    text = report((1..5).map { pr(it, :merged_with_warnings, names: %w[block]) }).to_s
+  it "lists every pull request with untested code" do
+    text = report((1..5).map { pr(it, :merged_with_warnings) }).to_s
 
-    expect(text).to include(
-      "- 5 merged with untested code:\n  - https://github.com/acme/api/pull/1\n  " \
-      "- https://github.com/acme/api/pull/2\n  - https://github.com/acme/api/pull/3\n  - and 2 more\n"
-    )
+    expect(text).to include("- 5 merged with untested code:\n")
+    expect(text.scan(%r{https://github.com/acme/api/pull/\d+\n}).size).to eq(5)
   end
 
   it "is notable only with merged pull requests" do

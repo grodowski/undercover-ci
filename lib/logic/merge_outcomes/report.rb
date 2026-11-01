@@ -3,8 +3,6 @@
 module Logic
   class MergeOutcomes
     class Report
-      EMAIL_PULL_REQUESTS = 3
-      NODES_PER_PULL_REQUEST = 3
       PERIODS = {7 => "the last week", 14 => "the last 2 weeks", 30 => "the last 30 days"}.freeze
 
       attr_reader :result
@@ -79,12 +77,11 @@ module Logic
         return [] if with_warnings.empty?
 
         lines = ["- #{with_warnings.size} merged with untested code:"]
-        with_warnings.first(EMAIL_PULL_REQUESTS).each do |pr|
-          names = pr.flagged_nodes.map { it[:name] }.reject { it == "block" }.uniq.first(NODES_PER_PULL_REQUEST)
-          methods = " (#{names.join(', ')})" if names.any?
-          lines << "  - https://github.com/#{pr.repo}/pull/#{pr.number}#{methods}"
+        with_warnings.each do |pr|
+          names = pr.flagged_nodes.map { it[:name] == "block" ? "block in #{it[:path]}" : it[:name] }.uniq
+          details = " (#{names.join(', ')})" if names.any?
+          lines << "  - https://github.com/#{pr.repo}/pull/#{pr.number}#{details}"
         end
-        lines << "  - and #{with_warnings.size - EMAIL_PULL_REQUESTS} more" if with_warnings.size > EMAIL_PULL_REQUESTS
         lines
       end
     end
