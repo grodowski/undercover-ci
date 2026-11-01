@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_11_01_125118) do
+ActiveRecord::Schema[7.2].define(version: 2025_02_16_162610) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "plpgsql"
@@ -46,6 +46,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_11_01_125118) do
   create_table "coverage_checks", force: :cascade do |t|
     t.string "head_sha"
     t.jsonb "repo"
+    t.text "lcov"
     t.jsonb "event_log"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
