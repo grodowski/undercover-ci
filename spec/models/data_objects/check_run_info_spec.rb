@@ -78,4 +78,32 @@ describe DataObjects::CheckRunInfo do
       expect(described_class.find_base_sha(payload)).to eq("HEAD~1")
     end
   end
+
+  describe "#critical?" do
+    let(:run) { described_class.new }
+
+    it "is false without critical paths" do
+      expect(run.critical?("app/models/billing/invoice.rb")).to be false
+    end
+
+    it "matches paths relative to the repository root" do
+      run.failure_mode = "neutral"
+      run.critical_paths = ["app/models/billing/**/*", "lib/{auth,payments}/*.rb"]
+
+      expect(run.critical?("app/models/billing/invoice.rb")).to be true
+      expect(run.critical?("app/models/billing/stripe/charge.rb")).to be true
+      expect(run.critical?("lib/auth/token.rb")).to be true
+      expect(run.critical?("lib/payments/card.rb")).to be true
+      expect(run.critical?("lib/payments/stripe/card.rb")).to be false
+      expect(run.critical?("lib/mailers/receipt.rb")).to be false
+      expect(run.critical?("apps/dash/app/models/billing/invoice.rb")).to be false
+    end
+
+    it "ignores critical paths outside the neutral failure mode" do
+      run.failure_mode = "failure"
+      run.critical_paths = ["app/models/billing/**/*"]
+
+      expect(run.critical?("app/models/billing/invoice.rb")).to be false
+    end
+  end
 end

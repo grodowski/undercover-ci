@@ -114,4 +114,8 @@ class CoverageCheck < ApplicationRecord
   def failure_mode
     installation.repo_failure_modes[repo_full_name]
   end
+
+  def critical_paths
+    installation.repo_critical_paths[repo_full_name] || []
+  end
 end
