@@ -19,7 +19,7 @@ describe "uploader.rb" do
 
   around do |example|
     with_env(
-      "GITHUB_ACTIONS" => nil, "GITHUB_REPOSITORY" => nil,
+      "GITHUB_ACTIONS" => nil, "GITHUB_REPOSITORY" => nil, "GITHUB_EVENT_PATH" => nil,
       "GITHUB_REF" => nil, "GITHUB_BASE_REF" => nil, "GITHUB_HEAD_REF" => nil
     ) do
       example.run
@@ -118,8 +118,42 @@ describe "uploader.rb" do
     ).to_stderr
   end
 
-  context "when running in a different repository, like a contributor's fork" do
-    around { |example| with_env("GITHUB_REPOSITORY" => "someone/bob-fork") { example.run } }
+  def with_github_event(event, &)
+    Tempfile.create(["event", ".json"]) do |file|
+      file.write(event.to_json)
+      file.flush
+      with_env("GITHUB_EVENT_PATH" => file.path, &)
+    end
+  end
+
+  it "uploads to --repo from a workflow in another repository that isn't a fork" do
+    stub_post_coverage({}, status: 201)
+
+    with_env("GITHUB_REPOSITORY" => "alice/ci") do
+      with_github_event("repository" => {"fork" => false}) do
+        build_uploader("--simplecov spec/fixtures/coverage.json --repo alice/bob --commit 1fffbb").upload
+      end
+    end
+
+    expect(uploaded_body).to include("repo" => "alice/bob")
+  end
+
+  it "uploads to --repo without an event file to tell a fork apart" do
+    stub_post_coverage({}, status: 201)
+
+    with_env("GITHUB_REPOSITORY" => "alice/ci") do
+      build_uploader("--simplecov spec/fixtures/coverage.json --repo alice/bob --commit 1fffbb").upload
+    end
+
+    expect(uploaded_body).to include("repo" => "alice/bob")
+  end
+
+  context "when running in a contributor's fork" do
+    around do |example|
+      with_env("GITHUB_REPOSITORY" => "someone/bob-fork") do
+        with_github_event("repository" => {"fork" => true}) { example.run }
+      end
+    end
 
     def upload
       build_uploader("--simplecov spec/fixtures/coverage.json --repo alice/bob --commit 1fffbb").tap(&:upload)

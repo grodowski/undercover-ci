@@ -150,13 +150,20 @@ class UndercoverCiCoverageUpload # rubocop:disable Metrics/ClassLength
   def target_repo
     @target_repo ||= begin
       running_in = Options.presence(ENV.fetch("GITHUB_REPOSITORY", nil))
-      if running_in && !running_in.casecmp?(@options.repo)
+      if running_in && !running_in.casecmp?(@options.repo) && running_in_fork?
         puts "Running in #{running_in}, uploading coverage there instead of #{@options.repo}"
         running_in
       else
         @options.repo
       end
     end
+  end
+
+  # A workflow can also check out another repo on purpose, only a fork's own builds switch
+  def running_in_fork?
+    JSON.parse(File.read(ENV.fetch("GITHUB_EVENT_PATH", ""))).dig("repository", "fork") == true
+  rescue Errno::ENOENT, JSON::ParserError
+    false
   end
 
   def retargeted?
