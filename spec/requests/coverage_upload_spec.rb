@@ -11,19 +11,6 @@ describe "Coverage Upload" do
     expect(response.status).to eq(404)
   end
 
-  it "stores the LCOV in active storage" do
-    check = make_coverage_check
-    contents = File.read("spec/fixtures/coverage.lcov")
-
-    post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
-
-    check.reload
-    expect(check.coverage_reports).not_to be_empty
-
-    expect(check.coverage_reports.attachments.first.download).to eq(contents)
-    expect(response.status).to eq(201)
-  end
-
   it "stores JSON coverage in active storage" do
     check = make_coverage_check
     contents = File.read("spec/fixtures/coverage.json")
@@ -44,16 +31,20 @@ describe "Coverage Upload" do
     expect(response.status).to eq(201)
   end
 
-  it "validates uploads" do
+  it "rejects LCOV and uploads without a file_type" do
     check = make_coverage_check
-    contents = File.read("public/404.html") # text/html, should fail
+    contents = Base64.encode64(File.read("spec/fixtures/coverage.lcov"))
 
-    post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
+    [
+      {lcov_base64: contents},
+      {file_base64: contents},
+      {file_base64: contents, file_type: "lcov"}
+    ].each do |params|
+      post path, params: {repo: check.repo_full_name, sha: check.head_sha, **params}
 
-    expect(response.status).to eq(422)
-    expect(JSON.parse(response.body)).to eq(
-      "error" => "could not recognise '<!doctype html>\n' as valid LCOV"
-    )
+      expect(response.status).to eq(422)
+      expect(JSON.parse(response.body)["error"]).to include("LCOV is no longer supported")
+    end
     expect(check.reload.coverage_reports.attached?).to eq(false)
   end
 
@@ -119,8 +110,8 @@ describe "Coverage Upload" do
     check = make_coverage_check
     check.update!(state: :canceled)
 
-    contents = File.read("spec/fixtures/coverage.lcov")
-    post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
+    contents = File.read("spec/fixtures/coverage.json")
+    post path, params: upload_params(check, contents)
 
     expect(response.status).to eq(201)
 
@@ -130,11 +121,11 @@ describe "Coverage Upload" do
 
   it "transitions the check to in_progress and enqueues RunUndercover in 5 seconds" do
     check = make_coverage_check
-    contents = File.read("spec/fixtures/coverage.lcov")
+    contents = File.read("spec/fixtures/coverage.json")
 
     Timecop.freeze do
       expect do
-        post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
+        post path, params: upload_params(check, contents)
       end.to have_enqueued_job(RunnerJob).at(5.seconds.from_now)
     end
 
@@ -145,11 +136,11 @@ describe "Coverage Upload" do
   it "restarts an in_progress check and enqueues RunUndercover in 5 seconds" do
     check = make_coverage_check
     check.update!(state: :in_progress)
-    contents = File.read("spec/fixtures/coverage.lcov")
+    contents = File.read("spec/fixtures/coverage.json")
 
     Timecop.freeze do
       expect do
-        post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
+        post path, params: upload_params(check, contents)
       end.to have_enqueued_job(RunnerJob).at(5.seconds.from_now)
     end
 
@@ -168,8 +159,8 @@ describe "Coverage Upload" do
       license_key: "1337"
     )
 
-    contents = File.read("spec/fixtures/coverage.lcov")
-    post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
+    contents = File.read("spec/fixtures/coverage.json")
+    post path, params: upload_params(check, contents)
 
     expect(check.reload.state).to eq(:in_progress) # canceled?
     expect(response.status).to eq(422)
@@ -191,8 +182,8 @@ describe "Coverage Upload" do
       license_key: "1337"
     )
 
-    contents = File.read("spec/fixtures/coverage.lcov")
-    post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
+    contents = File.read("spec/fixtures/coverage.json")
+    post path, params: upload_params(check, contents)
 
     expect(check.reload.state).to eq(:queued)
     expect(response.status).to eq(201)
@@ -201,9 +192,9 @@ describe "Coverage Upload" do
   it "raises a state machine error when check is complete" do
     check = make_coverage_check
     check.update!(state: :complete)
-    contents = "SF:./foo.rb\nDA:1,1"
+    contents = File.read("spec/fixtures/coverage.json")
 
-    post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
+    post path, params: upload_params(check, contents)
 
     expect(response.status).to eq(422)
     expect(JSON.parse(response.body)).to eq(
@@ -216,13 +207,13 @@ describe "Coverage Upload" do
     allow(RunnerJob).to receive(:set) { RunnerJob }
 
     check = make_coverage_check
-    contents = File.read("spec/fixtures/coverage.lcov")
+    contents = File.read("spec/fixtures/coverage.json")
 
     fake_run = class_spy(Logic::RunUndercover)
     stub_const("Logic::RunUndercover", fake_run)
 
     perform_enqueued_jobs do
-      post path, params: {repo: check.repo_full_name, sha: check.head_sha, lcov_base64: Base64.encode64(contents)}
+      post path, params: upload_params(check, contents)
     end
 
     expect(response.status).to eq(201)
@@ -246,6 +237,10 @@ describe "Coverage Upload" do
 
       expect(response.status).to eq(404)
     end
+  end
+
+  def upload_params(check, contents)
+    {repo: check.repo_full_name, sha: check.head_sha, file_base64: Base64.encode64(contents), file_type: "json"}
   end
 
   def make_coverage_check
