@@ -20,8 +20,8 @@ require 'simplecov'
 require 'undercover/simplecov_formatter'
 SimpleCov.formatter = SimpleCov::Formatter::Undercover
 SimpleCov.start do
-  add_filter(/^\/spec\//) # For RSpec, use `test` for MiniTest
-  enable_coverage(:branch)
+  skip(/^\/spec\//) # For RSpec, use `test` for MiniTest
+  enable_coverage :branch, :eval
 end
 ```
 
