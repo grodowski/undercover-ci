@@ -2,7 +2,7 @@
 
 module CheckRuns
   class Complete < Base # rubocop:disable Metrics/ClassLength
-    # Prevents GitHub Checks API errors with the 50 annotation limit
+    # GitHub accepts 50 annotations per request, more are appended with check run updates
     # https://docs.github.com/en/rest/checks/runs?apiVersion=2022-11-28#update-a-check-run--parameters
     MAX_ANNOTATIONS = 50
     MAX_TABLE_ROWS = 100
@@ -18,7 +18,9 @@ module CheckRuns
         @undercover_report = undercover_report
         @warnings = undercover_report.flagged_results
         client = installation_api_client(run.installation_id)
-        client.post(
+        annotations = warnings_to_annotations
+        output = {title: "Complete", summary: summary_for_run, text: text_for_run}
+        check_run = client.post(
           "/repos/#{run.full_name}/check-runs",
           head_sha: run.sha,
           name: "coverage",
@@ -28,15 +30,13 @@ module CheckRuns
           conclusion: conclusion_for_run,
           details_url:,
           external_id: run.external_id,
-          output: {
-            title: "Complete",
-            summary: summary_for_run,
-            text: text_for_run,
-            annotations: warnings_to_annotations.first(MAX_ANNOTATIONS)
-          },
+          output: output.merge(annotations: annotations.first(MAX_ANNOTATIONS)),
           accept: "application/vnd.github.antiope-preview+json"
         )
         log "#{run.external_id} response: #{client.last_response.status}"
+        if annotations.size > MAX_ANNOTATIONS
+          append_annotations(client, check_run[:id], output, annotations.drop(MAX_ANNOTATIONS))
+        end
         true
       rescue Octokit::UnprocessableEntity, Octokit::InternalServerError => e
         retry if tries <= retry_limit
@@ -76,12 +76,23 @@ module CheckRuns
 
     private
 
+    # The check run is already complete, so a failed update only loses annotations
+    def append_annotations(client, check_run_id, output, annotations)
+      annotations.each_slice(MAX_ANNOTATIONS) do |batch|
+        client.patch("/repos/#{run.full_name}/check-runs/#{check_run_id}", output: output.merge(annotations: batch))
+      end
+    rescue Octokit::Error => e
+      log("Appending annotations to #{run.external_id} failed with #{e.message}")
+      Sentry.capture_exception(e)
+    end
+
     # TODO: can be updated to read directly from `run.nodes` instead of passing `undercover_report`
     # @return [Array] matching the format expected by GitHub Checks API
     # https://developer.github.com/v3/checks/runs/#output-object
+    # Critical warnings first, so they are annotated even if appending more fails
     def warnings_to_annotations
       log "posting warnings: #{@warnings.size}"
-      @warnings.map do |result|
+      annotations = @warnings.map do |result|
         # TODO: duplicates pronto-undercover logic, move to Undercover::Result
         lines = result.coverage.map { |ln, *| ln if result.uncovered?(ln) }.compact.uniq
         message = "#{result.node.human_name.capitalize} `#{result.node.name}` is missing " \
@@ -105,6 +116,7 @@ module CheckRuns
           raw_details: result.pretty_print
         }
       end
+      annotations.partition { it[:annotation_level] == "failure" }.flatten(1)
     end
 
     def conclusion_for_run
@@ -123,11 +135,6 @@ module CheckRuns
       summary += " ⚠️ Analysis stopped after #{num}, see the details below." if warnings_limit_hit?
       summary += " ℹ️ Some changed files were not checked, see the details below." if skipped_files_notes.any?
       summary
-    end
-
-    def full_list_location
-      report = "the full report at #{details_url}"
-      @warnings.size <= MAX_TABLE_ROWS ? "the table below and #{report}" : report
     end
 
     def warnings_limit_hit?
@@ -187,11 +194,6 @@ module CheckRuns
       if warnings_limit_hit?
         text += "\n\n⚠️ Analysis stopped after #{pluralize(@warnings.size, 'warning')}, so the rest of the diff " \
                 "was not checked."
-      end
-      if @warnings.size > MAX_ANNOTATIONS
-        text += "\n\n⚠️ Found #{pluralize(@warnings.size, 'warning')}. GitHub allows #{MAX_ANNOTATIONS} annotations " \
-                "per check, so the first #{MAX_ANNOTATIONS} are annotated in the pull request diff. " \
-                "All #{@warnings.size} are in #{full_list_location}."
       end
       skipped_files_notes.each { |note| text += "\n\n#{note}" }
       text += "\n\n"

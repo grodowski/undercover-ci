@@ -307,7 +307,9 @@ describe CheckRuns::Complete do
   end
 
   describe "more warnings than annotations" do
-    def post_with_warnings(count)
+    let(:dummy_github) { instance_spy(Octokit::Client, post: {id: 42}) }
+
+    def post_with_warnings(count, critical: [])
       check = CoverageCheck.create!(installation: Installation.create, state: :complete)
       Node.insert_all(
         Array.new(count) do |i|
@@ -329,8 +331,8 @@ describe CheckRuns::Complete do
         "grodowski/undercover-ci", "abc123", "installation-1", nil,
         "2020-02-02T16:13:22Z", nil, :complete, check.id, "2020-02-02T16:20:47Z", check.nodes
       )
+      allow(run).to receive(:critical?).and_return(*Array.new(count) { critical.include?(it) })
       check_run_complete = described_class.new(run)
-      dummy_github = instance_spy(Octokit::Client)
       allow(dummy_github).to receive_message_chain(:last_response, :status)
       allow(check_run_complete).to receive(:installation_api_client) { dummy_github }
 
@@ -347,17 +349,38 @@ describe CheckRuns::Complete do
       payload
     end
 
-    it "annotates the first 50 and lists every warning" do
+    it "annotates every warning, appending batches of 50 to the check run" do
       payload = post_with_warnings(60)
 
       expect(payload[:output][:annotations].size).to eq(50)
       expect(payload[:output][:summary]).to eq("🚨 UndercoverCI has detected 60 warnings in this changeset.")
-      expect(payload[:output][:text]).to include(
-        "⚠️ Found 60 warnings. GitHub allows 50 annotations per check, so the first 50 are annotated in the " \
-        "pull request diff. All 60 are in the table below and the full report at https://undercover-ci.com/checks/"
-      )
+      expect(payload[:output][:text]).not_to include("annotated")
       expect(payload[:output][:text].scan("⚠️ instance method").size).to eq(60)
       expect(payload[:output][:text]).not_to include("Analysis stopped")
+      expect(dummy_github).to have_received(:patch).once do |path, update|
+        expect(path).to eq("/repos/grodowski/undercover-ci/check-runs/42")
+        expect(update[:output].except(:annotations)).to eq(payload[:output].except(:annotations))
+        expect(update[:output][:annotations].size).to eq(10)
+      end
+    end
+
+    it "annotates critical warnings first" do
+      payload = post_with_warnings(60, critical: [55])
+
+      expect(payload[:output][:annotations].first[:annotation_level]).to eq("failure")
+      expect(payload[:output][:annotations].drop(1).pluck(:annotation_level).uniq).to eq(["warning"])
+    end
+
+    it "keeps the completed check when appending annotations fails" do
+      allow(dummy_github).to receive(:patch).and_raise(Octokit::UnprocessableEntity)
+      allow(Sentry).to receive(:capture_exception)
+      allow(ExpireCheckJob).to receive(:perform_later)
+
+      post_with_warnings(60)
+
+      expect(Sentry).to have_received(:capture_exception).with(Octokit::UnprocessableEntity)
+      expect(ExpireCheckJob).not_to have_received(:perform_later)
+      expect(dummy_github).to have_received(:post).once
     end
 
     it "says when the analysis limit was hit" do
@@ -372,10 +395,7 @@ describe CheckRuns::Complete do
       expect(payload[:output][:text]).to include(
         "⚠️ Analysis stopped after #{limit} warnings, so the rest of the diff was not checked."
       )
-      expect(payload[:output][:text]).to include(
-        "the first 50 are annotated in the pull request diff. All #{limit} are in the full report at " \
-        "https://undercover-ci.com/checks/"
-      )
+      expect(dummy_github).to have_received(:patch).exactly((limit - 50) / 50).times
     end
   end
 
