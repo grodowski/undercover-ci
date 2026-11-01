@@ -77,11 +77,11 @@
       </thead>
       <tbody>
         <% @checks.each do |check| %>
-          <tr class="row-href" data-href="<%= check_path(check.id) %>">
+          <tr class="row-link">
             <td><%= check.repo_full_name %></td>
             <td><%= check.head_branch %></td>
             <td><%= pull_request_label(check) %></td>
-            <td><code><%= check.head_sha[0..7] %></code></td>
+            <td><%= link_to content_tag(:code, check.head_sha[0..7]), check_path(check.id), class: "stretched-link" %></td>
             <td>
               <%= coverage_result_badge(check) %>
             </td>

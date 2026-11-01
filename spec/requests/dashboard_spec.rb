@@ -84,7 +84,7 @@ describe "Dashboard spec" do
       get("/auth/github/callback")
       get("/app")
       expect(response.body).to include(
-        "<td><code>1337SHA</code></td>"
+        "<a class=\"stretched-link\" href=\"/checks/#{check.id}\"><code>1337SHA</code></a>"
       )
       expect(response.body).to include("<span class=\"badge rounded-pill text-bg-warning\">1 warning</span>")
       expect(response.body).to include("<span class=\"badge rounded-pill text-bg-success\">0 warnings</span>")
