@@ -14,7 +14,7 @@ module Logic
     Check = Data.define(:id, :repo, :number, :head_sha, :created_at, :state_log, :warnings, :completed_at) do
       # A canceled check can be re-queued by a late upload, so only the log tells its state at a given time
       def state_at(time)
-        state_log.select { Time.zone.parse(it["ts"]) <= time }.max_by { Time.zone.parse(it["ts"]) }&.fetch("to")
+        state_log.select { Time.zone.parse(it["ts"]) <= time }.last&.fetch("to")
       end
     end
     PullRequest = Data.define(:repo, :number, :merged_at, :check_id, :outcome, :caught, :flagged_nodes)
@@ -179,17 +179,23 @@ module Logic
     end
 
     # All pre-merge history of the merged PRs, however old
+    # The PR number saved from an upload, else the same-repo PRs GitHub listed in the check suite
+    # (a fork's suite also lists upstream PRs)
     def load_pr_checks(keys)
       return [] if keys.empty?
 
-      CoverageCheck
-        .joins("CROSS JOIN LATERAL jsonb_array_elements(" \
-               "COALESCE(coverage_checks.check_suite->'pull_requests', '[]'::jsonb)) pull_request")
-        .where(installation_id: installation.id, created_at: ..now)
-        .where("coverage_checks.repo->>'full_name' IN (?)", keys.map(&:first).uniq)
-        .where("(pull_request->>'number')::int IN (?)", keys.map(&:last).uniq)
-        .pluck(*check_columns("(pull_request->>'number')::int"))
-        .map { Check.new(*it) }
+      checks = CoverageCheck.where(installation_id: installation.id, created_at: ..now)
+                            .where("coverage_checks.repo->>'full_name' IN (?)", keys.map(&:first).uniq)
+      numbers = keys.map(&:last).uniq
+      uploaded = checks.where(pull_request_number: numbers)
+                       .pluck(*check_columns("coverage_checks.pull_request_number"))
+      listed = checks
+               .joins("CROSS JOIN LATERAL jsonb_array_elements(" \
+                      "COALESCE(coverage_checks.check_suite->'pull_requests', '[]'::jsonb)) pull_request")
+               .where("pull_request->'base'->'repo'->>'id' = coverage_checks.repo->>'id'")
+               .where("(pull_request->>'number')::int IN (?)", numbers)
+               .pluck(*check_columns("(pull_request->>'number')::int"))
+      (uploaded + listed).uniq { [it.first, it[2]] }.map { Check.new(*it) }
     end
 
     def load_checks_by_sha(shas)

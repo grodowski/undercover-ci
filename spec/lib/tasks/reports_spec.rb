@@ -33,12 +33,17 @@ describe "reports:merge_outcomes" do
     CoverageCheck.create!(
       installation:, head_sha: sha, state: :complete, result:, created_at:, check_suite:,
       state_log: [{"to" => "complete", "ts" => (created_at + 1.minute).iso8601}],
-      repo: {"full_name" => "#{installation.metadata.dig('account', 'login')}/api", "default_branch" => "main"}
+      repo: {
+        "id" => installation.id,
+        "full_name" => "#{installation.metadata.dig('account', 'login')}/api",
+        "default_branch" => "main"
+      }
     )
   end
 
   def pr_check(installation, sha, number, **)
-    check(installation, sha, {"head_branch" => "feature", "pull_requests" => number ? [{"number" => number}] : []}, **)
+    listed = number ? [{"number" => number, "base" => {"repo" => {"id" => installation.id}}}] : []
+    check(installation, sha, {"head_branch" => "feature", "pull_requests" => listed}, **)
   end
 
   def merge_check(installation, sha, message)

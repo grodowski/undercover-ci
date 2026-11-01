@@ -28,14 +28,20 @@ describe Logic::MergeOutcomes do
     )
   end
 
+  def repo_id(full_name) = full_name.sum
+
+  def listed_pr(number, repo, base_repo: repo)
+    {"number" => number, "base" => {"repo" => {"id" => repo_id(base_repo)}}}
+  end
+
   def pr_check(number, created_at:, completed_at: created_at + 5.minutes, repo: "acme/api", **attrs)
     attrs = {state: :complete, result: "passed", head_sha: SecureRandom.hex(20)}.merge(attrs)
     finished = attrs[:state].in?(%i[complete canceled]) && completed_at
     state_log = finished ? [{"to" => attrs[:state].to_s, "ts" => completed_at.utc.iso8601}] : []
     CoverageCheck.create!(
       installation:, created_at:, state_log:, **attrs,
-      repo: {"full_name" => repo, "default_branch" => "main"},
-      check_suite: {"head_branch" => "feature", "pull_requests" => number ? [{"number" => number}] : []}
+      repo: {"id" => repo_id(repo), "full_name" => repo, "default_branch" => "main"},
+      check_suite: {"head_branch" => "feature", "pull_requests" => number ? [listed_pr(number, repo)] : []}
     )
   end
 
@@ -116,6 +122,35 @@ describe Logic::MergeOutcomes do
     merge_check("Add (#1)", merged_at)
 
     expect(outcomes(result.current)).to eq(1 => :merged_before_check)
+  end
+
+  it "takes the last transition when timestamps tie" do
+    merged_at = now - 1.day
+    check = pr_check(1, created_at: merged_at - 3.hours)
+    ts = (merged_at - 2.hours).iso8601
+    check.update!(state_log: [{"to" => "canceled", "ts" => ts}, {"to" => "queued", "ts" => ts}])
+    merge_check("Add (#1)", merged_at)
+
+    expect(outcomes(result.current)).to eq(1 => :merged_before_check)
+  end
+
+  it "finds checks by the pull request number saved from an upload" do
+    check = pr_check(nil, created_at: now - 2.days, result: "failed")
+    check.update!(pull_request_number: 1, check_suite: nil)
+    merge_check("Add (#1)", now - 1.day)
+
+    expect(outcomes(result.current)).to eq(1 => :merged_with_warnings)
+  end
+
+  it "ignores upstream pull requests listed in a fork's check suite" do
+    stub_token
+    stub_ref(1)
+    pr_check(nil, created_at: now - 2.days).update!(
+      check_suite: {"pull_requests" => [listed_pr(1, "acme/api", base_repo: "upstream/api")]}
+    )
+    merge_check("Add (#1)", now - 1.day)
+
+    expect(outcomes(result.current)).to eq(1 => :no_check)
   end
 
   it "treats flagged nodes as warnings when result is missing" do
