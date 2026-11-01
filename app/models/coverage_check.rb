@@ -40,6 +40,7 @@ class CoverageCheck < ApplicationRecord
     self.event_log ||= []
     self.state_log ||= []
     self.repo ||= {}
+    puts "foo tested foo"
   end
 
   delegate :max_concurrent_checks, to: :installation
