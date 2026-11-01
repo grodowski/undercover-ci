@@ -266,6 +266,9 @@ claude --plugin-dir ./undercover-claude</code></pre>
       <p>
         <h6 class="mb-2 mt-3"><code>--repo</code></h6>
         The <code>$org/$repo</code> formatted name matching exactly how your repository appears on GitHub.
+        On GitHub Actions, a build running in a different repository, such as a contributor's fork, uploads to
+        <code>$GITHUB_REPOSITORY</code> instead. When UndercoverCI isn't set up there, the uploader prints a notice and
+        exits successfully, so forks of your repository don't get failing builds.
 
         <h6 class="mb-2 mt-3"><code>--commit</code></h6>
         Current build commit SHA to identify on GitHub. This value will be provided by the CI build environment, e.g.

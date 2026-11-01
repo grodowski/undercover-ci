@@ -18,7 +18,10 @@ describe "uploader.rb" do
   end
 
   around do |example|
-    with_env("GITHUB_REF" => nil, "GITHUB_BASE_REF" => nil, "GITHUB_HEAD_REF" => nil) do
+    with_env(
+      "GITHUB_ACTIONS" => nil, "GITHUB_REPOSITORY" => nil,
+      "GITHUB_REF" => nil, "GITHUB_BASE_REF" => nil, "GITHUB_HEAD_REF" => nil
+    ) do
       example.run
     end
   end
@@ -113,6 +116,67 @@ describe "uploader.rb" do
     end.to output(
       a_string_including("Error 404: does a check for commit 1fffbb exist in alice/bob?")
     ).to_stderr
+  end
+
+  context "when running in a different repository, like a contributor's fork" do
+    around { |example| with_env("GITHUB_REPOSITORY" => "someone/bob-fork") { example.run } }
+
+    def upload
+      build_uploader("--simplecov spec/fixtures/coverage.json --repo alice/bob --commit 1fffbb").tap(&:upload)
+    end
+
+    it "uploads to the repository it runs in" do
+      stub_post_coverage({}, status: 201)
+
+      expect { expect(upload.exitcode).to eq(0) }
+        .to output(a_string_including("Running in someone/bob-fork, uploading coverage there instead of alice/bob"))
+        .to_stdout
+      expect(uploaded_body).to include("repo" => "someone/bob-fork")
+    end
+
+    it "prints a setup notice and succeeds when UndercoverCI isn't set up there" do
+      stub_post_coverage({"error" => "record not found"}, status: 404)
+
+      expect { expect(upload.exitcode).to eq(0) }
+        .to output(
+          a_string_including(
+            "\nUndercoverCI isn't set up for someone/bob-fork, so coverage wasn't uploaded. " \
+            "It's free for public repos: https://undercover-ci.com\n"
+          )
+        ).to_stdout
+    end
+
+    it "shows the setup notice on the run summary on GitHub Actions" do
+      stub_post_coverage({"error" => "record not found"}, status: 404)
+
+      expect { with_env("GITHUB_ACTIONS" => "true") { upload } }
+        .to output(a_string_including("::notice title=UndercoverCI::UndercoverCI isn't set up for someone/bob-fork"))
+        .to_stdout
+    end
+
+    it "still fails on other errors" do
+      stub_post_coverage({"error" => "license expired"}, status: 422)
+
+      expect { expect(upload.exitcode).to eq(1) }.to output(a_string_including("Error 422")).to_stderr
+    end
+
+    it "cancels the check in the repository it runs in" do
+      stub_delete_coverage({}, status: 204)
+
+      expect do
+        build_uploader("--repo alice/bob --commit 1fffbb --simplecov spec/fixtures/coverage.json --cancel").cancel
+      end.to output.to_stdout
+      expect(WebMock).to have_requested(:delete, "https://undercover-ci.com/v1/coverage")
+        .with(body: hash_including("repo" => "someone/bob-fork"))
+    end
+
+    it "uploads to --repo when only the case differs" do
+      stub_post_coverage({}, status: 201)
+
+      with_env("GITHUB_REPOSITORY" => "Alice/Bob") { upload }
+
+      expect(uploaded_body).to include("repo" => "alice/bob")
+    end
   end
 
   it "prints 201 on success" do

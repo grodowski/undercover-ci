@@ -122,7 +122,7 @@ class UndercoverCiCoverageUpload # rubocop:disable Metrics/ClassLength
       Net::HTTP::Post,
       @options.url,
       {
-        repo: @options.repo,
+        repo: target_repo,
         sha: @options.commit,
         file_base64: coverage_data_base64,
         file_type: @options.lcov ? :lcov : :json,
@@ -138,13 +138,30 @@ class UndercoverCiCoverageUpload # rubocop:disable Metrics/ClassLength
       Net::HTTP::Delete,
       @options.url,
       {
-        repo: @options.repo,
+        repo: target_repo,
         sha: @options.commit
       }.to_json
     )
   end
 
   private
+
+  # A fork's own builds run the upstream workflow, so --repo still names the upstream repo
+  def target_repo
+    @target_repo ||= begin
+      running_in = Options.presence(ENV.fetch("GITHUB_REPOSITORY", nil))
+      if running_in && !running_in.casecmp?(@options.repo)
+        puts "Running in #{running_in}, uploading coverage there instead of #{@options.repo}"
+        running_in
+      else
+        @options.repo
+      end
+    end
+  end
+
+  def retargeted?
+    target_repo != @options.repo
+  end
 
   # optional arguments, so a CI template that expands to nothing (a push build) is not an error
   def pull_request_options(opts)
@@ -168,13 +185,28 @@ class UndercoverCiCoverageUpload # rubocop:disable Metrics/ClassLength
     when (200..299)
       puts("Done! #{resp.code}")
     when 404
-      error "Error 404: does a check for commit #{@options.commit} exist in #{@options.repo}? " \
-            "Visit https://undercover-ci.com/docs or get support at help@undercover-ci.com."
+      not_found
     else
       error "Error #{resp.code}, #{resp.body}. " \
             "Visit https://undercover-ci.com/docs or get support at help@undercover-ci.com."
     end
     self
+  end
+
+  def not_found
+    if retargeted?
+      notice "UndercoverCI isn't set up for #{target_repo}, so coverage wasn't uploaded. " \
+             "It's free for public repos: https://undercover-ci.com"
+      return
+    end
+
+    error "Error 404: does a check for commit #{@options.commit} exist in #{@options.repo}? " \
+          "Visit https://undercover-ci.com/docs or get support at help@undercover-ci.com."
+  end
+
+  # shown on the run's summary page on GitHub Actions, not only in the job log
+  def notice(message)
+    puts ENV["GITHUB_ACTIONS"] == "true" ? "::notice title=UndercoverCI::#{message}" : message
   end
 
   def error(message)
