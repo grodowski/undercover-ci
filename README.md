@@ -32,7 +32,7 @@ Add a build step uploading the coverage file with `uploader.rb`:
 ```
 ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- \
   --repo grodowski/undercover-ci \
-  --commit $GITHUB_SHA \
+  --commit ${{ github.event.pull_request.head.sha || github.sha }} \
   --simplecov coverage/coverage.json
 ```
 
