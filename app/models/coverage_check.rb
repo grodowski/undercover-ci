@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class CoverageCheck < ApplicationRecord
+  self.ignored_columns += ["lcov"]
+
   belongs_to :installation
   has_many :nodes
 
