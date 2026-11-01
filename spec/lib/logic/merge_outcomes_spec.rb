@@ -103,6 +103,21 @@ describe Logic::MergeOutcomes do
     )
   end
 
+  it "reads the state at merge from the log when a canceled check was retried" do
+    merged_at = now - 1.day
+    check = pr_check(1, created_at: merged_at - 3.hours, completed_at: merged_at + 1.hour)
+    check.update!(
+      state_log: [
+        {"to" => "canceled", "ts" => (merged_at - 2.hours).iso8601},
+        {"to" => "queued", "ts" => (merged_at - 1.hour).iso8601},
+        {"to" => "complete", "ts" => (merged_at + 1.hour).iso8601}
+      ]
+    )
+    merge_check("Add (#1)", merged_at)
+
+    expect(outcomes(result.current)).to eq(1 => :merged_before_check)
+  end
+
   it "treats flagged nodes as warnings when result is missing" do
     check = pr_check(1, created_at: now - 2.days, result: nil)
     flag_nodes(check, 1)

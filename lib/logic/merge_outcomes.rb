@@ -11,7 +11,12 @@ module Logic
     SQUASH_COMMIT = /\(#(\d+)\)\s*\z/
     FLAGGED_NODES_PER_PR = 3
 
-    Check = Data.define(:id, :repo, :number, :head_sha, :created_at, :state, :warnings, :finished_at)
+    Check = Data.define(:id, :repo, :number, :head_sha, :created_at, :state_log, :warnings, :completed_at) do
+      # A canceled check can be re-queued by a late upload, so only the log tells its state at a given time
+      def state_at(time)
+        state_log.select { Time.zone.parse(it["ts"]) <= time }.max_by { Time.zone.parse(it["ts"]) }&.fetch("to")
+      end
+    end
     PullRequest = Data.define(:repo, :number, :merged_at, :check_id, :outcome, :caught, :flagged_nodes)
 
     Window = Data.define(:from, :to, :pull_requests, :pushes_without_pr) do
@@ -122,18 +127,19 @@ module Logic
       checks.select { it.created_at <= time }.max_by(&:created_at)
     end
 
-    # A check that completed or was canceled after the merge was still pending when the PR merged
     def outcome(check, merged_at)
       return :no_check unless check
-      return :merged_before_check if check.finished_at.nil? || check.finished_at > merged_at
-      return :no_coverage if check.state == "canceled"
 
-      check.warnings ? :merged_with_warnings : :passed
+      case check.state_at(merged_at)
+      when "complete" then check.warnings ? :merged_with_warnings : :passed
+      when "canceled" then :no_coverage
+      else :merged_before_check
+      end
     end
 
     def caught?(outcome, head, pr_checks)
       outcome == :passed && pr_checks.any? do |check|
-        check.state == "complete" && check.warnings && check.finished_at && check.finished_at < head.finished_at
+        check.warnings && check.completed_at && check.completed_at < head.completed_at
       end
     end
 
@@ -164,11 +170,11 @@ module Logic
         number_sql,
         "coverage_checks.head_sha",
         "coverage_checks.created_at",
-        "coverage_checks.state",
+        "COALESCE(coverage_checks.state_log, '[]'::jsonb)",
         "COALESCE(coverage_checks.result = 'failed', EXISTS (SELECT 1 FROM nodes " \
         "WHERE nodes.coverage_check_id = coverage_checks.id AND nodes.flagged))",
         "(SELECT MIN((log->>'ts')::timestamptz) FROM jsonb_array_elements(coverage_checks.state_log) log " \
-        "WHERE log->>'to' IN ('complete', 'canceled'))"
+        "WHERE log->>'to' = 'complete')"
       ].map { Arel.sql(it) }
     end
 
