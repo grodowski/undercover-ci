@@ -120,6 +120,18 @@ describe "uploader.rb" do
     end
   end
 
+  [nil, [], "already_uploaded"].each do |payload|
+    it "exits 1 on a 422 with #{payload.to_json} instead of a JSON object" do
+      stub_post_coverage(payload, status: 422)
+
+      expect do
+        uploader = build_uploader("--simplecov spec/fixtures/coverage.json --repo alice/bob --commit 1fffbb")
+        uploader.upload
+        expect(uploader.exitcode).to eq(1)
+      end.to output(/Error 422/).to_stderr
+    end
+  end
+
   it "exits 1 on a 422 that is not JSON" do
     WebMock.stub_request(:post, "https://undercover-ci.com/v1/coverage")
            .to_return(status: 422, body: "<html>Unprocessable</html>")

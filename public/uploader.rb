@@ -216,9 +216,7 @@ class UndercoverCiCoverageUpload # rubocop:disable Metrics/ClassLength
   end
 
   def not_installed?(body)
-    JSON.parse(body.to_s)["code"] == "not_installed"
-  rescue JSON::ParserError
-    false
+    error_code(body) == "not_installed"
   end
 
   # shown on the run's summary page on GitHub Actions, not only in the job log
@@ -233,9 +231,15 @@ class UndercoverCiCoverageUpload # rubocop:disable Metrics/ClassLength
 
   # e.g. a workflow that runs on both push and pull_request uploads twice for the same commit
   def already_uploaded?(body)
-    JSON.parse(body.to_s)["code"] == "already_uploaded"
+    error_code(body) == "already_uploaded"
+  end
+
+  # an error body can be any JSON, or none at all
+  def error_code(body)
+    parsed = JSON.parse(body.to_s)
+    parsed["code"] if parsed.is_a?(Hash)
   rescue JSON::ParserError
-    false
+    nil
   end
 end
 
