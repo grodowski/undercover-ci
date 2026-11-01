@@ -32,6 +32,7 @@ Learn how to install UndercoverCI for your repos, report coverage data and use t
             <li class=""><a href="#nocov-syntax">Skip coverage with code comments</a></li>
             <li class=""><a href="#undercover-configuration-file">Configuration file</a></li>
             <li class=""><a href="#branch-filtering">Branch filtering</a></li>
+            <li class=""><a href="#critical-paths">Critical paths</a></li>
             <li class=""><a href="#ignoring-test-coverage-checks">Skip coverage entirely</a></li>
             <li class=""><a href="#api">API access</a>
           </ul>
@@ -266,6 +267,9 @@ claude --plugin-dir ./undercover-claude</code></pre>
       <p>
         <h6 class="mb-2 mt-3"><code>--repo</code></h6>
         The <code>$org/$repo</code> formatted name matching exactly how your repository appears on GitHub.
+        On GitHub Actions, a build running in a fork of that repository, such as a contributor's, uploads to the fork
+        (<code>$GITHUB_REPOSITORY</code>) instead. When UndercoverCI isn't set up there, the uploader prints a notice and
+        exits successfully, so forks of your repository don't get failing builds.
 
         <h6 class="mb-2 mt-3"><code>--commit</code></h6>
         Current build commit SHA to identify on GitHub. This value will be provided by the CI build environment, e.g.
@@ -273,14 +277,26 @@ claude --plugin-dir ./undercover-claude</code></pre>
         GitHub Actions or <code>$TRAVIS_COMMIT</code> for TravisCI.</li> Consult your CI service documentation to get the
         right head SHA value for your build environment.
 
+        <h6 class="mb-2 mt-3"><code>--pull-request</code></h6>
+        The pull request number, detected automatically on GitHub Actions pull request builds.
+        Required to run coverage checks on pull requests opened from forks, because GitHub sends no
+        <code>check_suite</code> event for those and the upload itself has to start the check.
+        The value is optional, so the same build command works for push builds where it expands to nothing.
+
+        <h6 class="mb-2 mt-3"><code>--pull-request-base-ref</code></h6>
+        The branch the pull request targets, sent with <code>--pull-request</code> so a fork's pull request is compared
+        against the right branch. Defaults to <code>$GITHUB_BASE_REF</code> on GitHub Actions; elsewhere the default
+        branch is used when it's not set.
+
+        <h6 class="mb-2 mt-3"><code>--pull-request-head-ref</code></h6>
+        The pull request's branch, sent with <code>--pull-request</code> so the dashboard shows a fork's branch name.
+        Defaults to <code>$GITHUB_HEAD_REF</code> on GitHub Actions.
+
         <h6 class="mb-2 mt-3"><code>--cancel</code></h6>
         Cancel coverage check represented by the given <code>--commit</code>. The check will be passing and marked as completed + skipped on your GitHub commit or pull request.
 
         <h6 class="mb-2 mt-3"><code>--simplecov</code></h6>
         A relative path to the SimpleCov JSON coverage report, defaults to <code>coverage/coverage.json</code>.
-
-        <h6 class="mb-2 mt-3"><code>--lcov</code> (legacy)</h6>
-        A relative path to the LCOV coverage report. Still supported for backward compatibility, but SimpleCov JSON format is recommended.
       </p>
 
       <h4 id="parallel-tests" class="mt-5 mb-2">Parallel tests</h4>
@@ -421,6 +437,49 @@ claude --plugin-dir ./undercover-claude</code></pre>
       <p>
         Leave the field blank to run coverage checks on all branches. If you enter an invalid regular expression, UndercoverCI will default to checking all branches.
       </p>
+
+      <h4 id="critical-paths" class="mt-5 mb-2">Critical paths</h4>
+      <p>
+        Critical paths let a neutral (🟡) repository fail the check (🔴) when untested changes touch code you care about most, such as billing or authentication. Everything else stays neutral. Warnings in critical paths are annotated as failures in the pull request diff and marked <code>(critical)</code> in the check run table. With the "Failure" mode every warning already fails the check, so critical paths only apply to neutral repositories.
+      </p>
+
+      <p>
+        To configure critical paths, go to your Settings page, expand the configuration section for a repository, select "Neutral" and enter one glob per line in the "Critical paths" field. Blank lines and comments starting with <code>#</code> are ignored, on their own line or after a pattern, and up to <%= Installation::MAX_CRITICAL_PATHS %> patterns are allowed.
+      </p>
+
+      <p>
+        Patterns are relative to the repository root, not to the directory SimpleCov covered. In a monorepo with tests running in <code>apps/dash</code>, write <code>apps/dash/app/models/billing/**/*</code>. Use <code>**/</code> to match any number of directories (end a directory pattern with <code>/**/*</code>, a trailing <code>/**</code> only matches one level) and <code>{a,b}</code> to match alternatives.
+      </p>
+
+      <h6 class="mb-2 mt-3">Examples</h6>
+      <div class="table-responsive">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Glob</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Any file under <code>app/models/billing</code>, at any depth</td>
+              <td><code>app/models/billing/**/*</code></td>
+            </tr>
+            <tr>
+              <td>Ruby files under <code>lib/payments</code>, at any depth</td>
+              <td><code>lib/payments/**/*.rb</code></td>
+            </tr>
+            <tr>
+              <td>Auth and billing controllers</td>
+              <td><code>app/controllers/{sessions,billing}_controller.rb</code></td>
+            </tr>
+            <tr>
+              <td>A single file</td>
+              <td><code>app/services/charge_card.rb</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <h4 id="ignoring-test-coverage-checks" class="mt-5 mb-2">Skip coverage entirely</h4>
 

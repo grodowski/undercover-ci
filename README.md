@@ -17,24 +17,23 @@ Sign up on [https://undercover-ci.com](https://undercover-ci.com) to set it up w
 
 ```
 require 'simplecov'
-require 'simplecov-lcov'
-SimpleCov::Formatter::LcovFormatter.config.report_with_single_file = true
-SimpleCov.formatter = SimpleCov::Formatter::LcovFormatter
+require 'undercover/simplecov_formatter'
+SimpleCov.formatter = SimpleCov::Formatter::Undercover
 SimpleCov.start do
-  add_filter(/^\/spec\//) # For RSpec, use `test` for MiniTest
+  skip(/^\/spec\//) # For RSpec, use `test` for MiniTest
+  enable_coverage :branch, :eval
 end
-````
+```
 
 #### 2. Upload coverage data after running tests
 
-UndercoverCI accepts LCOV-formatted coverage reports. Please use the `simplecov-lcov` gem to generate them when running your specs. Then you should be able to create a build step uploading the coverage file with `uploader.rb`.
+Add a build step uploading the coverage file with `uploader.rb`:
 
-Example:
 ```
 ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- \
   --repo grodowski/undercover-ci \
-  --commit $TRAVIS_COMMIT \
-  --lcov coverage/lcov/undercover-ci.lcov
+  --commit ${{ github.event.pull_request.head.sha || github.sha }} \
+  --simplecov coverage/coverage.json
 ```
 
 #### 3. Receive GitHub checks for commits and pull request
@@ -63,7 +62,7 @@ git commit --amend -m  "test with branch cov" && git push -f
 ruby -e "$(curl -s https://undercover-ci.com/uploader.rb)" -- \
                   --repo twitchy-tortoise/undercover-test \
                   --commit $(git rev-parse HEAD) \
-                  --lcov coverage/lcov/undercover-test.lcov \
+                  --simplecov coverage/coverage.json \
                   --url http://localhost:3000/v1/coverage
 201
 ```

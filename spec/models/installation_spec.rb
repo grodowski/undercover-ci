@@ -157,4 +157,54 @@ RSpec.describe Installation, type: :model do
       expect(installation.repo_branch_filters["owner/repo1"]).to eq("^main$")
     end
   end
+
+  describe "#set_repo_critical_paths" do
+    let(:installation) do
+      Installation.create!(
+        installation_id: "123123",
+        users: [user],
+        metadata: {target_type: "User"}
+      )
+    end
+
+    it "parses one glob per line, dropping blanks, comments and duplicates" do
+      text = "  app/models/billing/**/*  \r\n\n# payments\nlib/payments/**/*.rb\napp/models/billing/**/*\n"
+
+      installation.set_repo_critical_paths("owner/repo1", text)
+
+      expect(installation.repo_critical_paths["owner/repo1"]).to eq(["app/models/billing/**/*", "lib/payments/**/*.rb"])
+    end
+
+    it "drops comments after a pattern" do
+      text = "app/models/billing/**/*  # billing code\n**/*.rb\t# all Ruby\n"
+
+      installation.set_repo_critical_paths("owner/repo1", text)
+
+      expect(installation.repo_critical_paths["owner/repo1"]).to eq(["app/models/billing/**/*", "**/*.rb"])
+    end
+
+    it "removes the repo when no globs are left" do
+      installation.set_repo_critical_paths("owner/repo1", "lib/**/*")
+      installation.set_repo_critical_paths("owner/repo1", "# nothing\n")
+
+      expect(installation.repo_critical_paths).not_to have_key("owner/repo1")
+    end
+
+    it "rejects too many or too long patterns" do
+      max_globs = Array.new(Installation::MAX_CRITICAL_PATHS) { "lib/#{it}.rb" }
+      installation.set_repo_critical_paths("owner/repo1", max_globs.join("\n"))
+      installation.set_repo_critical_paths("owner/repo2", "a" * Installation::MAX_CRITICAL_PATH_LENGTH)
+      expect(installation).to be_valid
+
+      installation.set_repo_critical_paths("owner/repo1", (max_globs + ["lib/x.rb"]).join("\n"))
+      expect(installation).not_to be_valid
+      expect(installation.errors.full_messages).to eq(
+        ["Critical paths are limited to 50 patterns of up to 200 characters"]
+      )
+
+      installation.set_repo_critical_paths("owner/repo1", "")
+      installation.set_repo_critical_paths("owner/repo2", "a" * (Installation::MAX_CRITICAL_PATH_LENGTH + 1))
+      expect(installation).not_to be_valid
+    end
+  end
 end

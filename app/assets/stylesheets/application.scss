@@ -413,8 +413,9 @@ a.lead { line-height: 1.2; }
   }
 }
 
-.row-href {
-  cursor: pointer;
+// the row's stretched-link covers the whole row
+.row-link {
+  position: relative;
 }
 
 .node-coverage-yellow {
@@ -2250,6 +2251,14 @@ h1 *, h2 *, h3 *, h4 *, h5 *, h6 * {
 .blog-post-body h3 {
   margin-top: 3rem;
   margin-bottom: 1rem;
+}
+
+.critical-paths {
+  display: none;
+}
+
+form:has(input[name="failure_mode"][value="neutral"]:checked) .critical-paths {
+  display: block;
 }
 
 .blog-post-body .post-caption {

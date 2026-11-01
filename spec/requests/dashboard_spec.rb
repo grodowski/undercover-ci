@@ -84,7 +84,7 @@ describe "Dashboard spec" do
       get("/auth/github/callback")
       get("/app")
       expect(response.body).to include(
-        "<a href=\"https://github.com//commit/1337SHA\"><code>1337SHA</code> 👉 <code></code></a>"
+        "<a class=\"stretched-link\" href=\"/checks/#{check.id}\"><code>1337SHA</code></a>"
       )
       expect(response.body).to include("<span class=\"badge rounded-pill text-bg-warning\">1 warning</span>")
       expect(response.body).to include("<span class=\"badge rounded-pill text-bg-success\">0 warnings</span>")
@@ -115,9 +115,34 @@ describe "Dashboard spec" do
         expect(response.body).not_to include("OLD_SHA")
       end
 
+      it "renders the head branch of each check" do
+        get("/app", params: {date_range: "last_90d"})
+
+        expect(response.body).to include("<td>main</td>")
+        expect(response.body).to include("<td>feature</td>")
+      end
+
+      it "renders an empty state when no checks match" do
+        get("/app", params: {repository_name: "owner/repo1", date_range: "last_7d"})
+
+        expect(response.body).to include("<td colspan=6><span>No data yet</span></td>")
+      end
+
       it "filters by repository name" do
         get("/app", params: {repository_name: "owner/repo1", date_range: "last_90d"})
         expect(response.body).to include("OLD_SHA")
+        expect(response.body).not_to include("RECENT_S")
+      end
+
+      it "filters by and suggests the branch of a check created by an upload" do
+        CoverageCheck.create!(
+          head_sha: "FORK_SHA", installation: inst, created_at: 1.day.ago,
+          repo: {"full_name" => "owner/repo2"}, pull_request_number: 7, pull_request_head_ref: "fork-branch"
+        )
+
+        get("/app", params: {branch_name: "fork-branch"})
+
+        expect(response.body).to include("FORK_SHA", '<option value="fork-branch">')
         expect(response.body).not_to include("RECENT_S")
       end
 
@@ -196,6 +221,9 @@ describe "Dashboard spec" do
 
       get("/auth/github/callback")
       get("/checks/#{check.id}")
+      expect(response.body).to include(
+        "<a class=\"btn btn-primary\" href=\"https://github.com//commit/1337SHA\">View on GitHub</a>"
+      )
       expect(response.body).to include("<span class=\"badge rounded-pill text-bg-warning\">warning</span>")
       expect(response.body).to include(
         "Instance method <code>hello</code>. " \

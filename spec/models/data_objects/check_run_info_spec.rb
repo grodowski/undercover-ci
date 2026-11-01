@@ -12,15 +12,36 @@ describe DataObjects::CheckRunInfo do
           "head_branch" => "feature_branch",
           "before" => "before_commit",
           "pull_requests" => [
-            {"base" => {"ref" => "master", "sha" => "pr_base_commit"}}
+            {"base" => {"ref" => "master", "sha" => "pr_base_commit", "repo" => {"id" => 1}}}
           ]
         },
         "repository" => {
+          "id" => 1,
           "default_branch" => "master"
         }
       )
 
       expect(described_class.find_base_sha(payload)).to eq("pr_base_commit")
+    end
+
+    it "ignores an upstream pull request opened from a fork's default branch" do
+      payload = OpenStruct.new(
+        "action" => "requested",
+        "check_suite" => {
+          "head_sha" => "head_commit",
+          "head_branch" => "master",
+          "before" => "before_commit",
+          "pull_requests" => [
+            {"number" => 62, "base" => {"ref" => "master", "sha" => "upstream_commit", "repo" => {"id" => 2}}}
+          ]
+        },
+        "repository" => {
+          "id" => 1,
+          "default_branch" => "master"
+        }
+      )
+
+      expect(described_class.find_base_sha(payload)).to eq("HEAD~1")
     end
 
     it "falls back to repository base branch" do
@@ -55,6 +76,34 @@ describe DataObjects::CheckRunInfo do
       )
 
       expect(described_class.find_base_sha(payload)).to eq("HEAD~1")
+    end
+  end
+
+  describe "#critical?" do
+    let(:run) { described_class.new }
+
+    it "is false without critical paths" do
+      expect(run.critical?("app/models/billing/invoice.rb")).to be false
+    end
+
+    it "matches paths relative to the repository root" do
+      run.failure_mode = "neutral"
+      run.critical_paths = ["app/models/billing/**/*", "lib/{auth,payments}/*.rb"]
+
+      expect(run.critical?("app/models/billing/invoice.rb")).to be true
+      expect(run.critical?("app/models/billing/stripe/charge.rb")).to be true
+      expect(run.critical?("lib/auth/token.rb")).to be true
+      expect(run.critical?("lib/payments/card.rb")).to be true
+      expect(run.critical?("lib/payments/stripe/card.rb")).to be false
+      expect(run.critical?("lib/mailers/receipt.rb")).to be false
+      expect(run.critical?("apps/dash/app/models/billing/invoice.rb")).to be false
+    end
+
+    it "ignores critical paths outside the neutral failure mode" do
+      run.failure_mode = "failure"
+      run.critical_paths = ["app/models/billing/**/*"]
+
+      expect(run.critical?("app/models/billing/invoice.rb")).to be false
     end
   end
 end
