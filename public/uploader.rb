@@ -18,8 +18,7 @@ require "optparse"
 require "pathname"
 require "uri"
 
-LCOV_DEPRECATION_NOTICE = "⚠️ The LCOV coverage format is being deprecated and will be removed from " \
-                          "the UndercoverCI uploader and APIs after 2026/01/31. Please migrate to " \
+LCOV_DEPRECATION_NOTICE = "⚠️ LCOV uploads are deprecated and will stop working soon. Please migrate to " \
                           "SimpleCov::Formatter::Undercover: " \
                           "https://undercover-ci.com/docs#reporting"
 
