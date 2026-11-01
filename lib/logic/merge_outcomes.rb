@@ -6,6 +6,8 @@ module Logic
     include ClassLoggable
 
     DAYS = [7, 14, 30].freeze
+    PR_HISTORY = 30.days
+    MAX_REF_LOOKUPS = 500
     OUTCOMES = %i[passed merged_with_warnings merged_before_check no_coverage no_check unresolved].freeze
     MERGE_COMMIT = /\AMerge pull request #(\d+)/
     SQUASH_COMMIT = /\(#(\d+)\)\s*\z/
@@ -68,8 +70,9 @@ module Logic
     def call
       current_from = now - days.days
       previous_from = current_from - days.days
-      merges, pushes = load_merges(previous_from)
-      pull_requests = resolve(merges, load_pr_checks(merges.keys))
+      merges, pushes = timed("merges") { load_merges(previous_from) }
+      pr_checks = timed("pull request checks") { load_pr_checks(merges.keys, previous_from - PR_HISTORY) }
+      pull_requests = timed("resolve #{merges.size} merges") { resolve(merges, pr_checks) }
 
       Result.new(
         installation:, days:,
@@ -104,10 +107,21 @@ module Logic
       [merges, pushes]
     end
 
+    def timed(step)
+      started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      yield.tap do
+        seconds = (Process.clock_gettime(Process::CLOCK_MONOTONIC) - started).round(1)
+        log "#{installation.installation_id} #{step}: #{seconds}s"
+      end
+    end
+
     def resolve(merges, pr_checks)
       checks_by_pr = pr_checks.group_by { [it.repo, it.number] }
       heads = merges.to_h { |key, merged_at| [key, latest_before(checks_by_pr.fetch(key, []), merged_at)] }
-      shas = merges.keys.reject { heads[it] }.index_with { |(repo, number)| ref_head_sha(repo, number) }
+      lookups = merges.keys.reject { heads[it] }
+      # Each lookup spends the installation's API budget, which its live checks share
+      shas = lookups.first(MAX_REF_LOOKUPS).index_with { |(repo, number)| ref_head_sha(repo, number) }
+      lookups.drop(MAX_REF_LOOKUPS).each { shas[it] = :unresolved }
       checks_by_sha = load_checks_by_sha(shas.values.grep(String))
 
       merges.filter_map do |key, merged_at|
@@ -178,13 +192,12 @@ module Logic
       ].map { Arel.sql(it) }
     end
 
-    # All pre-merge history of the merged PRs, however old
     # The PR number saved from an upload, else the same-repo PRs GitHub listed in the check suite
     # (a fork's suite also lists upstream PRs)
-    def load_pr_checks(keys)
+    def load_pr_checks(keys, from)
       return [] if keys.empty?
 
-      checks = CoverageCheck.where(installation_id: installation.id, created_at: ..now)
+      checks = CoverageCheck.where(installation_id: installation.id, created_at: from..now)
                             .where("coverage_checks.repo->>'full_name' IN (?)", keys.map(&:first).uniq)
       numbers = keys.map(&:last).uniq
       uploaded = checks.where(pull_request_number: numbers)

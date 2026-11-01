@@ -247,12 +247,26 @@ describe Logic::MergeOutcomes do
     expect(result.current.pull_requests.map(&:caught)).to eq([false])
   end
 
-  it "reads the whole history of a merged pull request, not only the report window" do
+  it "reads a merged pull request's checks from #{described_class::PR_HISTORY.inspect} before the report windows" do
     pr_check(1, created_at: now - 40.days, result: "failed")
     pr_check(1, created_at: now - 2.days)
     merge_check("Add (#1)", now - 1.day)
+    pr_check(2, created_at: now - 50.days, result: "failed")
+    pr_check(2, created_at: now - 2.days)
+    merge_check("Add (#2)", now - 1.day)
 
-    expect(result(days: 7).current.pull_requests.map(&:caught)).to eq([true])
+    expect(result(days: 7).current.pull_requests.to_h { [it.number, it.caught] }).to eq(1 => true, 2 => false)
+  end
+
+  it "caps GitHub lookups per installation and counts the rest as unresolved" do
+    stub_const("#{described_class}::MAX_REF_LOOKUPS", 1)
+    stub_token
+    stub_ref(7)
+    merge_check("Add x (#7)", now - 1.day)
+    merge_check("Add y (#8)", now - 1.day)
+
+    expect(outcomes(result.current)).to eq(7 => :no_check, 8 => :unresolved)
+    expect(WebMock).not_to have_requested(:get, /\/git\/ref\/pull\/8\/head/)
   end
 
   it "computes the previous window of the same length" do

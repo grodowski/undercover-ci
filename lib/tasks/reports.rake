@@ -14,6 +14,7 @@ namespace :reports do
                         Logic::MergeOutcomes.installations_with_merges(days)
                       end
       installations.each do |installation|
+        warn "Reporting installation #{installation.installation_id}..."
         report = Logic::MergeOutcomes::Report.new(Logic::MergeOutcomes.call(installation, days:))
         puts report if report.notable?
       end
