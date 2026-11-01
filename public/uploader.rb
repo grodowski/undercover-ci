@@ -15,7 +15,7 @@ require "base64"
 require "json"
 require "net/http"
 require "optparse"
-require "pathname"
+require "pathname" # rubocop:disable Lint/RedundantRequireStatement -- the uploader runs on customers' Ruby, which may be < 4.0
 require "uri"
 
 LCOV_DEPRECATION_NOTICE = "⚠️ The LCOV coverage format is being deprecated and will be removed from " \
