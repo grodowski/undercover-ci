@@ -16,6 +16,8 @@ module DataObjects
     nodes
     state_log
     failure_mode
+    pull_request_number
+    critical_paths
   ].freeze
 
   # TODO: consider refactoring into OpenStruct/Class with named attrs
@@ -42,12 +44,14 @@ module DataObjects
         db_check.state_log.last&.fetch("ts"),
         db_check.nodes, # TODO: wrap AR models with a dedicated read model
         db_check.state_log,
-        db_check.failure_mode
+        db_check.failure_mode,
+        db_check.pull_request_number,
+        db_check.critical_paths
       )
     end
 
     def self.find_base_sha(payload)
-      pr_base_sha = payload.check_suite.dig("pull_requests", 0, "base", "sha")
+      pr_base_sha = same_repo_pull_requests(payload.check_suite, payload.repository).dig(0, "base", "sha")
       if pr_base_sha
         pr_base_sha
       elsif payload.check_suite["head_branch"] != payload.repository["default_branch"]
@@ -59,12 +63,29 @@ module DataObjects
       end
     end
 
+    # A check suite for a fork's branch also lists the upstream pull requests opened from that branch,
+    # which belong to (and compare against) another repository
+    def self.same_repo_pull_requests(check_suite, repository)
+      check_suite.fetch("pull_requests", []).select { it.dig("base", "repo", "id") == repository["id"] }
+    end
+
     def success?
       num_warnings.zero?
     end
 
     def num_warnings
       @num_warnings ||= nodes.flagged.size
+    end
+
+    # With the failure mode every warning already fails the check, so critical paths only apply to neutral checks
+    def critical?(path)
+      return false unless failure_mode == "neutral"
+
+      (critical_paths || []).any? { File.fnmatch?(it, path, File::FNM_PATHNAME | File::FNM_EXTGLOB) }
+    end
+
+    def critical_warnings
+      @critical_warnings ||= nodes.flagged.select { critical?(it.path) }
     end
 
     def error_message

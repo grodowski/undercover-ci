@@ -1,24 +1,25 @@
 # frozen_string_literal: true
 
 module ApplicationHelper
-  def pull_request_or_commit_link(coverage_check)
-    repo = coverage_check.repo_full_name
-    pr = coverage_check.check_suite&.dig("pull_requests", 0)
+  # a check started by a fork's coverage upload has no check_suite, only the number
+  def check_pull_request_number(coverage_check)
+    coverage_check.pull_requests.dig(0, "number") || coverage_check.pull_request_number
+  end
 
-    # rubocop:disable-next Style/StringConcatenation
-    if pr
-      pr_number = pr["number"]
-      base_vs_compare = content_tag("code", "#{pr['head']['ref']} @ #{coverage_check.head_sha[0..7]}") +
-                        " 👉 " +
-                        content_tag("code", pr["base"]["ref"])
-      url = "https://github.com/#{repo}/pull/#{pr_number}/checks"
-    else
-      base_vs_compare = content_tag("code", coverage_check.head_sha[0..7]) +
-                        " 👉 " +
-                        content_tag("code", coverage_check.base_ref_or_branch)
-      url = "https://github.com/#{repo}/commit/#{coverage_check.head_sha}"
-    end
-    link_to base_vs_compare, url
+  def pull_request_label(coverage_check)
+    number = check_pull_request_number(coverage_check)
+    "##{number}" if number
+  end
+
+  def github_link(coverage_check, **html_options)
+    repo_url = "https://github.com/#{coverage_check.repo_full_name}"
+    number = check_pull_request_number(coverage_check)
+    url = number ? "#{repo_url}/pull/#{number}/checks" : "#{repo_url}/commit/#{coverage_check.head_sha}"
+    link_to("View on GitHub", url, html_options)
+  end
+
+  def compare_base(coverage_check)
+    coverage_check.pull_requests.dig(0, "base", "ref") || coverage_check.base_ref_or_branch
   end
 
   def coverage_result_badge(check)

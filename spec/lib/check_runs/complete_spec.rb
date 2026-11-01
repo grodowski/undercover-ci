@@ -129,6 +129,89 @@ describe CheckRuns::Complete do
       end
   end
 
+  describe "critical paths" do
+    let(:check) { check_run_fixture }
+    let(:run) do
+      DataObjects::CheckRunInfo.new(
+        "grodowski/undercover-ci", "abc123", "installation-1", nil,
+        "2020-02-02T16:13:22Z", nil, :complete, 1337, "2020-02-02T16:20:47Z", check.nodes
+      )
+    end
+    let(:dummy_github) { instance_spy(Octokit::Client) }
+
+    def post_payload
+      check_run_complete = described_class.new(run)
+      allow(dummy_github).to receive_message_chain(:last_response, :status)
+      allow(check_run_complete).to receive(:installation_api_client) { dummy_github }
+      check_run_complete.post(undercover_report_fixture)
+      payload = nil
+      expect(dummy_github).to have_received(:post) { |_, p| payload = p }
+      payload
+    end
+
+    it "keeps the neutral failure mode when no warning is in a critical path" do
+      run.failure_mode = "neutral"
+      run.critical_paths = ["app/models/billing/**/*"]
+
+      payload = post_payload
+
+      expect(payload[:conclusion]).to eq("neutral")
+      expect(payload[:output][:summary]).to eq("🚨 UndercoverCI has detected 2 warnings in this changeset.")
+      expect(payload[:output][:annotations].pluck(:annotation_level)).to eq(%w[warning warning])
+      expect(payload[:output][:text]).not_to include("(critical)")
+    end
+
+    it "fails a neutral check when a warning is in a critical path" do
+      run.failure_mode = "neutral"
+      run.critical_paths = ["spec/**/*.rb"]
+
+      payload = post_payload
+
+      expect(payload[:conclusion]).to eq("failure")
+      expect(payload[:output][:summary]).to eq(
+        "🚨 UndercoverCI has detected 2 warnings in this changeset, 2 in critical paths."
+      )
+      expect(payload[:output][:annotations].pluck(:annotation_level)).to eq(%w[failure failure])
+      expect(payload[:output][:text]).to include(
+        "look into them! Warnings marked (critical) match a critical path and fail the check."
+      )
+      expect(payload[:output][:text]).to include(
+        "spec/fixtures/application_record.rb | ⚠️ instance method `method` (critical) | 0.0 | 2/4\n" \
+        "spec/fixtures/application_record.rb | ⚠️ instance method `method` (critical) | 0.0 | 2/4\n" \
+        "spec/fixtures/application_record.rb | instance method `method` | 1.0 | 2/4"
+      )
+    end
+
+    it "counts and marks only the warnings in critical paths" do
+      check.nodes.create!(
+        node_type: "instance method", node_name: "charge", start_line: 1, end_line: 3,
+        coverage: 0.0, flagged: true, path: "app/models/billing/invoice.rb"
+      )
+      run.failure_mode = "neutral"
+      run.critical_paths = ["app/models/{billing,payments}/**/*"]
+
+      payload = post_payload
+
+      expect(payload[:conclusion]).to eq("failure")
+      expect(payload[:output][:summary]).to eq(
+        "🚨 UndercoverCI has detected 3 warnings in this changeset, 1 in critical paths."
+      )
+      expect(payload[:output][:annotations].pluck(:annotation_level)).to eq(%w[warning warning])
+      expect(payload[:output][:text]).to include(
+        "app/models/billing/invoice.rb | ⚠️ instance method `charge` (critical) | 0.0 |"
+      )
+      expect(payload[:output][:text]).to include("application_record.rb | ⚠️ instance method `method` | 0.0")
+    end
+
+    it "ignores covered nodes in critical paths" do
+      check.nodes.where(flagged: true).destroy_all
+      run.failure_mode = "neutral"
+      run.critical_paths = ["spec/**/*.rb"]
+
+      expect(post_payload[:conclusion]).to eq("success")
+    end
+  end
+
   it "responds with success conclusion with a successful check run" do
     run = DataObjects::CheckRunInfo.new(
       "grodowski/undercover-ci",
@@ -223,34 +306,96 @@ describe CheckRuns::Complete do
     end
   end
 
-  it "includes an annotation-limit notice when warnings exceed MAX_ANNOTATIONS" do
-    run = DataObjects::CheckRunInfo.new(
-      "grodowski/undercover-ci", "abc123", "installation-1", nil,
-      "2020-02-02T16:13:22Z", nil, :complete, check_run_fixture.id,
-      "2020-02-02T16:20:47Z", check_run_fixture.nodes
-    )
-    check_run_complete = described_class.new(run)
+  describe "more warnings than annotations" do
+    let(:dummy_github) { instance_spy(Octokit::Client, post: {id: 42}) }
 
-    dummy_github = instance_spy(Octokit::Client)
-    allow(dummy_github).to receive_message_chain(:last_response, :status)
-    allow(check_run_complete).to receive(:installation_api_client) { dummy_github }
+    def post_with_warnings(count, critical: [])
+      check = CoverageCheck.create!(installation: Installation.create, state: :complete)
+      Node.insert_all(
+        Array.new(count) do |i|
+          {
+            coverage_check_id: check.id,
+            node_type: "instance method",
+            node_name: "method_#{i}",
+            start_line: i + 1,
+            end_line: i + 1,
+            coverage: 0.0,
+            flagged: true,
+            path: "app/models/foo.rb",
+            created_at: Time.current,
+            updated_at: Time.current
+          }
+        end
+      )
+      run = DataObjects::CheckRunInfo.new(
+        "grodowski/undercover-ci", "abc123", "installation-1", nil,
+        "2020-02-02T16:13:22Z", nil, :complete, check.id, "2020-02-02T16:20:47Z", check.nodes
+      )
+      allow(run).to receive(:critical?).and_return(*Array.new(count) { critical.include?(it) })
+      check_run_complete = described_class.new(run)
+      allow(dummy_github).to receive_message_chain(:last_response, :status)
+      allow(check_run_complete).to receive(:installation_api_client) { dummy_github }
 
-    many_warnings = Array.new(CheckRuns::Complete::MAX_ANNOTATIONS + 1) do
-      undercover_report_fixture.flagged_results.first
+      warnings = Array.new(count) { undercover_report_fixture.flagged_results.first }
+      report = instance_double(
+        Undercover::Report,
+        all_results: warnings, flagged_results: warnings, globbed_out_files: [],
+        erb_files_without_coverage: [], erb_parse_failures: []
+      )
+      check_run_complete.post(report)
+
+      payload = nil
+      expect(dummy_github).to have_received(:post) { |_, p| payload = p }
+      payload
     end
-    large_report = instance_double(
-      Undercover::Report,
-      all_results: many_warnings,
-      flagged_results: many_warnings,
-      globbed_out_files: [],
-      erb_files_without_coverage: [],
-      erb_parse_failures: []
-    )
 
-    check_run_complete.post(large_report)
+    it "annotates every warning, appending batches of 50 to the check run" do
+      payload = post_with_warnings(60)
 
-    expect(dummy_github).to have_received(:post) do |_, payload|
-      expect(payload[:output][:text]).to include("50 annotation limit")
+      expect(payload[:output][:annotations].size).to eq(50)
+      expect(payload[:output][:summary]).to eq("🚨 UndercoverCI has detected 60 warnings in this changeset.")
+      expect(payload[:output][:text]).not_to include("annotated")
+      expect(payload[:output][:text].scan("⚠️ instance method").size).to eq(60)
+      expect(payload[:output][:text]).not_to include("Analysis stopped")
+      expect(dummy_github).to have_received(:patch).once do |path, update|
+        expect(path).to eq("/repos/grodowski/undercover-ci/check-runs/42")
+        expect(update[:output].except(:annotations)).to eq(payload[:output].except(:annotations))
+        expect(update[:output][:annotations].size).to eq(10)
+      end
+    end
+
+    it "annotates critical warnings first" do
+      payload = post_with_warnings(60, critical: [55])
+
+      expect(payload[:output][:annotations].first[:annotation_level]).to eq("failure")
+      expect(payload[:output][:annotations].drop(1).pluck(:annotation_level).uniq).to eq(["warning"])
+    end
+
+    it "keeps the completed check when appending annotations fails" do
+      allow(dummy_github).to receive(:patch).and_raise(Octokit::UnprocessableEntity)
+      allow(Sentry).to receive(:capture_exception)
+      allow(ExpireCheckJob).to receive(:perform_later)
+
+      post_with_warnings(60)
+
+      expect(Sentry).to have_received(:capture_exception).with(Octokit::UnprocessableEntity)
+      expect(ExpireCheckJob).not_to have_received(:perform_later)
+      expect(dummy_github).to have_received(:post).once
+    end
+
+    it "says when the analysis limit was hit" do
+      limit = Logic::RunUndercover::MAX_WARNINGS_LIMIT
+      payload = post_with_warnings(limit)
+
+      expect(payload[:output][:annotations].size).to eq(50)
+      expect(payload[:output][:summary]).to eq(
+        "🚨 UndercoverCI has detected #{limit} warnings in this changeset. " \
+        "⚠️ Analysis stopped after #{limit} warnings, see the details below."
+      )
+      expect(payload[:output][:text]).to include(
+        "⚠️ Analysis stopped after #{limit} warnings, so the rest of the diff was not checked."
+      )
+      expect(dummy_github).to have_received(:patch).exactly((limit - 50) / 50).times
     end
   end
 

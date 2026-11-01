@@ -47,11 +47,11 @@
                 <div class="border-top py-3">
                   <label class="form-label">
                     Branch Filter
-                    <a href="/docs#branch-filtering" target="_blank" class="text-decoration-none ms-1 text-muted" title="Learn more about branch filtering">
-                      (docs)
-                    </a>
                   </label>
-                  <p class="text-muted mb-2 small">Enter a regular expression to only run coverage checks on matching branches. Leave blank to run on all branches.</p>
+                  <p class="text-muted mb-2 small">
+                    Enter a regular expression to only run coverage checks on matching branches. Leave blank to run on all branches.
+                    <a href="/docs#branch-filtering" target="_blank" class="text-muted">Examples in the docs</a>
+                  </p>
 
                     <%= form.hidden_field :installation_id, value: inst.installation_id %>
                     <%= form.hidden_field :repo_full_name, value: repo["full_name"] %>
@@ -73,6 +73,22 @@
                     <%= form.radio_button :failure_mode, "neutral", checked: current_failure_mode == "neutral", class: "form-check-input" %>
                     <%= form.label "Neutral, displays PR annotations treated as a success for dependent checks (🟡)", class: "form-check-label small" %>
                   </div>
+                </div>
+                <div class="pb-3 critical-paths">
+                  <label class="form-label" for="critical_paths_<%= inst.installation_id %>_<%= index %>">
+                    Critical paths
+                  </label>
+                  <p class="text-muted mb-2 small">
+                    Untested changes in these paths fail the check, everything else stays neutral.
+                    One glob per line, relative to the repository root.
+                    <a href="/docs#critical-paths" target="_blank" class="text-muted">Examples in the docs</a>
+                  </p>
+                  <%= form.text_area :critical_paths,
+                                     id: "critical_paths_#{inst.installation_id}_#{index}",
+                                     value: inst.repo_critical_paths[repo["full_name"]]&.join("\n"),
+                                     rows: 6,
+                                     placeholder: "app/models/billing/**/*  # billing code\n**/*.rb  # all Ruby, views stay neutral",
+                                     class: "form-control form-control-sm font-monospace" %>
                 </div>
                 <div class="text-end">
                   <%= form.submit "Save settings", class: "btn btn-sm btn-outline-primary" %>

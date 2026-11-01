@@ -21,43 +21,47 @@ module Logic
         log "StartCheckRun skipping due to branch filter, branch: #{branch_name}, repo: #{repo_full_name}"
         return
       end
-      build_coverage_check
-
-      unless coverage_check.state == :created
+      unless save_new_coverage_check
         log "StartCheckRun exiting early, #{check_run_info} is #{coverage_check.state}"
         return
       end
 
-      coverage_check.repo = check_run_info.payload&.repository
-      coverage_check.check_suite = check_run_info.payload&.check_suite
-      coverage_check.save!
-
       Logic::UpdateCoverageCheckState.new(coverage_check).await_coverage
       CreateCheckRunJob.perform_later(coverage_check.id)
 
-      ExpireCheckJob.set(wait:).perform_later(coverage_check.id)
+      ExpireCheckJob.set(wait: coverage_check.expire_check_wait).perform_later(coverage_check.id)
     end
 
     private
 
     attr_reader :coverage_check, :installation
 
-    def wait
-      return ExpireCheckJob::INACTIVE_WAIT unless coverage_check.installation_active?
-      return installation.expire_check_job_wait_minutes.minutes if installation.expire_check_job_wait_minutes
-
-      ExpireCheckJob::DEFAULT_WAIT
-    end
-
     def find_installation
       @installation = Installation.find_by!(installation_id: check_run_info.installation_id)
     end
 
+    def save_new_coverage_check
+      CoverageCheck.transaction do
+        CoverageCheck.lock_repo_sha(repo_full_name, check_run_info.sha)
+        build_coverage_check
+        next false unless coverage_check.state == :created
+
+        coverage_check.repo = check_run_info.payload.repository
+        coverage_check.check_suite = check_run_info.payload.check_suite
+        coverage_check.save!
+      end
+    end
+
+    # An upload with --pull-request may have created the check before this webhook arrived
     def build_coverage_check
-      @coverage_check = @installation.coverage_checks.find_or_initialize_by(
+      @coverage_check = upload_created_check || @installation.coverage_checks.find_or_initialize_by(
         head_sha: check_run_info.sha,
         base_sha: check_run_info.compare
       )
+    end
+
+    def upload_created_check
+      CoverageCheck.where(check_suite: nil).for_repo_sha(repo_full_name, check_run_info.sha)
     end
 
     def branch_name

@@ -3,6 +3,16 @@
 require "rails_helper"
 
 RSpec.describe CoverageCheck, type: :model do
+  describe "#head_branch" do
+    it "returns the branch of the check_suite that started the check" do
+      expect(CoverageCheck.new(check_suite: {"head_branch" => "main"}).head_branch).to eq("main")
+    end
+
+    it "is nil for a check started by a coverage upload" do
+      expect(CoverageCheck.new.head_branch).to be_nil
+    end
+  end
+
   describe "#installation_active?" do
     let(:coverage_check) { CoverageCheck.new }
     let(:installation) { instance_double(Installation) }

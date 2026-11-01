@@ -121,6 +121,84 @@ describe Logic::RunUndercover do
     expect { subject }.to raise_error(Octokit::ServiceUnavailable)
   end
 
+  context "with a check started by a fork pull request upload" do
+    before do
+      coverage_check.update!(pull_request_number: 42)
+      coverage_check.coverage_reports.attach(
+        io: File.open("spec/fixtures/coverage.lcov"),
+        filename: "#{coverage_check.id}_b4c0n.lcov",
+        content_type: "text/plain"
+      )
+      stub_get_installation_token
+      stub_post_check_runs
+      stub_fetch_merge_base
+      allow(Open3).to receive(:capture3).and_call_original
+    end
+
+    it "analyses a head commit that is only reachable through the pull request ref" do
+      use_fake_remote(fork_pull_request: 42)
+
+      subject
+
+      expect(Open3).to have_received(:capture3)
+        .with(anything, "git", "-C", anything, "fetch", any_args, "+refs/pull/42/head:refs/remotes/origin/pull/42")
+      expect(Open3).not_to have_received(:capture3)
+        .with(anything, "git", "-C", anything, "fetch", any_args, coverage_check.head_sha)
+      coverage_check.reload
+      expect(coverage_check.state).to eq(:complete)
+      expect(coverage_check.nodes.where(flagged: true).pluck(:node_name)).to eq(["untested"])
+    end
+
+    it "compares against the merge base with the pull request's target branch" do
+      coverage_check.update!(base_sha: "develop")
+      compare_stub = WebMock
+                     .stub_request(:get, "https://api.github.com/repos/author/repo/compare/develop...#{coverage_check.head_sha}")
+                     .to_return(
+                       status: 200,
+                       body: {merge_base_commit: {sha: "953a8049abaaa57f8db4ff97a55114283355d17e"}}.to_json,
+                       headers: {"Content-Type" => "application/json"}
+                     )
+      use_fake_remote(fork_pull_request: 42)
+
+      subject
+
+      expect(compare_stub).to have_been_requested
+      expect(Open3).to have_received(:capture3)
+        .with(anything, "git", "-C", anything, "fetch", any_args, "953a8049abaaa57f8db4ff97a55114283355d17e", anything)
+      expect(coverage_check.reload.state).to eq(:complete)
+    end
+
+    it "escapes a target branch with characters outside a URL path" do
+      coverage_check.update!(base_sha: "rélease/1+x")
+      compare_stub = WebMock
+                     .stub_request(:get, "https://api.github.com/repos/author/repo/compare/r%C3%A9lease/1%2Bx...#{coverage_check.head_sha}")
+                     .to_return(
+                       status: 200,
+                       body: {merge_base_commit: {sha: "953a8049abaaa57f8db4ff97a55114283355d17e"}}.to_json,
+                       headers: {"Content-Type" => "application/json"}
+                     )
+      use_fake_remote(fork_pull_request: 42)
+
+      subject
+
+      expect(compare_stub).to have_been_requested
+    end
+
+    it "fetches the head sha directly when the pull request ref has moved on" do
+      remote = use_fake_remote(fork_pull_request: 42)
+      system(
+        "git", "--git-dir", remote, "update-ref", "refs/pull/42/head",
+        "dce6e1e942a782506dd37eda819dead236c112da", exception: true
+      )
+
+      subject
+
+      expect(Open3).to have_received(:capture3)
+        .with(anything, "git", "-C", anything, "fetch", any_args, coverage_check.head_sha)
+      expect(coverage_check.reload.state).to eq(:complete)
+    end
+  end
+
   it "clones the repository and runs the undercover command" do
     coverage_check.coverage_reports.attach(
       io: File.open("spec/fixtures/coverage.lcov"),
@@ -137,6 +215,7 @@ describe Logic::RunUndercover do
     allow_any_instance_of(described_class).to receive(:run_undercover_cmd).and_wrap_original do |method, *args|
       @sparse_patterns = File.read(File.join(repo_path, ".git/info/sparse-checkout"))
       @promisor = `git -C #{repo_path} config remote.origin.promisor`.strip
+      @symlinks = `git -C #{repo_path} config core.symlinks`.strip
       method.call(*args)
     end
 
@@ -144,6 +223,7 @@ describe Logic::RunUndercover do
 
     expect(@sparse_patterns).to eq("/.undercover\n/foo.rb\n")
     expect(@promisor).to eq("true")
+    expect(@symlinks).to eq("false")
 
     coverage_check.reload
     expect(coverage_check.state).to eq(:complete)
@@ -249,13 +329,21 @@ describe Logic::RunUndercover do
   end
 
   # A copy of spec/fixtures/fake_repo standing in for GitHub, with partial clone enabled so
-  # file contents really are left out of the fetch and downloaded on demand
-  def use_fake_remote
+  # file contents really are left out of the fetch and downloaded on demand.
+  # With fork_pull_request, the feature branch exists only as that pull request's ref.
+  def use_fake_remote(fork_pull_request: nil)
     @remote_tmp = Dir.mktmpdir
     remote = File.join(@remote_tmp, "remote.git")
     FileUtils.cp_r("spec/fixtures/fake_repo/fake.git", remote)
     %w[uploadpack.allowFilter uploadpack.allowAnySHA1InWant].each do |key|
       system("git", "--git-dir", remote, "config", key, "true", exception: true)
+    end
+    if fork_pull_request
+      system(
+        "git", "--git-dir", remote, "update-ref", "refs/pull/#{fork_pull_request}/head", "feature",
+        exception: true
+      )
+      system("git", "--git-dir", remote, "update-ref", "-d", "refs/heads/feature", exception: true)
     end
     allow_any_instance_of(described_class).to receive(:remote_url).and_return("file://#{remote}")
     remote
@@ -329,7 +417,7 @@ describe Logic::RunUndercover do
 
       expect(opts.lcov).to eq(runner.instance_variable_get(:@coverage_tmpfile).path)
       expect(opts.compare).to eq(runner.instance_variable_get(:@run).compare)
-      expect(opts.max_warnings_limit).to eq(51)
+      expect(opts.max_warnings_limit).to eq(500)
     end
 
     it "respects .undercover file when present" do
@@ -344,7 +432,7 @@ describe Logic::RunUndercover do
       opts = nil
       expect { opts = runner.__send__(:build_undercover_options) }.to output(/--ruby-syntax is ignored/).to_stderr
 
-      expect(opts.max_warnings_limit).to eq(51) # CI override
+      expect(opts.max_warnings_limit).to eq(500) # CI override
       expect(opts.glob_allow_filters).to eq(["*.rb", "*.rake"])
       expect(opts.glob_reject_filters).to eq(["test/*", "spec/*"])
     end
@@ -365,7 +453,7 @@ describe Logic::RunUndercover do
 
       expect(opts.compare).to eq(runner.instance_variable_get(:@run).compare)
       expect(opts.lcov).to eq(runner.instance_variable_get(:@coverage_tmpfile).path)
-      expect(opts.max_warnings_limit).to eq(51)
+      expect(opts.max_warnings_limit).to eq(500)
     end
 
     it "handles .undercover file with only CI-controlled options" do

@@ -33,8 +33,12 @@ module Dashboard
 
       installation.set_repo_failure_mode(params[:repo_full_name], params[:failure_mode].presence)
       installation.set_repo_branch_filter(params[:repo_full_name], params[:branch_filter_regex])
-      installation.save!
-      redirect_to settings_path, notice: "Saved settings for #{params[:repo_full_name]}"
+      installation.set_repo_critical_paths(params[:repo_full_name], params[:critical_paths])
+      if installation.save
+        redirect_to settings_path, notice: "Saved settings for #{params[:repo_full_name]}"
+      else
+        redirect_to settings_path, alert: installation.errors.full_messages.to_sentence
+      end
     end
 
     private

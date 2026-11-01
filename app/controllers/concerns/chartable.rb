@@ -13,7 +13,7 @@ module Chartable
         checks = checks.where("repo->>'full_name' = ?", chart_params[:repository_name])
       end
       if chart_params[:branch_name].present? && chart_params[:branch_name] != "all"
-        checks = checks.where("check_suite->>'head_branch' = ?", chart_params[:branch_name])
+        checks = checks.on_branch(chart_params[:branch_name])
       end
       checks = checks.where(result: chart_params[:result]) if chart_params[:result] && chart_params[:result] != "all"
       checks

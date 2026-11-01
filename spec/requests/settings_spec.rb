@@ -25,7 +25,9 @@ describe "Settings" do
       .to_return(
         status: 200,
         body: {
-          repositories: [{id: 1, url: "https://api.github.com/repos/grodowski/undercover"}]
+          repositories: [
+            {id: 1, full_name: "grodowski/undercover", private: false, url: "https://api.github.com/repos/grodowski/undercover"}
+          ]
         }.to_json,
         headers: {"Content-Type" => "application/json"}
       )
@@ -101,6 +103,41 @@ describe "Settings" do
       expect(installation.reload.settings["repo_branch_filters"]).not_to have_key("owner/repo")
     end
 
+    it "updates critical paths for repository" do
+      patch(
+        "/settings", params: {
+          installation_id: "1337",
+          repo_full_name: "owner/repo",
+          failure_mode: "neutral",
+          critical_paths: "app/models/billing/**/*\n# auth\nlib/auth/*.rb\n"
+        }
+      )
+
+      expect(response).to redirect_to(settings_path)
+      expect(flash[:notice]).to eq("Saved settings for owner/repo")
+      expect(installation.reload.repo_critical_paths["owner/repo"]).to eq(["app/models/billing/**/*", "lib/auth/*.rb"])
+    end
+
+    it "rejects too many critical paths" do
+      installation.set_repo_critical_paths("owner/repo", "lib/**/*")
+      installation.save!
+
+      patch(
+        "/settings", params: {
+          installation_id: "1337",
+          repo_full_name: "owner/repo",
+          failure_mode: "neutral",
+          critical_paths: Array.new(51) { "lib/#{it}.rb" }.join("\n")
+        }
+      )
+
+      expect(response).to redirect_to(settings_path)
+      expect(flash[:alert]).to eq("Critical paths are limited to 50 patterns of up to 200 characters")
+      installation.reload
+      expect(installation.repo_critical_paths["owner/repo"]).to eq(["lib/**/*"])
+      expect(installation.repo_failure_modes).not_to have_key("owner/repo")
+    end
+
     it "redirects with alert when repo_full_name is missing" do
       patch(
         "/settings", params: {
@@ -112,6 +149,21 @@ describe "Settings" do
       expect(response).to redirect_to(settings_path)
       expect(flash[:alert]).to eq("Repository name is required")
     end
+  end
+
+  it "renders the critical paths field for each repository" do
+    installation.set_repo_critical_paths("grodowski/undercover", "app/models/billing/**/*\nlib/auth/*.rb")
+    installation.save!
+    get("/auth/github/callback")
+
+    get("/settings")
+
+    textarea = Nokogiri::HTML(response.body).at_css("textarea[name=critical_paths]")
+    expect(textarea.text.strip).to eq("app/models/billing/**/*\nlib/auth/*.rb")
+    expect(textarea["placeholder"]).to eq(
+      "app/models/billing/**/*  # billing code\n**/*.rb  # all Ruby, views stay neutral"
+    )
+    expect(response.body).to include("relative to the repository root")
   end
 
   it "resets user access token" do

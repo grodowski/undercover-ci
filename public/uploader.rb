@@ -15,23 +15,47 @@ require "base64"
 require "json"
 require "net/http"
 require "optparse"
-require "pathname"
+require "pathname" # rubocop:disable Lint/RedundantRequireStatement -- the uploader runs on customers' Ruby, which may be < 4.0
 require "uri"
 
-LCOV_DEPRECATION_NOTICE = "⚠️ The LCOV coverage format is being deprecated and will be removed from " \
-                          "the UndercoverCI uploader and APIs after 2026/01/31. Please migrate to " \
+LCOV_DEPRECATION_NOTICE = "⚠️ LCOV uploads are deprecated and will stop working soon. Please migrate to " \
                           "SimpleCov::Formatter::Undercover: " \
                           "https://undercover-ci.com/docs#reporting"
 
-Options = Struct.new(:commit, :lcov, :simplecov, :repo, :url, :cancel) do
+Options = Struct.new(
+  :commit, :lcov, :simplecov, :repo, :url, :cancel, :pull_request, :pull_request_base_ref, :pull_request_head_ref
+) do
   def valid?
     commit && !commit.empty? &&
       repo && !repo.empty? &&
       ((lcov && !lcov.empty?) || (simplecov && !simplecov.empty?))
   end
+
+  def self.presence(value)
+    value = value.to_s.strip
+    value.empty? ? nil : value
+  end
+
+  # GitHub Actions pull request builds run on refs/pull/N/merge
+  def pull_request_param
+    pull_request || ENV.fetch("GITHUB_REF", nil).to_s[/\Arefs\/pull\/(\d+)\//, 1]
+  end
+
+  # Only meaningful with a pull request number. GitHub Actions sets GITHUB_BASE_REF on pull request builds.
+  def base_ref_param
+    pull_request_param && (pull_request_base_ref || Options.presence(ENV.fetch("GITHUB_BASE_REF", nil)))
+  end
+
+  def head_ref_param
+    pull_request_param && (pull_request_head_ref || Options.presence(ENV.fetch("GITHUB_HEAD_REF", nil)))
+  end
+
+  def pull_request_valid?
+    pull_request.nil? || pull_request.match?(/\A\d+\z/)
+  end
 end
 
-class UndercoverCiCoverageUpload
+class UndercoverCiCoverageUpload # rubocop:disable Metrics/ClassLength
   attr_reader :exitcode, :options
 
   def initialize(argv = ARGV)
@@ -46,6 +70,7 @@ class UndercoverCiCoverageUpload
       opts.on("--commit COMMIT", "Commit SHA") do |v|
         @options.commit = v
       end
+      pull_request_options(opts)
       opts.on("--cancel", "Cancel coverage check") do |v|
         @options.cancel = v
       end
@@ -76,6 +101,11 @@ class UndercoverCiCoverageUpload
       return self
     end
 
+    unless @options.pull_request_valid?
+      error("--pull-request must be a number, got #{@options.pull_request.inspect}")
+      return self
+    end
+
     puts LCOV_DEPRECATION_NOTICE if @options.lcov
 
     file = @options.simplecov || @options.lcov
@@ -91,11 +121,14 @@ class UndercoverCiCoverageUpload
       Net::HTTP::Post,
       @options.url,
       {
-        repo: @options.repo,
+        repo: target_repo,
         sha: @options.commit,
         file_base64: coverage_data_base64,
-        file_type: @options.lcov ? :lcov : :json
-      }.to_json
+        file_type: @options.lcov ? :lcov : :json,
+        pull_request_number: @options.pull_request_param,
+        pull_request_base_ref: @options.base_ref_param,
+        pull_request_head_ref: @options.head_ref_param
+      }.compact.to_json
     )
   end
 
@@ -104,7 +137,7 @@ class UndercoverCiCoverageUpload
       Net::HTTP::Delete,
       @options.url,
       {
-        repo: @options.repo,
+        repo: target_repo,
         sha: @options.commit
       }.to_json
     )
@@ -112,8 +145,45 @@ class UndercoverCiCoverageUpload
 
   private
 
+  # A fork's own builds run the upstream workflow, so --repo still names the upstream repo
+  def target_repo
+    @target_repo ||= begin
+      running_in = Options.presence(ENV.fetch("GITHUB_REPOSITORY", nil))
+      if running_in && !running_in.casecmp?(@options.repo) && running_in_fork?
+        puts "Running in #{running_in}, uploading coverage there instead of #{@options.repo}"
+        running_in
+      else
+        @options.repo
+      end
+    end
+  end
+
+  # A workflow can also check out another repo on purpose, only a fork's own builds switch
+  def running_in_fork?
+    JSON.parse(File.read(ENV.fetch("GITHUB_EVENT_PATH", ""))).dig("repository", "fork") == true
+  rescue Errno::ENOENT, JSON::ParserError
+    false
+  end
+
+  def retargeted?
+    target_repo != @options.repo
+  end
+
+  # optional arguments, so a CI template that expands to nothing (a push build) is not an error
+  def pull_request_options(opts)
+    opts.on("--pull-request [NUMBER]", "Pull request number, defaults to $GITHUB_REF on GitHub Actions") do |v|
+      @options.pull_request = Options.presence(v)
+    end
+    opts.on("--pull-request-base-ref [BRANCH]", "Pull request target branch, defaults to $GITHUB_BASE_REF") do |v|
+      @options.pull_request_base_ref = Options.presence(v)
+    end
+    opts.on("--pull-request-head-ref [BRANCH]", "Pull request branch, defaults to $GITHUB_HEAD_REF") do |v|
+      @options.pull_request_head_ref = Options.presence(v)
+    end
+  end
+
   def request(method, url, body)
-    http = Net::HTTP.start(url.hostname, use_ssl: url.instance_of?(URI::HTTPS))
+    http = Net::HTTP.start(url.hostname, url.port, use_ssl: url.instance_of?(URI::HTTPS))
     req = method.new(url.path, "Content-Type" => "application/json")
     req.body = body
     resp = http.request(req)
@@ -121,18 +191,53 @@ class UndercoverCiCoverageUpload
     when (200..299)
       puts("Done! #{resp.code}")
     when 404
-      error "Error 404: does a check for commit #{@options.commit} exist in #{@options.repo}? " \
-            "Visit https://undercover-ci.com/docs or get support at help@undercover-ci.com."
+      not_found(resp.body)
     else
-      error "Error #{resp.code}, #{resp.body}. " \
-            "Visit https://undercover-ci.com/docs or get support at help@undercover-ci.com."
+      if already_uploaded?(resp.body)
+        notice "Coverage for commit #{@options.commit} was already uploaded by another build, skipping."
+      else
+        error "Error #{resp.code}, #{resp.body}. " \
+              "Visit https://undercover-ci.com/docs or get support at help@undercover-ci.com."
+      end
     end
     self
+  end
+
+  def not_found(body)
+    if retargeted? && not_installed?(body)
+      notice "UndercoverCI isn't set up for #{target_repo}, so coverage wasn't uploaded. " \
+             "It's free for public repos: https://undercover-ci.com"
+      return
+    end
+
+    error "Error 404: does a check for commit #{@options.commit} exist in #{target_repo}? " \
+          "Visit https://undercover-ci.com/docs or get support at help@undercover-ci.com."
+  end
+
+  def not_installed?(body)
+    error_code(body) == "not_installed"
+  end
+
+  # shown on the run's summary page on GitHub Actions, not only in the job log
+  def notice(message)
+    puts ENV["GITHUB_ACTIONS"] == "true" ? "::notice title=UndercoverCI::#{message}" : message
   end
 
   def error(message)
     @exitcode = 1
     warn(message)
+  end
+
+  # e.g. a workflow that runs on both push and pull_request uploads twice for the same commit
+  def already_uploaded?(body)
+    error_code(body) == "already_uploaded"
+  end
+
+  def error_code(body)
+    parsed = JSON.parse(body.to_s)
+    parsed["code"] if parsed.is_a?(Hash)
+  rescue JSON::ParserError
+    nil
   end
 end
 
