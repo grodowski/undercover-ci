@@ -7,6 +7,8 @@ module Logic
     include GithubRequests
     include ClassLoggable
 
+    MAX_WARNINGS_LIMIT = 500
+
     class RunError < StandardError
     end
 
@@ -204,7 +206,7 @@ module Logic
         opts.lcov = @coverage_tmpfile.path
       end
       opts.compare = @run.compare
-      opts.max_warnings_limit = 51
+      opts.max_warnings_limit = MAX_WARNINGS_LIMIT
 
       opts
     end

@@ -223,34 +223,76 @@ describe CheckRuns::Complete do
     end
   end
 
-  it "includes an annotation-limit notice when warnings exceed MAX_ANNOTATIONS" do
-    run = DataObjects::CheckRunInfo.new(
-      "grodowski/undercover-ci", "abc123", "installation-1", nil,
-      "2020-02-02T16:13:22Z", nil, :complete, check_run_fixture.id,
-      "2020-02-02T16:20:47Z", check_run_fixture.nodes
-    )
-    check_run_complete = described_class.new(run)
+  describe "more warnings than annotations" do
+    def post_with_warnings(count)
+      check = CoverageCheck.create!(installation: Installation.create, state: :complete)
+      Node.insert_all(
+        Array.new(count) do |i|
+          {
+            coverage_check_id: check.id,
+            node_type: "instance method",
+            node_name: "method_#{i}",
+            start_line: i + 1,
+            end_line: i + 1,
+            coverage: 0.0,
+            flagged: true,
+            path: "app/models/foo.rb",
+            created_at: Time.current,
+            updated_at: Time.current
+          }
+        end
+      )
+      run = DataObjects::CheckRunInfo.new(
+        "grodowski/undercover-ci", "abc123", "installation-1", nil,
+        "2020-02-02T16:13:22Z", nil, :complete, check.id, "2020-02-02T16:20:47Z", check.nodes
+      )
+      check_run_complete = described_class.new(run)
+      dummy_github = instance_spy(Octokit::Client)
+      allow(dummy_github).to receive_message_chain(:last_response, :status)
+      allow(check_run_complete).to receive(:installation_api_client) { dummy_github }
 
-    dummy_github = instance_spy(Octokit::Client)
-    allow(dummy_github).to receive_message_chain(:last_response, :status)
-    allow(check_run_complete).to receive(:installation_api_client) { dummy_github }
+      warnings = Array.new(count) { undercover_report_fixture.flagged_results.first }
+      report = instance_double(
+        Undercover::Report,
+        all_results: warnings, flagged_results: warnings, globbed_out_files: [],
+        erb_files_without_coverage: [], erb_parse_failures: []
+      )
+      check_run_complete.post(report)
 
-    many_warnings = Array.new(CheckRuns::Complete::MAX_ANNOTATIONS + 1) do
-      undercover_report_fixture.flagged_results.first
+      payload = nil
+      expect(dummy_github).to have_received(:post) { |_, p| payload = p }
+      payload
     end
-    large_report = instance_double(
-      Undercover::Report,
-      all_results: many_warnings,
-      flagged_results: many_warnings,
-      globbed_out_files: [],
-      erb_files_without_coverage: [],
-      erb_parse_failures: []
-    )
 
-    check_run_complete.post(large_report)
+    it "annotates the first 50 and lists every warning" do
+      payload = post_with_warnings(60)
 
-    expect(dummy_github).to have_received(:post) do |_, payload|
-      expect(payload[:output][:text]).to include("50 annotation limit")
+      expect(payload[:output][:annotations].size).to eq(50)
+      expect(payload[:output][:summary]).to eq("🚨 UndercoverCI has detected 60 warnings in this changeset.")
+      expect(payload[:output][:text]).to include(
+        "⚠️ Found 60 warnings. GitHub allows 50 annotations per check, so the first 50 are annotated in the " \
+        "pull request diff. All 60 are in the table below and the full report at https://undercover-ci.com/checks/"
+      )
+      expect(payload[:output][:text].scan("⚠️ instance method").size).to eq(60)
+      expect(payload[:output][:text]).not_to include("Analysis stopped")
+    end
+
+    it "says when the analysis limit was hit" do
+      limit = Logic::RunUndercover::MAX_WARNINGS_LIMIT
+      payload = post_with_warnings(limit)
+
+      expect(payload[:output][:annotations].size).to eq(50)
+      expect(payload[:output][:summary]).to eq(
+        "🚨 UndercoverCI has detected #{limit} warnings in this changeset. " \
+        "⚠️ Analysis stopped after #{limit} warnings, see the details below."
+      )
+      expect(payload[:output][:text]).to include(
+        "⚠️ Analysis stopped after #{limit} warnings, so the rest of the diff was not checked."
+      )
+      expect(payload[:output][:text]).to include(
+        "the first 50 are annotated in the pull request diff. All #{limit} are in the full report at " \
+        "https://undercover-ci.com/checks/"
+      )
     end
   end
 

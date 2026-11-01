@@ -116,8 +116,18 @@ module CheckRuns
       complete_message = run.num_warnings.zero? ? "🚀 Ship it!" : "🚨"
       num = pluralize(run.num_warnings, "warning")
       summary = "#{complete_message} UndercoverCI has detected #{num} in this changeset."
+      summary += " ⚠️ Analysis stopped after #{num}, see the details below." if warnings_limit_hit?
       summary += " ℹ️ Some changed files were not checked, see the details below." if skipped_files_notes.any?
       summary
+    end
+
+    def full_list_location
+      report = "the full report at #{details_url}"
+      @warnings.size <= MAX_TABLE_ROWS ? "the table below and #{report}" : report
+    end
+
+    def warnings_limit_hit?
+      @warnings.size >= Logic::RunUndercover::MAX_WARNINGS_LIMIT
     end
 
     def skipped_files_notes
@@ -169,10 +179,14 @@ module CheckRuns
         text += " Results marked with ⚠️ have untested lines added or changed in this commit, " \
                 "look into them!"
       end
+      if warnings_limit_hit?
+        text += "\n\n⚠️ Analysis stopped after #{pluralize(@warnings.size, 'warning')}, so the rest of the diff " \
+                "was not checked."
+      end
       if @warnings.size > MAX_ANNOTATIONS
-        text += "\n\n"
-        text += "⚠️ Due to GitHub's 50 annotation limit, only the first 50 warnings are shown in the pull request " \
-                "diff. Please inspect the table below and the full report at #{details_url}."
+        text += "\n\n⚠️ Found #{pluralize(@warnings.size, 'warning')}. GitHub allows #{MAX_ANNOTATIONS} annotations " \
+                "per check, so the first #{MAX_ANNOTATIONS} are annotated in the pull request diff. " \
+                "All #{@warnings.size} are in #{full_list_location}."
       end
       skipped_files_notes.each { |note| text += "\n\n#{note}" }
       text += "\n\n"

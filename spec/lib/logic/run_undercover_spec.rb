@@ -329,7 +329,7 @@ describe Logic::RunUndercover do
 
       expect(opts.lcov).to eq(runner.instance_variable_get(:@coverage_tmpfile).path)
       expect(opts.compare).to eq(runner.instance_variable_get(:@run).compare)
-      expect(opts.max_warnings_limit).to eq(51)
+      expect(opts.max_warnings_limit).to eq(500)
     end
 
     it "respects .undercover file when present" do
@@ -344,7 +344,7 @@ describe Logic::RunUndercover do
       opts = nil
       expect { opts = runner.__send__(:build_undercover_options) }.to output(/--ruby-syntax is ignored/).to_stderr
 
-      expect(opts.max_warnings_limit).to eq(51) # CI override
+      expect(opts.max_warnings_limit).to eq(500) # CI override
       expect(opts.glob_allow_filters).to eq(["*.rb", "*.rake"])
       expect(opts.glob_reject_filters).to eq(["test/*", "spec/*"])
     end
@@ -365,7 +365,7 @@ describe Logic::RunUndercover do
 
       expect(opts.compare).to eq(runner.instance_variable_get(:@run).compare)
       expect(opts.lcov).to eq(runner.instance_variable_get(:@coverage_tmpfile).path)
-      expect(opts.max_warnings_limit).to eq(51)
+      expect(opts.max_warnings_limit).to eq(500)
     end
 
     it "handles .undercover file with only CI-controlled options" do
