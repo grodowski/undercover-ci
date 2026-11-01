@@ -6,13 +6,12 @@ module Logic
     include ClassLoggable
 
     DAYS = [7, 14, 30].freeze
-    PR_CHECK_PADDING = 14.days
     OUTCOMES = %i[passed merged_with_warnings merged_before_check no_coverage no_check unresolved].freeze
     MERGE_COMMIT = /\AMerge pull request #(\d+)/
     SQUASH_COMMIT = /\(#(\d+)\)\s*\z/
     FLAGGED_NODES_PER_PR = 3
 
-    Check = Data.define(:id, :repo, :number, :head_sha, :created_at, :state, :warnings, :completed_at)
+    Check = Data.define(:id, :repo, :number, :head_sha, :created_at, :state, :warnings, :finished_at)
     PullRequest = Data.define(:repo, :number, :merged_at, :check_id, :outcome, :caught, :flagged_nodes)
 
     Window = Data.define(:from, :to, :pull_requests, :pushes_without_pr) do
@@ -65,7 +64,7 @@ module Logic
       current_from = now - days.days
       previous_from = current_from - days.days
       merges, pushes = load_merges(previous_from)
-      pull_requests = resolve(merges, load_pr_checks(previous_from - PR_CHECK_PADDING, merges.keys.map(&:first).uniq))
+      pull_requests = resolve(merges, load_pr_checks(merges.keys))
 
       Result.new(
         installation:, days:,
@@ -110,7 +109,7 @@ module Logic
         sha = shas[key]
         next if sha == :not_a_pr
 
-        head = heads[key] || latest_before(checks_by_sha.fetch(sha, []), merged_at)
+        head = heads[key] || latest_before(checks_by_sha.fetch([key.first, sha], []), merged_at)
         outcome = sha == :unresolved ? :unresolved : outcome(head, merged_at)
         PullRequest.new(
           repo: key.first, number: key.last, merged_at:, check_id: head&.id, outcome:,
@@ -123,18 +122,19 @@ module Logic
       checks.select { it.created_at <= time }.max_by(&:created_at)
     end
 
+    # A check that completed or was canceled after the merge was still pending when the PR merged
     def outcome(check, merged_at)
       return :no_check unless check
+      return :merged_before_check if check.finished_at.nil? || check.finished_at > merged_at
       return :no_coverage if check.state == "canceled"
-      return :merged_before_check unless check.state == "complete"
-      return :merged_before_check if check.completed_at && check.completed_at > merged_at
 
       check.warnings ? :merged_with_warnings : :passed
     end
 
     def caught?(outcome, head, pr_checks)
-      outcome == :passed &&
-        pr_checks.any? { it.created_at < head.created_at && it.state == "complete" && it.warnings }
+      outcome == :passed && pr_checks.any? do |check|
+        check.state == "complete" && check.warnings && check.finished_at && check.finished_at < head.finished_at
+      end
     end
 
     def ref_head_sha(repo, number)
@@ -168,18 +168,20 @@ module Logic
         "COALESCE(coverage_checks.result = 'failed', EXISTS (SELECT 1 FROM nodes " \
         "WHERE nodes.coverage_check_id = coverage_checks.id AND nodes.flagged))",
         "(SELECT MIN((log->>'ts')::timestamptz) FROM jsonb_array_elements(coverage_checks.state_log) log " \
-        "WHERE log->>'to' = 'complete')"
+        "WHERE log->>'to' IN ('complete', 'canceled'))"
       ].map { Arel.sql(it) }
     end
 
-    def load_pr_checks(from, repos)
-      return [] if repos.empty?
+    # All pre-merge history of the merged PRs, however old
+    def load_pr_checks(keys)
+      return [] if keys.empty?
 
       CoverageCheck
         .joins("CROSS JOIN LATERAL jsonb_array_elements(" \
                "COALESCE(coverage_checks.check_suite->'pull_requests', '[]'::jsonb)) pull_request")
-        .where(installation_id: installation.id, created_at: from..now)
-        .where("coverage_checks.repo->>'full_name' IN (?)", repos)
+        .where(installation_id: installation.id, created_at: ..now)
+        .where("coverage_checks.repo->>'full_name' IN (?)", keys.map(&:first).uniq)
+        .where("(pull_request->>'number')::int IN (?)", keys.map(&:last).uniq)
         .pluck(*check_columns("(pull_request->>'number')::int"))
         .map { Check.new(*it) }
     end
@@ -188,7 +190,7 @@ module Logic
       return {} if shas.empty?
 
       CoverageCheck.where(installation_id: installation.id, head_sha: shas)
-                   .pluck(*check_columns("NULL")).map { Check.new(*it) }.group_by(&:head_sha)
+                   .pluck(*check_columns("NULL")).map { Check.new(*it) }.group_by { [it.repo, it.head_sha] }
     end
 
     def with_flagged_nodes(pull_requests)

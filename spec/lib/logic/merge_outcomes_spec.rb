@@ -28,12 +28,13 @@ describe Logic::MergeOutcomes do
     )
   end
 
-  def pr_check(number, created_at:, completed_at: created_at + 5.minutes, **attrs)
+  def pr_check(number, created_at:, completed_at: created_at + 5.minutes, repo: "acme/api", **attrs)
     attrs = {state: :complete, result: "passed", head_sha: SecureRandom.hex(20)}.merge(attrs)
-    state_log = attrs[:state] == :complete ? [{"to" => "complete", "ts" => completed_at.utc.iso8601}] : []
+    finished = attrs[:state].in?(%i[complete canceled]) && completed_at
+    state_log = finished ? [{"to" => attrs[:state].to_s, "ts" => completed_at.utc.iso8601}] : []
     CoverageCheck.create!(
       installation:, created_at:, state_log:, **attrs,
-      repo: {"full_name" => "acme/api", "default_branch" => "main"},
+      repo: {"full_name" => repo, "default_branch" => "main"},
       check_suite: {"head_branch" => "feature", "pull_requests" => number ? [{"number" => number}] : []}
     )
   end
@@ -87,8 +88,9 @@ describe Logic::MergeOutcomes do
       2 => [:complete, "failed", merged_at - 1.hour],
       3 => [:in_progress, nil, nil],
       4 => [:complete, "passed", merged_at + 1.hour],
-      5 => [:canceled, nil, nil],
-      6 => [:awaiting_coverage, nil, nil]
+      5 => [:canceled, nil, merged_at - 1.hour],
+      6 => [:awaiting_coverage, nil, nil],
+      7 => [:canceled, nil, merged_at + 1.hour]
     }.each do |number, (state, check_result, completed_at)|
       pr_check(number, created_at: merged_at - 2.hours, state:, result: check_result, completed_at:)
       merge_check("Add feature (##{number})", merged_at)
@@ -97,7 +99,7 @@ describe Logic::MergeOutcomes do
 
     expect(outcomes(result.current)).to eq(
       1 => :passed, 2 => :merged_with_warnings, 3 => :merged_before_check,
-      4 => :merged_before_check, 5 => :no_coverage, 6 => :merged_before_check
+      4 => :merged_before_check, 5 => :no_coverage, 6 => :merged_before_check, 7 => :merged_before_check
     )
   end
 
@@ -134,6 +136,14 @@ describe Logic::MergeOutcomes do
 
       expect(outcomes(result.current)).to eq(7 => :merged_with_warnings)
       expect(WebMock).to have_requested(:get, "https://api.github.com/repos/acme/api/git/ref/pull/7/head").once
+    end
+
+    it "ignores checks with the same head sha in another repository" do
+      pr_check(nil, created_at: now - 2.days, head_sha: "f0f0", repo: "acme/api-fork")
+      merge_check("Add x (#7)", now - 1.day)
+      stub_ref(7)
+
+      expect(outcomes(result.current)).to eq(7 => :no_check)
     end
 
     it "reports no_check when no check exists for the head sha" do
@@ -177,6 +187,22 @@ describe Logic::MergeOutcomes do
 
     expect(result.current.pull_requests.to_h { [it.number, it.caught] }).to eq(1 => true, 2 => false, 3 => false)
     expect(result.current.caught_count).to eq(1)
+  end
+
+  it "counts as caught only a warning check that finished before the passing one" do
+    pr_check(1, created_at: now - 3.days, completed_at: now - 1.day + 2.hours, result: "failed")
+    pr_check(1, created_at: now - 2.days)
+    merge_check("Add (#1)", now - 1.day + 3.hours)
+
+    expect(result.current.pull_requests.map(&:caught)).to eq([false])
+  end
+
+  it "reads the whole history of a merged pull request, not only the report window" do
+    pr_check(1, created_at: now - 40.days, result: "failed")
+    pr_check(1, created_at: now - 2.days)
+    merge_check("Add (#1)", now - 1.day)
+
+    expect(result(days: 7).current.pull_requests.map(&:caught)).to eq([true])
   end
 
   it "computes the previous window of the same length" do

@@ -68,7 +68,7 @@ module Logic
         lines.concat(untested_lines)
         {
           merged_before_check: "merged before the coverage check finished",
-          no_coverage: "merged without a coverage report",
+          no_coverage: "merged without a coverage result",
           no_check: "merged without a coverage check"
         }.each { |outcome, text| lines << "- #{current.count(outcome)} #{text}" if current.count(outcome).positive? }
         lines

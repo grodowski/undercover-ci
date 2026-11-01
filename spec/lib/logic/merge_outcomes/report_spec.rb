@@ -47,7 +47,7 @@ describe Logic::MergeOutcomes::Report do
       - 1 merged with untested code:
         - https://github.com/acme/api/pull/4 (charge, refund, void)
       - 1 merged before the coverage check finished
-      - 1 merged without a coverage report
+      - 1 merged without a coverage result
       - 1 merged without a coverage check
 
       Do you find this useful? I'm researching more advanced coverage reporting views for UndercoverCI and I'm curious to learn what else you'd like to see.
