@@ -10,8 +10,7 @@ describe Logic::StartCheckRunFromUpload do
     Installation.create!(
       installation_id: "123123",
       users: [user],
-      repos: [{"full_name" => "author/repo"}],
-      settings: {"repo_fork_checks" => {"author/repo" => true}}
+      repos: [{"full_name" => "author/repo"}]
     )
   end
   let(:sha) { "b4c0n1" }
@@ -74,10 +73,9 @@ describe Logic::StartCheckRunFromUpload do
     )
   end
 
-  it "uses the installation that enabled fork checks when a stale one lists the repo too" do
+  it "uses the newest installation when a stale one lists the repo too" do
     Installation.create!(installation_id: "999", users: [user], repos: [{"full_name" => "author/repo"}])
     installation.itself
-    Installation.create!(installation_id: "998", users: [user], repos: [{"full_name" => "author/repo"}])
     stub_installation_token
     stub_pull_request_ref
     stub_repository
@@ -213,12 +211,6 @@ describe Logic::StartCheckRunFromUpload do
   end
 
   it "does nothing when no installation covers the repo" do
-    expect { subject }.not_to change(CoverageCheck, :count)
-  end
-
-  it "does nothing when fork checks are disabled for the repo" do
-    installation.update!(settings: {})
-
     expect { subject }.not_to change(CoverageCheck, :count)
   end
 

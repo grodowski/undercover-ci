@@ -132,34 +132,6 @@ RSpec.describe Installation, type: :model do
     end
   end
 
-  describe "#set_repo_fork_checks" do
-    let(:installation) do
-      Installation.create!(
-        installation_id: "123123",
-        users: [user],
-        metadata: {target_type: "User"}
-      )
-    end
-
-    it "is disabled by default" do
-      expect(installation.fork_checks_enabled?("owner/repo1")).to eq(false)
-    end
-
-    it "enables fork checks for a specific repo" do
-      installation.set_repo_fork_checks("owner/repo1", true)
-
-      expect(installation.fork_checks_enabled?("owner/repo1")).to eq(true)
-      expect(installation.fork_checks_enabled?("owner/repo2")).to eq(false)
-    end
-
-    it "removes the setting when disabled" do
-      installation.set_repo_fork_checks("owner/repo1", true)
-      installation.set_repo_fork_checks("owner/repo1", false)
-
-      expect(installation.repo_fork_checks).not_to have_key("owner/repo1")
-    end
-  end
-
   describe "#set_repo_branch_filter" do
     let(:installation) do
       Installation.create!(

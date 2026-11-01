@@ -8,8 +8,7 @@ describe Logic::ResolveCoverageCheck do
     Installation.create!(
       installation_id: "123123",
       users: [user],
-      repos: [{"full_name" => "author/repo"}],
-      settings: {"repo_fork_checks" => {"author/repo" => true}}
+      repos: [{"full_name" => "author/repo"}]
     )
   end
 

@@ -74,17 +74,6 @@
                     <%= form.label "Neutral, displays PR annotations treated as a success for dependent checks (🟡)", class: "form-check-label small" %>
                   </div>
                 </div>
-                <div class="pb-3">
-                  <label class="form-label">
-                  Pull requests from forks
-                  </label>
-                  <p class="text-muted mb-2 small">Run coverage checks for pull requests opened from forks. GitHub sends no check_suite event for those, so the check starts when your CI uploads a report with <code>--pull-request</code>.</p>
-                  <div class="form-check">
-                    <% fork_checks_id = "fork-checks-#{inst.installation_id}-#{index}" %>
-                    <%= form.check_box :fork_checks, {checked: inst.fork_checks_enabled?(repo["full_name"]), class: "form-check-input", id: fork_checks_id}, "1", "0" %>
-                    <%= form.label :fork_checks, "Enable fork pull request checks", for: fork_checks_id, class: "form-check-label small" %>
-                  </div>
-                </div>
                 <div class="text-end">
                   <%= form.submit "Save settings", class: "btn btn-sm btn-outline-primary" %>
                 </div>

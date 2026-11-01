@@ -276,8 +276,7 @@ claude --plugin-dir ./undercover-claude</code></pre>
         <h6 class="mb-2 mt-3"><code>--pull-request</code></h6>
         The pull request number, detected automatically on GitHub Actions pull request builds.
         Required to run coverage checks on pull requests opened from forks, because GitHub sends no
-        <code>check_suite</code> event for those and the upload itself has to start the check. Fork pull request
-        checks are opt-in per repository in <%= link_to "settings", settings_path %>.
+        <code>check_suite</code> event for those and the upload itself has to start the check.
         The value is optional, so the same build command works for push builds where it expands to nothing.
 
         <h6 class="mb-2 mt-3"><code>--pull-request-base-ref</code></h6>

@@ -38,16 +38,6 @@ describe "Settings" do
     Rails.application.env_config["omniauth.auth"] = OmniAuth.config.mock_auth[:github]
   end
 
-  describe "GET /settings" do
-    it "labels the fork checks checkbox with a per-repository id" do
-      get("/auth/github/callback")
-
-      get("/settings")
-
-      expect(response.body).to include('id="fork-checks-1337-0"', 'for="fork-checks-1337-0"')
-    end
-  end
-
   describe "PATCH /settings" do
     before do
       get("/auth/github/callback")
@@ -65,29 +55,6 @@ describe "Settings" do
       expect(response).to redirect_to(settings_path)
       expect(flash[:notice]).to eq("Saved settings for owner/repo")
       expect(installation.reload.settings["repo_branch_filters"]["owner/repo"]).to eq("main|develop")
-    end
-
-    it "updates fork checks for repository" do
-      patch(
-        "/settings", params: {
-          installation_id: "1337",
-          repo_full_name: "owner/repo",
-          fork_checks: "1"
-        }
-      )
-
-      expect(response).to redirect_to(settings_path)
-      expect(installation.reload.settings["repo_fork_checks"]["owner/repo"]).to eq(true)
-
-      patch(
-        "/settings", params: {
-          installation_id: "1337",
-          repo_full_name: "owner/repo",
-          fork_checks: "0"
-        }
-      )
-
-      expect(installation.reload.settings["repo_fork_checks"]).not_to have_key("owner/repo")
     end
 
     it "updates failure_mode for repository" do

@@ -27,7 +27,7 @@ module Logic
       return unless pull_request_number.positive?
 
       installation = find_installation
-      return skip("fork checks are disabled for #{repo_full_name}") unless installation
+      return skip("#{repo_full_name} is not installed") unless installation
       return skip("#{sha} is not the head of #{repo_full_name} pull/#{pull_request_number}") unless
         pull_request_head?(installation)
       return skip("#{sha} is on a branch excluded by the branch filter") if branch_filtered?(installation)
@@ -72,11 +72,9 @@ module Logic
       nil
     end
 
-    # A repo can be listed by a stale installation too, so take the newest one that opted in
+    # A repo can be listed by a stale installation too, so take the newest one
     def find_installation
-      Installation.where("repos @> ?", [{full_name: repo_full_name}].to_json)
-                  .order(id: :desc)
-                  .find { it.fork_checks_enabled?(repo_full_name) }
+      Installation.where("repos @> ?", [{full_name: repo_full_name}].to_json).order(id: :desc).first
     end
 
     def pull_request_head?(installation)

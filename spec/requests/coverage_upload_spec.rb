@@ -16,8 +16,7 @@ describe "Coverage Upload" do
     Installation.create!(
       installation_id: "123123",
       users: [user],
-      repos: [{"full_name" => "user/repository"}],
-      settings: {"repo_fork_checks" => {"user/repository" => true}}
+      repos: [{"full_name" => "user/repository"}]
     )
     stub_installation_token
     stub_pull_request_ref
@@ -46,8 +45,7 @@ describe "Coverage Upload" do
       Installation.create!(
         installation_id: "123123",
         users: [user],
-        repos: [{"full_name" => "user/repository"}],
-        settings: {"repo_fork_checks" => {"user/repository" => true}}
+        repos: [{"full_name" => "user/repository"}]
       )
       stub_installation_token
       stub_pull_request_ref
@@ -143,8 +141,7 @@ describe "Coverage Upload" do
     Installation.create!(
       installation_id: "123123",
       users: [user],
-      repos: [{"full_name" => "user/repository"}],
-      settings: {"repo_fork_checks" => {"user/repository" => true}}
+      repos: [{"full_name" => "user/repository"}]
     )
     stub_installation_token
     stub_pull_request_ref(head_sha: "n0tthesame")
