@@ -42,6 +42,21 @@ class CoverageCheck < ApplicationRecord
 
   delegate :max_concurrent_checks, to: :installation
 
+  # SQL for #head_branch, until the branch gets a column of its own
+  HEAD_BRANCH_SQL = "COALESCE(check_suite->>'head_branch', pull_request_head_ref)"
+
+  scope :on_branch, ->(branch) { where("#{HEAD_BRANCH_SQL} = ?", branch) }
+
+  def self.for_repo_sha(repo_full_name, sha)
+    where("repo @> ?", {full_name: repo_full_name}.to_json).find_by(head_sha: sha)
+  end
+
+  # Serializes check creation for a commit between the check_suite webhook and coverage uploads.
+  # Call inside a transaction, the lock is released on commit.
+  def self.lock_repo_sha(repo_full_name, sha)
+    connection.execute(sanitize_sql_array(["SELECT pg_advisory_xact_lock(hashtext(?))", "#{repo_full_name}@#{sha}"]))
+  end
+
   def self.to_chartkick
     group(:result).group_by_day(:created_at).count
   end
@@ -50,6 +65,13 @@ class CoverageCheck < ApplicationRecord
     return true if repo_public?
 
     installation.active?
+  end
+
+  def expire_check_wait
+    return ExpireCheckJob::INACTIVE_WAIT unless installation_active?
+    return installation.expire_check_job_wait_minutes.minutes if installation.expire_check_job_wait_minutes
+
+    ExpireCheckJob::DEFAULT_WAIT
   end
 
   def state
@@ -72,14 +94,21 @@ class CoverageCheck < ApplicationRecord
     repo["visibility"] == "public"
   end
 
+  # an upload-created check has no check_suite, only the branch name the uploader sent
+  def head_branch
+    check_suite&.dig("head_branch") || pull_request_head_ref
+  end
+
   def pull_requests
     return [] unless check_suite
 
-    check_suite["pull_requests"]
+    DataObjects::CheckRunInfo.same_repo_pull_requests(check_suite, repo)
   end
 
   def base_ref_or_branch
-    base_sha.try(:[], 0..7) || default_branch
+    return default_branch if base_sha.blank?
+
+    base_sha.match?(/\A\h{40}\z/) ? base_sha[0..7] : base_sha
   end
 
   def failure_mode

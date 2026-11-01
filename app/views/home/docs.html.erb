@@ -267,12 +267,30 @@ claude --plugin-dir ./undercover-claude</code></pre>
       <p>
         <h6 class="mb-2 mt-3"><code>--repo</code></h6>
         The <code>$org/$repo</code> formatted name matching exactly how your repository appears on GitHub.
+        On GitHub Actions, a build running in a fork of that repository, such as a contributor's, uploads to the fork
+        (<code>$GITHUB_REPOSITORY</code>) instead. When UndercoverCI isn't set up there, the uploader prints a notice and
+        exits successfully, so forks of your repository don't get failing builds.
 
         <h6 class="mb-2 mt-3"><code>--commit</code></h6>
         Current build commit SHA to identify on GitHub. This value will be provided by the CI build environment, e.g.
         <code>$CIRCLE_SHA1</code> for CircleCI, <code>${{ github.event.pull_request.head.sha || github.sha }}</code> for
         GitHub Actions or <code>$TRAVIS_COMMIT</code> for TravisCI.</li> Consult your CI service documentation to get the
         right head SHA value for your build environment.
+
+        <h6 class="mb-2 mt-3"><code>--pull-request</code></h6>
+        The pull request number, detected automatically on GitHub Actions pull request builds.
+        Required to run coverage checks on pull requests opened from forks, because GitHub sends no
+        <code>check_suite</code> event for those and the upload itself has to start the check.
+        The value is optional, so the same build command works for push builds where it expands to nothing.
+
+        <h6 class="mb-2 mt-3"><code>--pull-request-base-ref</code></h6>
+        The branch the pull request targets, sent with <code>--pull-request</code> so a fork's pull request is compared
+        against the right branch. Defaults to <code>$GITHUB_BASE_REF</code> on GitHub Actions; elsewhere the default
+        branch is used when it's not set.
+
+        <h6 class="mb-2 mt-3"><code>--pull-request-head-ref</code></h6>
+        The pull request's branch, sent with <code>--pull-request</code> so the dashboard shows a fork's branch name.
+        Defaults to <code>$GITHUB_HEAD_REF</code> on GitHub Actions.
 
         <h6 class="mb-2 mt-3"><code>--cancel</code></h6>
         Cancel coverage check represented by the given <code>--commit</code>. The check will be passing and marked as completed + skipped on your GitHub commit or pull request.

@@ -12,15 +12,36 @@ describe DataObjects::CheckRunInfo do
           "head_branch" => "feature_branch",
           "before" => "before_commit",
           "pull_requests" => [
-            {"base" => {"ref" => "master", "sha" => "pr_base_commit"}}
+            {"base" => {"ref" => "master", "sha" => "pr_base_commit", "repo" => {"id" => 1}}}
           ]
         },
         "repository" => {
+          "id" => 1,
           "default_branch" => "master"
         }
       )
 
       expect(described_class.find_base_sha(payload)).to eq("pr_base_commit")
+    end
+
+    it "ignores an upstream pull request opened from a fork's default branch" do
+      payload = OpenStruct.new(
+        "action" => "requested",
+        "check_suite" => {
+          "head_sha" => "head_commit",
+          "head_branch" => "master",
+          "before" => "before_commit",
+          "pull_requests" => [
+            {"number" => 62, "base" => {"ref" => "master", "sha" => "upstream_commit", "repo" => {"id" => 2}}}
+          ]
+        },
+        "repository" => {
+          "id" => 1,
+          "default_branch" => "master"
+        }
+      )
+
+      expect(described_class.find_base_sha(payload)).to eq("HEAD~1")
     end
 
     it "falls back to repository base branch" do

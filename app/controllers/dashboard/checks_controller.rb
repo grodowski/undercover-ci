@@ -37,8 +37,8 @@ module Dashboard
 
       checks.last_90d
             .order(created_at: :desc)
-            .pluck(Arel.sql("check_suite->>'head_branch'"))
-            .uniq.unshift(["All branches", "all"])
+            .pluck(Arel.sql(CoverageCheck::HEAD_BRANCH_SQL))
+            .compact.uniq.unshift(["All branches", "all"])
     end
 
     def chart_params_for_async_chart

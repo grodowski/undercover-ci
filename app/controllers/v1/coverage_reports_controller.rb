@@ -6,6 +6,8 @@ require "securerandom"
 module V1
   class CoverageReportsController < ApiController
     include JsonFormatterValidation
+    include CoverageUploadRateLimit
+    include CoverageUploadParams
 
     protect_from_forgery with: :null_session
     before_action :find_coverage_check
@@ -98,9 +100,24 @@ module V1
     end
 
     def find_coverage_check
-      check_params = params.require(%i[repo sha])
-      @coverage_check = CoverageCheck.where("repo @> ?", {full_name: check_params.first}.to_json)
-                                     .where(head_sha: check_params[1]).first!
+      repo_full_name, sha = params.require(%i[repo sha])
+      pull_request_number = uploaded_pull_request_number
+      @coverage_check = Logic::ResolveCoverageCheck.call(
+        repo_full_name, sha, pull_request_number,
+        base_ref: uploaded_branch(:pull_request_base_ref), head_ref: uploaded_branch(:pull_request_head_ref)
+      )
+      return if @coverage_check
+
+      render json: not_found_error(repo_full_name, sha), status: :not_found
+    end
+
+    # The uploader skips quietly on not_installed, e.g. for a fork's own builds
+    def not_found_error(repo_full_name, sha)
+      if Installation.where("repos @> ?", [{full_name: repo_full_name}].to_json).exists?
+        {error: "No coverage check for #{sha} in #{repo_full_name}"}
+      else
+        {error: "UndercoverCI is not installed on #{repo_full_name}", code: "not_installed"}
+      end
     end
 
     def check_subscription

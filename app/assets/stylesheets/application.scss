@@ -413,8 +413,9 @@ a.lead { line-height: 1.2; }
   }
 }
 
-.row-href {
-  cursor: pointer;
+// the row's stretched-link covers the whole row
+.row-link {
+  position: relative;
 }
 
 .node-coverage-yellow {
