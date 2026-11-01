@@ -194,8 +194,12 @@ class UndercoverCiCoverageUpload # rubocop:disable Metrics/ClassLength
     when 404
       not_found(resp.body)
     else
-      error "Error #{resp.code}, #{resp.body}. " \
-            "Visit https://undercover-ci.com/docs or get support at help@undercover-ci.com."
+      if already_uploaded?(resp.body)
+        notice "Coverage for commit #{@options.commit} was already uploaded by another build, skipping."
+      else
+        error "Error #{resp.code}, #{resp.body}. " \
+              "Visit https://undercover-ci.com/docs or get support at help@undercover-ci.com."
+      end
     end
     self
   end
@@ -225,6 +229,13 @@ class UndercoverCiCoverageUpload # rubocop:disable Metrics/ClassLength
   def error(message)
     @exitcode = 1
     warn(message)
+  end
+
+  # e.g. a workflow that runs on both push and pull_request uploads twice for the same commit
+  def already_uploaded?(body)
+    JSON.parse(body.to_s)["code"] == "already_uploaded"
+  rescue JSON::ParserError
+    false
   end
 end
 

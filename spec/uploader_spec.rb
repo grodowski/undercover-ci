@@ -96,6 +96,41 @@ describe "uploader.rb" do
     end.to output(a_string_including("Usage:")).to_stderr
   end
 
+  context "when coverage for the commit was already uploaded" do
+    before do
+      stub_post_coverage(
+        {"error" => "Coverage for 1fffbb has already been uploaded to check 18.", "code" => "already_uploaded"},
+        status: 422
+      )
+    end
+
+    def upload
+      build_uploader("--simplecov spec/fixtures/coverage.json --repo alice/bob --commit 1fffbb").tap(&:upload)
+    end
+
+    it "prints a notice and exits 0" do
+      expect { expect(upload.exitcode).to eq(0) }
+        .to output("Coverage for commit 1fffbb was already uploaded by another build, skipping.\n").to_stdout
+    end
+
+    it "prints a GitHub Actions notice annotation" do
+      expect { with_env("GITHUB_ACTIONS" => "true") { upload } }.to output(
+        "::notice title=UndercoverCI::Coverage for commit 1fffbb was already uploaded by another build, skipping.\n"
+      ).to_stdout
+    end
+  end
+
+  it "exits 1 on a 422 that is not JSON" do
+    WebMock.stub_request(:post, "https://undercover-ci.com/v1/coverage")
+           .to_return(status: 422, body: "<html>Unprocessable</html>")
+
+    expect do
+      uploader = build_uploader("--simplecov spec/fixtures/coverage.json --repo alice/bob --commit 1fffbb")
+      uploader.upload
+      expect(uploader.exitcode).to eq(1)
+    end.to output(a_string_including("Error 422, <html>Unprocessable</html>")).to_stderr
+  end
+
   it "exits 1 when supplied SimpleCov JSON report is empty" do
     allow(File).to receive(:read).with("spec/fixtures/empty_coverage.json").and_return("")
     expect do
