@@ -99,7 +99,7 @@ module CheckRuns
           path: result.file_path,
           start_line: result.first_line,
           end_line: result.last_line,
-          annotation_level: "warning",
+          annotation_level: run.critical?(result.file_path) ? "failure" : "warning",
           title: "Untested #{result.node.human_name}",
           message:,
           raw_details: result.pretty_print
@@ -108,14 +108,18 @@ module CheckRuns
     end
 
     def conclusion_for_run
-      failure_mode = run.failure_mode || DEFAULT_FAILURE_MODE
-      run.success? ? "success" : failure_mode
+      return "success" if run.success?
+      return "failure" if run.critical_warnings.any?
+
+      run.failure_mode || DEFAULT_FAILURE_MODE
     end
 
     def summary_for_run
       complete_message = run.num_warnings.zero? ? "🚀 Ship it!" : "🚨"
       num = pluralize(run.num_warnings, "warning")
-      summary = "#{complete_message} UndercoverCI has detected #{num} in this changeset."
+      summary = "#{complete_message} UndercoverCI has detected #{num} in this changeset"
+      summary += ", #{run.critical_warnings.size} in critical paths" if run.critical_warnings.any?
+      summary += "."
       summary += " ⚠️ Analysis stopped after #{num}, see the details below." if warnings_limit_hit?
       summary += " ℹ️ Some changed files were not checked, see the details below." if skipped_files_notes.any?
       summary
@@ -179,6 +183,7 @@ module CheckRuns
         text += " Results marked with ⚠️ have untested lines added or changed in this commit, " \
                 "look into them!"
       end
+      text += " Warnings marked (critical) match a critical path and fail the check." if run.critical_warnings.any?
       if warnings_limit_hit?
         text += "\n\n⚠️ Analysis stopped after #{pluralize(@warnings.size, 'warning')}, so the rest of the diff " \
                 "was not checked."
@@ -193,9 +198,10 @@ module CheckRuns
       rows = ["file | name | coverage | branches", ":--- | :--- | ---: | ---:"]
       format_to_md = proc do |node|
         flag = node.flagged? ? "⚠️ " : ""
+        critical = " (critical)" if node.flagged? && run.critical?(node.path)
         [
           node.path,
-          "#{flag}#{node.node_type} `#{node.node_name}`",
+          "#{flag}#{node.node_type} `#{node.node_name}`#{critical}",
           node.coverage,
           total_branches_for_node(node)
         ]

@@ -129,6 +129,88 @@ describe CheckRuns::Complete do
       end
   end
 
+  describe "critical paths" do
+    let(:check) { check_run_fixture }
+    let(:run) do
+      DataObjects::CheckRunInfo.new(
+        "grodowski/undercover-ci", "abc123", "installation-1", nil,
+        "2020-02-02T16:13:22Z", nil, :complete, 1337, "2020-02-02T16:20:47Z", check.nodes
+      )
+    end
+    let(:dummy_github) { instance_spy(Octokit::Client) }
+
+    def post_payload
+      check_run_complete = described_class.new(run)
+      allow(dummy_github).to receive_message_chain(:last_response, :status)
+      allow(check_run_complete).to receive(:installation_api_client) { dummy_github }
+      check_run_complete.post(undercover_report_fixture)
+      payload = nil
+      expect(dummy_github).to have_received(:post) { |_, p| payload = p }
+      payload
+    end
+
+    it "keeps the neutral failure mode when no warning is in a critical path" do
+      run.failure_mode = "neutral"
+      run.critical_paths = ["app/models/billing/**/*"]
+
+      payload = post_payload
+
+      expect(payload[:conclusion]).to eq("neutral")
+      expect(payload[:output][:summary]).to eq("🚨 UndercoverCI has detected 2 warnings in this changeset.")
+      expect(payload[:output][:annotations].pluck(:annotation_level)).to eq(%w[warning warning])
+      expect(payload[:output][:text]).not_to include("(critical)")
+    end
+
+    it "fails a neutral check when a warning is in a critical path" do
+      run.failure_mode = "neutral"
+      run.critical_paths = ["spec/**/*.rb"]
+
+      payload = post_payload
+
+      expect(payload[:conclusion]).to eq("failure")
+      expect(payload[:output][:summary]).to eq(
+        "🚨 UndercoverCI has detected 2 warnings in this changeset, 2 in critical paths."
+      )
+      expect(payload[:output][:annotations].pluck(:annotation_level)).to eq(%w[failure failure])
+      expect(payload[:output][:text]).to include(
+        "look into them! Warnings marked (critical) match a critical path and fail the check."
+      )
+      expect(payload[:output][:text]).to include(
+        "spec/fixtures/application_record.rb | ⚠️ instance method `method` (critical) | 0.0 | 2/4\n" \
+        "spec/fixtures/application_record.rb | ⚠️ instance method `method` (critical) | 0.0 | 2/4\n" \
+        "spec/fixtures/application_record.rb | instance method `method` | 1.0 | 2/4"
+      )
+    end
+
+    it "counts and marks only the warnings in critical paths" do
+      check.nodes.create!(
+        node_type: "instance method", node_name: "charge", start_line: 1, end_line: 3,
+        coverage: 0.0, flagged: true, path: "app/models/billing/invoice.rb"
+      )
+      run.critical_paths = ["app/models/{billing,payments}/**/*"]
+
+      payload = post_payload
+
+      expect(payload[:conclusion]).to eq("failure")
+      expect(payload[:output][:summary]).to eq(
+        "🚨 UndercoverCI has detected 3 warnings in this changeset, 1 in critical paths."
+      )
+      expect(payload[:output][:annotations].pluck(:annotation_level)).to eq(%w[warning warning])
+      expect(payload[:output][:text]).to include(
+        "app/models/billing/invoice.rb | ⚠️ instance method `charge` (critical) | 0.0 |"
+      )
+      expect(payload[:output][:text]).to include("application_record.rb | ⚠️ instance method `method` | 0.0")
+    end
+
+    it "ignores covered nodes in critical paths" do
+      check.nodes.where(flagged: true).destroy_all
+      run.failure_mode = "neutral"
+      run.critical_paths = ["spec/**/*.rb"]
+
+      expect(post_payload[:conclusion]).to eq("success")
+    end
+  end
+
   it "responds with success conclusion with a successful check run" do
     run = DataObjects::CheckRunInfo.new(
       "grodowski/undercover-ci",

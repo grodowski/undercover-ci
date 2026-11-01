@@ -8,13 +8,17 @@ class Installation < ApplicationRecord
   has_many :subscriptions
 
   validates_presence_of :installation_id
+  validate :critical_paths_within_limits
 
   DEFAULTS = {max_concurrent_checks: ENV.fetch("DEFAULT_MAX_CONCURRENT_CHECKS", 2).to_i}.freeze
+  MAX_CRITICAL_PATHS = 50
+  MAX_CRITICAL_PATH_LENGTH = 200
   store_accessor :settings,
                  :expire_check_job_wait_minutes,
                  :max_concurrent_checks,
                  :repo_branch_filters,
-                 :repo_failure_modes
+                 :repo_failure_modes,
+                 :repo_critical_paths
 
   after_create :ensure_subscription
   after_create_commit :notify_admin
@@ -76,6 +80,7 @@ class Installation < ApplicationRecord
 
   def repo_branch_filters = super || {}
   def repo_failure_modes = super || {}
+  def repo_critical_paths = super || {}
 
   def set_repo_failure_mode(repo_full_name, failure_mode)
     failure_mode = failure_mode&.to_sym || :failure
@@ -93,5 +98,29 @@ class Installation < ApplicationRecord
       filters.delete(repo_full_name)
     end
     self.repo_branch_filters = filters
+  end
+
+  def set_repo_critical_paths(repo_full_name, text)
+    globs = text.to_s.lines.map(&:strip).reject { it.empty? || it.start_with?("#") }.uniq
+    paths = repo_critical_paths.dup
+    if globs.any?
+      paths[repo_full_name] = globs
+    else
+      paths.delete(repo_full_name)
+    end
+    self.repo_critical_paths = paths
+  end
+
+  private
+
+  def critical_paths_within_limits
+    return if repo_critical_paths.values.all? do |globs|
+      globs.size <= MAX_CRITICAL_PATHS && globs.all? { it.size <= MAX_CRITICAL_PATH_LENGTH }
+    end
+
+    errors.add(
+      :base,
+      "Critical paths are limited to #{MAX_CRITICAL_PATHS} patterns of up to #{MAX_CRITICAL_PATH_LENGTH} characters"
+    )
   end
 end

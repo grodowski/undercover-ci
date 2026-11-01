@@ -16,6 +16,7 @@ module DataObjects
     nodes
     state_log
     failure_mode
+    critical_paths
   ].freeze
 
   # TODO: consider refactoring into OpenStruct/Class with named attrs
@@ -42,7 +43,8 @@ module DataObjects
         db_check.state_log.last&.fetch("ts"),
         db_check.nodes, # TODO: wrap AR models with a dedicated read model
         db_check.state_log,
-        db_check.failure_mode
+        db_check.failure_mode,
+        db_check.critical_paths
       )
     end
 
@@ -65,6 +67,14 @@ module DataObjects
 
     def num_warnings
       @num_warnings ||= nodes.flagged.size
+    end
+
+    def critical?(path)
+      (critical_paths || []).any? { File.fnmatch?(it, path, File::FNM_PATHNAME | File::FNM_EXTGLOB) }
+    end
+
+    def critical_warnings
+      @critical_warnings ||= nodes.flagged.select { critical?(it.path) }
     end
 
     def error_message

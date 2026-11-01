@@ -32,6 +32,7 @@ Learn how to install UndercoverCI for your repos, report coverage data and use t
             <li class=""><a href="#nocov-syntax">Skip coverage with code comments</a></li>
             <li class=""><a href="#undercover-configuration-file">Configuration file</a></li>
             <li class=""><a href="#branch-filtering">Branch filtering</a></li>
+            <li class=""><a href="#critical-paths">Critical paths</a></li>
             <li class=""><a href="#ignoring-test-coverage-checks">Skip coverage entirely</a></li>
             <li class=""><a href="#api">API access</a>
           </ul>
@@ -421,6 +422,49 @@ claude --plugin-dir ./undercover-claude</code></pre>
       <p>
         Leave the field blank to run coverage checks on all branches. If you enter an invalid regular expression, UndercoverCI will default to checking all branches.
       </p>
+
+      <h4 id="critical-paths" class="mt-5 mb-2">Critical paths</h4>
+      <p>
+        Critical paths fail the check (🔴) when untested changes touch code you care about most, such as billing or authentication, even if the repository's failure mode is neutral (🟡). Warnings in critical paths are annotated as failures in the pull request diff and marked <code>(critical)</code> in the check run table. When the failure mode is already "Failure", critical paths only change how warnings are displayed.
+      </p>
+
+      <p>
+        To configure critical paths, go to your Settings page, expand the configuration section for a repository and enter one glob per line in the "Critical paths" field. Blank lines and lines starting with <code>#</code> are ignored, up to <%= Installation::MAX_CRITICAL_PATHS %> patterns are allowed.
+      </p>
+
+      <p>
+        Patterns are relative to the repository root, not to the directory SimpleCov covered. In a monorepo with tests running in <code>apps/dash</code>, write <code>apps/dash/app/models/billing/**/*</code>. Use <code>**/</code> to match any number of directories (end a directory pattern with <code>/**/*</code>, a trailing <code>/**</code> only matches one level) and <code>{a,b}</code> to match alternatives.
+      </p>
+
+      <h6 class="mb-2 mt-3">Examples</h6>
+      <div class="table-responsive">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Glob</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Any file under <code>app/models/billing</code>, at any depth</td>
+              <td><code>app/models/billing/**/*</code></td>
+            </tr>
+            <tr>
+              <td>Ruby files under <code>lib/payments</code>, at any depth</td>
+              <td><code>lib/payments/**/*.rb</code></td>
+            </tr>
+            <tr>
+              <td>Auth and billing controllers</td>
+              <td><code>app/controllers/{sessions,billing}_controller.rb</code></td>
+            </tr>
+            <tr>
+              <td>A single file</td>
+              <td><code>app/services/charge_card.rb</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <h4 id="ignoring-test-coverage-checks" class="mt-5 mb-2">Skip coverage entirely</h4>
 
