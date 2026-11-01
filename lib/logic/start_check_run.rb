@@ -61,7 +61,7 @@ module Logic
     end
 
     def upload_created_check
-      CoverageCheck.where.not(pull_request_number: nil).for_repo_sha(repo_full_name, check_run_info.sha)
+      CoverageCheck.where(check_suite: nil).for_repo_sha(repo_full_name, check_run_info.sha)
     end
 
     def branch_name

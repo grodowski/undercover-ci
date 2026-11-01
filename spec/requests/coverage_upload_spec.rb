@@ -127,8 +127,10 @@ describe "Coverage Upload" do
     end
   end
 
-  it "uploads to an existing check without verifying the pull request number" do
+  it "saves a verified pull request number on an existing check that has none" do
     check = make_coverage_check
+    stub_installation_token
+    stub_pull_request_ref
 
     post path,
          params: {
@@ -139,7 +141,7 @@ describe "Coverage Upload" do
          }
 
     expect(response.status).to eq(201)
-    expect(check.reload.pull_request_number).to be_nil
+    expect(check.reload.pull_request_number).to eq(42)
   end
 
   it "renders 404 when a fork upload cannot be verified against the pull request head" do
