@@ -129,27 +129,6 @@ describe CheckRuns::Complete do
       end
   end
 
-  it "notes when the check fell back to the default branch" do
-    run = DataObjects::CheckRunInfo.new(
-      "grodowski/undercover-ci", "abc123", "installation-1", nil, "2020-02-02T16:13:22Z", nil,
-      :complete, 1337, "2020-02-02T16:20:47Z", check_run_fixture.nodes
-    )
-    run.compare_fallback = "main"
-    check_run_complete = described_class.new(run)
-    dummy_github = instance_spy(Octokit::Client)
-    allow(dummy_github).to receive_message_chain(:last_response, :status)
-    allow(check_run_complete).to receive(:installation_api_client) { dummy_github }
-
-    check_run_complete.post(undercover_report_fixture)
-
-    expect(dummy_github).to have_received(:post) do |_path, payload|
-      expect(payload[:output][:summary]).to eq(
-        "🚨 UndercoverCI has detected 2 warnings in this changeset.\n" \
-        "Compared against main (pull request target branch unknown)."
-      )
-    end
-  end
-
   it "responds with success conclusion with a successful check run" do
     run = DataObjects::CheckRunInfo.new(
       "grodowski/undercover-ci",

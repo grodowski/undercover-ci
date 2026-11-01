@@ -13,22 +13,6 @@ RSpec.describe CoverageCheck, type: :model do
     end
   end
 
-  describe "#compare_fallback" do
-    let(:repo) { {"default_branch" => "main"} }
-
-    it "is the default branch for an upload-created check without a target branch" do
-      expect(CoverageCheck.new(repo:, pull_request_number: 42).compare_fallback).to eq("main")
-    end
-
-    it "is nil when the target branch is known" do
-      expect(CoverageCheck.new(repo:, pull_request_number: 42, base_sha: "develop").compare_fallback).to be_nil
-    end
-
-    it "is nil for a check without a pull request number" do
-      expect(CoverageCheck.new(repo:).compare_fallback).to be_nil
-    end
-  end
-
   describe "#installation_active?" do
     let(:coverage_check) { CoverageCheck.new }
     let(:installation) { instance_double(Installation) }

@@ -117,9 +117,7 @@ module CheckRuns
       num = pluralize(run.num_warnings, "warning")
       summary = "#{complete_message} UndercoverCI has detected #{num} in this changeset."
       summary += " ℹ️ Some changed files were not checked, see the details below." if skipped_files_notes.any?
-      return summary unless run.compare_fallback
-
-      "#{summary}\nCompared against #{run.compare_fallback} (pull request target branch unknown)."
+      summary
     end
 
     def skipped_files_notes

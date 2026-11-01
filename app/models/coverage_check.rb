@@ -94,11 +94,6 @@ class CoverageCheck < ApplicationRecord
     repo["visibility"] == "public"
   end
 
-  # The default branch, when an upload-created check had no valid target branch to compare against
-  def compare_fallback
-    default_branch if pull_request_number && base_sha.blank?
-  end
-
   # an upload-created check has no check_suite, only the branch name the uploader sent
   def head_branch
     check_suite&.dig("head_branch") || pull_request_head_ref
