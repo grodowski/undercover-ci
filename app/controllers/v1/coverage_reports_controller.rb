@@ -7,21 +7,19 @@ module V1
   class CoverageReportsController < ApiController
     include JsonFormatterValidation
 
+    UNSUPPORTED_FILE_TYPE = "Unsupported file_type, upload SimpleCov JSON coverage with file_type=json. " \
+                            "LCOV is no longer supported, see https://undercover-ci.com/docs#reporting"
+
     protect_from_forgery with: :null_session
     before_action :find_coverage_check
     before_action :check_subscription
 
     def create
-      decoded = Base64.decode64(file_base64)
+      decoded = Base64.decode64(file_base64) if json_file_type?
 
-      input_io = StringIO.new(decoded)
-      success = validate_input(input_io)
-      if success
-        # Undercover::LcovParser closes the io internally 😭
-        input_io = StringIO.new(decoded)
-
+      if decoded && validate_input(decoded)
         @coverage_check.transaction do
-          attach_report(input_io, file_type)
+          attach_report(StringIO.new(decoded))
           Logic::UpdateCoverageCheckState.new(@coverage_check).enqueue
           # Wait 5 seconds to let ActiveStorage process the attachment
           RunnerJob.set(wait: 5.seconds).perform_later(@coverage_check.id)
@@ -50,22 +48,17 @@ module V1
 
     private
 
-    def validate_input(input_io)
-      case file_type
-      when :lcov
-        Undercover::LcovParser.new(input_io, nil).parse
-        true
-      when :json
-        input_io.rewind
-        parsed = JSON.parse(input_io.read)
-        validate_formatted_json(parsed)
-        true
-      else
-        # simplecov:disable
-        false
-        # simplecov:enable
-      end
-    rescue JsonFormatterValidation::Invalid, Undercover::LcovParseError => e
+    def json_file_type?
+      return true if params[:file_type] == "json"
+
+      @error_message = UNSUPPORTED_FILE_TYPE
+      false
+    end
+
+    def validate_input(decoded)
+      validate_formatted_json(JSON.parse(decoded))
+      true
+    rescue JsonFormatterValidation::Invalid => e
       @error_message = e.message
       false
     rescue JSON::ParserError => e
@@ -73,28 +66,17 @@ module V1
       false
     end
 
-    def attach_report(input_io, extension)
+    def attach_report(input_io)
       hex = SecureRandom.hex(2)
       @coverage_check.coverage_reports.attach(
         io: input_io,
-        filename: "#{@coverage_check.id}_#{hex}.#{extension}",
-        content_type: content_type
+        filename: "#{@coverage_check.id}_#{hex}.json",
+        content_type: "application/json"
       )
-    end
-
-    # :lcov or :json
-    def file_type
-      params[:file_type]&.to_sym || :lcov
-    end
-
-    def content_type
-      file_type == :json ? "application/json" : "text/plain"
     end
 
     def file_base64
       params.require(:file_base64)
-    rescue ActionController::ParameterMissing
-      params.require(:lcov_base64)
     end
 
     def find_coverage_check

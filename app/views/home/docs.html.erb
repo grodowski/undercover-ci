@@ -473,7 +473,7 @@ claude --plugin-dir ./undercover-claude</code></pre>
 
       <h5>GET /v1/checks/:commit_sha/coverage</h5>
       <p>
-        Returns the coverage report for the given commit SHA. The coverage report will be in the original format (JSON or LCOV) as uploaded.
+        Returns the coverage report for the given commit SHA. The coverage report is returned as uploaded.
         The `curl` example below includes the <code>-L</code> flag to ensure curl follows the redirect to the storage provider.
         <pre><code>
           curl -LH "Authorization: Bearer $UNDERCOVER_API_TOKEN" \

@@ -26,9 +26,9 @@ describe Logic::RunUndercover do
 
   it "logs and returns when CoverageCheck is not in in_progress state" do
     coverage_check.coverage_reports.attach(
-      io: File.open("spec/fixtures/coverage.lcov"),
-      filename: "#{coverage_check.id}_b4c0n.lcov",
-      content_type: "text/plain"
+      io: File.open("spec/fixtures/coverage.json"),
+      filename: "#{coverage_check.id}_b4c0n.json",
+      content_type: "application/json"
     )
     coverage_check.update!(state: :created)
 
@@ -40,9 +40,9 @@ describe Logic::RunUndercover do
   it "transitions a CoverageCheck from queued to in_progress" do
     coverage_check.update!(state: :queued)
     coverage_check.coverage_reports.attach(
-      io: File.open("spec/fixtures/coverage.lcov"),
-      filename: "#{coverage_check.id}_b4c0n.lcov",
-      content_type: "text/plain"
+      io: File.open("spec/fixtures/coverage.json"),
+      filename: "#{coverage_check.id}_b4c0n.json",
+      content_type: "application/json"
     )
 
     # simulate a clone error, irrelevant for this test
@@ -63,9 +63,9 @@ describe Logic::RunUndercover do
 
   it "raises a CloneError when the fetch fails to trigger a retry, without logging the token" do
     coverage_check.coverage_reports.attach(
-      io: File.open("spec/fixtures/coverage.lcov"),
-      filename: "#{coverage_check.id}_b4c0n.lcov",
-      content_type: "text/plain"
+      io: File.open("spec/fixtures/coverage.json"),
+      filename: "#{coverage_check.id}_b4c0n.json",
+      content_type: "application/json"
     )
     stub_get_installation_token
     stub_post_check_runs
@@ -83,9 +83,9 @@ describe Logic::RunUndercover do
 
   it "raises a CheckoutError when git checkout fails to trigger a retry" do
     coverage_check.coverage_reports.attach(
-      io: File.open("spec/fixtures/coverage.lcov"),
-      filename: "#{coverage_check.id}_b4c0n.lcov",
-      content_type: "text/plain"
+      io: File.open("spec/fixtures/coverage.json"),
+      filename: "#{coverage_check.id}_b4c0n.json",
+      content_type: "application/json"
     )
     stub_get_installation_token
     stub_post_check_runs
@@ -105,9 +105,9 @@ describe Logic::RunUndercover do
 
   it "logs when GitHub API fails to fetch the merge base" do
     coverage_check.coverage_reports.attach(
-      io: File.open("spec/fixtures/coverage.lcov"),
-      filename: "#{coverage_check.id}_b4c0n.lcov",
-      content_type: "text/plain"
+      io: File.open("spec/fixtures/coverage.json"),
+      filename: "#{coverage_check.id}_b4c0n.json",
+      content_type: "application/json"
     )
     stub_get_installation_token
     stub_post_check_runs
@@ -123,9 +123,9 @@ describe Logic::RunUndercover do
 
   it "clones the repository and runs the undercover command" do
     coverage_check.coverage_reports.attach(
-      io: File.open("spec/fixtures/coverage.lcov"),
-      filename: "#{coverage_check.id}_b4c0n.lcov",
-      content_type: "text/plain"
+      io: File.open("spec/fixtures/coverage.json"),
+      filename: "#{coverage_check.id}_b4c0n.json",
+      content_type: "application/json"
     )
 
     stub_get_installation_token
@@ -181,31 +181,27 @@ describe Logic::RunUndercover do
     expect(check_runs_stub).to have_been_requested.twice
   end
 
-  it "handles JSON coverage reports" do
+  it "cancels the check when the attached report is LCOV" do
     coverage_check.coverage_reports.attach(
-      io: File.open("spec/fixtures/coverage.json"),
-      filename: "#{coverage_check.id}_b4c0n.json",
-      content_type: "application/json"
+      io: StringIO.new("SF:./foo.rb\nDA:1,1\nend_of_record\n"),
+      filename: "#{coverage_check.id}_b4c0n.lcov",
+      content_type: "text/plain"
     )
-
     stub_get_installation_token
-    stub_fetch_merge_base
     check_runs_stub = stub_post_check_runs
+    expect_any_instance_of(described_class).not_to receive(:clone_repo)
 
-    use_fake_remote
+    perform_enqueued_jobs { subject }
 
-    subject
-
-    coverage_check.reload
-    expect(coverage_check.state).to eq(:complete)
-    expect(check_runs_stub).to have_been_requested.twice
+    expect(coverage_check.reload.state).to eq(:canceled)
+    expect(check_runs_stub.with(body: /LCOV coverage is no longer supported/)).to have_been_requested.once
   end
 
   it "does not complete the coverage check when the GitHub post fails" do
     coverage_check.coverage_reports.attach(
-      io: File.open("spec/fixtures/coverage.lcov"),
-      filename: "#{coverage_check.id}_b4c0n.lcov",
-      content_type: "text/plain"
+      io: File.open("spec/fixtures/coverage.json"),
+      filename: "#{coverage_check.id}_b4c0n.json",
+      content_type: "application/json"
     )
 
     stub_get_installation_token
@@ -227,9 +223,9 @@ describe Logic::RunUndercover do
       .and_raise(Rugged::ReferenceError, "revspec 'main' not found")
 
     coverage_check.coverage_reports.attach(
-      io: File.open("spec/fixtures/coverage.lcov"),
-      filename: "#{coverage_check.id}_b4c0n.lcov",
-      content_type: "text/plain"
+      io: File.open("spec/fixtures/coverage.json"),
+      filename: "#{coverage_check.id}_b4c0n.json",
+      content_type: "application/json"
     )
 
     stub_get_installation_token
@@ -297,9 +293,9 @@ describe Logic::RunUndercover do
 
   it "authenticates the remote with the installation token" do
     coverage_check.coverage_reports.attach(
-      io: File.open("spec/fixtures/coverage.lcov"),
-      filename: "#{coverage_check.id}_b4c0n.lcov",
-      content_type: "text/plain"
+      io: File.open("spec/fixtures/coverage.json"),
+      filename: "#{coverage_check.id}_b4c0n.json",
+      content_type: "application/json"
     )
     runner = described_class.new(coverage_check)
     runner.instance_variable_set(:@token, "t0k3n")
@@ -313,9 +309,9 @@ describe Logic::RunUndercover do
 
     before do
       coverage_check.coverage_reports.attach(
-        io: File.open("spec/fixtures/coverage.lcov"),
-        filename: "#{coverage_check.id}_b4c0n.lcov",
-        content_type: "text/plain"
+        io: File.open("spec/fixtures/coverage.json"),
+        filename: "#{coverage_check.id}_b4c0n.json",
+        content_type: "application/json"
       )
       FileUtils.mkdir_p(repo_path)
     end
@@ -327,7 +323,7 @@ describe Logic::RunUndercover do
     it "builds options without .undercover file" do
       opts = runner.__send__(:build_undercover_options)
 
-      expect(opts.lcov).to eq(runner.instance_variable_get(:@coverage_tmpfile).path)
+      expect(opts.simplecov_resultset).to eq(runner.instance_variable_get(:@coverage_tmpfile).path)
       expect(opts.compare).to eq(runner.instance_variable_get(:@run).compare)
       expect(opts.max_warnings_limit).to eq(51)
     end
@@ -364,7 +360,7 @@ describe Logic::RunUndercover do
       opts = runner.__send__(:build_undercover_options)
 
       expect(opts.compare).to eq(runner.instance_variable_get(:@run).compare)
-      expect(opts.lcov).to eq(runner.instance_variable_get(:@coverage_tmpfile).path)
+      expect(opts.simplecov_resultset).to eq(runner.instance_variable_get(:@coverage_tmpfile).path)
       expect(opts.max_warnings_limit).to eq(51)
     end
 
@@ -379,26 +375,7 @@ describe Logic::RunUndercover do
       opts = runner.__send__(:build_undercover_options)
 
       expect(opts.compare).to eq(runner.instance_variable_get(:@run).compare)
-      expect(opts.lcov).to eq(runner.instance_variable_get(:@coverage_tmpfile).path)
-    end
-
-    it "handles JSON coverage format" do
-      coverage_check.coverage_reports.first.destroy
-      coverage_check.coverage_reports.attach(
-        io: File.open("spec/fixtures/coverage.json"),
-        filename: "#{coverage_check.id}_b4c0n.json",
-        content_type: "application/json"
-      )
-
-      runner_json = described_class.new(coverage_check)
-      FileUtils.mkdir_p("tmp/job/#{coverage_check.id}")
-
-      opts = runner_json.__send__(:build_undercover_options)
-
-      expect(opts.simplecov_resultset).to eq(runner_json.instance_variable_get(:@coverage_tmpfile).path)
-      expect(opts.lcov).to be_nil
-
-      FileUtils.rm_rf("tmp/job/#{coverage_check.id}")
+      expect(opts.simplecov_resultset).to eq(runner.instance_variable_get(:@coverage_tmpfile).path)
     end
   end
 end

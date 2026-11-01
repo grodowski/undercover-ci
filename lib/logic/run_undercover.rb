@@ -19,6 +19,9 @@ module Logic
     class GitError < StandardError
     end
 
+    LCOV_UNSUPPORTED = "LCOV coverage is no longer supported, upload SimpleCov JSON instead: " \
+                       "https://undercover-ci.com/docs#reporting"
+
     def self.call(coverage_check)
       new(coverage_check).run_undercover
     end
@@ -33,7 +36,6 @@ module Logic
       raise RunError, "coverage_reports can't be blank" if coverage_check.coverage_reports.empty?
 
       @coverage_attachment = coverage_check.coverage_reports.last
-      @is_json_format = @coverage_attachment.filename.to_s.end_with?(".json")
       @coverage_tmpfile = Tempfile.new
 
       fetch_report
@@ -44,6 +46,11 @@ module Logic
 
       if coverage_check.state != :in_progress
         log "exiting early, coverage_check #{coverage_check.id} is #{coverage_check.state}, but should be in_progress"
+        return
+      end
+
+      unless @coverage_attachment.filename.to_s.end_with?(".json")
+        cancel_check_and_update_github(LCOV_UNSUPPORTED)
         return
       end
 
@@ -173,15 +180,9 @@ module Logic
       opts = build_undercover_options
       @changeset = Undercover::Changeset.new("#{repo_path}/.git", run.compare, commits_only: true)
       changed_files = @changeset.file_paths
-      simplecov_adapter = if opts.simplecov_resultset
-                            Undercover::SimplecovResultAdapter.parse(
-                              File.open(opts.simplecov_resultset), opts, only_files: changed_files
-                            )
-                          else
-                            Undercover::LcovParser.parse(
-                              File.open(opts.lcov), opts, only_files: changed_files
-                            )
-                          end
+      simplecov_adapter = Undercover::SimplecovResultAdapter.parse(
+        File.open(opts.simplecov_resultset), opts, only_files: changed_files
+      )
       Undercover::Report.new(@changeset, opts, simplecov_adapter).build
     end
 
@@ -196,13 +197,7 @@ module Logic
       end
       opts.parse(config_args)
 
-      if @is_json_format
-        opts.simplecov_resultset = @coverage_tmpfile.path
-        opts.lcov = nil
-      else
-        opts.simplecov_resultset = nil
-        opts.lcov = @coverage_tmpfile.path
-      end
+      opts.simplecov_resultset = @coverage_tmpfile.path
       opts.compare = @run.compare
       opts.max_warnings_limit = 51
 
