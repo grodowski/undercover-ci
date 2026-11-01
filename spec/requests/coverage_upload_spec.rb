@@ -6,9 +6,23 @@ require "rails_helper"
 describe "Coverage Upload" do
   let(:path) { "/v1/coverage.json" }
 
-  it "renders 404 when CoverageCheck does not exist" do
-    post path, params: {repo: "foo", sha: "bar"}
+  it "renders 404 with a not_installed code for a repo UndercoverCI isn't installed on" do
+    post path, params: {repo: "foo/bar", sha: "b4c0n"}
+
     expect(response.status).to eq(404)
+    expect(response.parsed_body).to eq(
+      "error" => "UndercoverCI is not installed on foo/bar", "code" => "not_installed"
+    )
+  end
+
+  it "renders a plain 404 when an installed repo has no check for the commit" do
+    user = User.create!(uid: "1337", email: "foo@bar.com", token: "sekritkey", name: "Foo Bar")
+    Installation.create!(installation_id: "123123", users: [user], repos: [{"full_name" => "foo/bar"}])
+
+    post path, params: {repo: "foo/bar", sha: "b4c0n"}
+
+    expect(response.status).to eq(404)
+    expect(response.parsed_body).to eq("error" => "No coverage check for b4c0n in foo/bar")
   end
 
   it "creates a check for a fork pull request when the upload carries a verified pull request number" do

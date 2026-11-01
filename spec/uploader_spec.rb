@@ -135,7 +135,7 @@ describe "uploader.rb" do
     end
 
     it "prints a setup notice and succeeds when UndercoverCI isn't set up there" do
-      stub_post_coverage({"error" => "record not found"}, status: 404)
+      stub_post_coverage({"error" => "not installed", "code" => "not_installed"}, status: 404)
 
       expect { expect(upload.exitcode).to eq(0) }
         .to output(
@@ -147,11 +147,26 @@ describe "uploader.rb" do
     end
 
     it "shows the setup notice on the run summary on GitHub Actions" do
-      stub_post_coverage({"error" => "record not found"}, status: 404)
+      stub_post_coverage({"error" => "not installed", "code" => "not_installed"}, status: 404)
 
       expect { with_env("GITHUB_ACTIONS" => "true") { upload } }
         .to output(a_string_including("::notice title=UndercoverCI::UndercoverCI isn't set up for someone/bob-fork"))
         .to_stdout
+    end
+
+    it "fails on a 404 when UndercoverCI is installed there but has no check" do
+      stub_post_coverage({"error" => "record not found"}, status: 404)
+
+      expect { expect(upload.exitcode).to eq(1) }
+        .to output(a_string_including("Error 404: does a check for commit 1fffbb exist in someone/bob-fork?"))
+        .to_stderr
+    end
+
+    it "fails on a 404 that isn't from UndercoverCI" do
+      WebMock.stub_request(:post, "https://undercover-ci.com/v1/coverage")
+             .to_return(status: 404, body: "<html>Not Found</html>")
+
+      expect { expect(upload.exitcode).to eq(1) }.to output(a_string_including("Error 404")).to_stderr
     end
 
     it "still fails on other errors" do

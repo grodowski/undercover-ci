@@ -185,7 +185,7 @@ class UndercoverCiCoverageUpload # rubocop:disable Metrics/ClassLength
     when (200..299)
       puts("Done! #{resp.code}")
     when 404
-      not_found
+      not_found(resp.body)
     else
       error "Error #{resp.code}, #{resp.body}. " \
             "Visit https://undercover-ci.com/docs or get support at help@undercover-ci.com."
@@ -193,15 +193,21 @@ class UndercoverCiCoverageUpload # rubocop:disable Metrics/ClassLength
     self
   end
 
-  def not_found
-    if retargeted?
+  def not_found(body)
+    if retargeted? && not_installed?(body)
       notice "UndercoverCI isn't set up for #{target_repo}, so coverage wasn't uploaded. " \
              "It's free for public repos: https://undercover-ci.com"
       return
     end
 
-    error "Error 404: does a check for commit #{@options.commit} exist in #{@options.repo}? " \
+    error "Error 404: does a check for commit #{@options.commit} exist in #{target_repo}? " \
           "Visit https://undercover-ci.com/docs or get support at help@undercover-ci.com."
+  end
+
+  def not_installed?(body)
+    JSON.parse(body.to_s)["code"] == "not_installed"
+  rescue JSON::ParserError
+    false
   end
 
   # shown on the run's summary page on GitHub Actions, not only in the job log

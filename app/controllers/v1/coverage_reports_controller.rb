@@ -7,9 +7,7 @@ module V1
   class CoverageReportsController < ApiController
     include JsonFormatterValidation
     include CoverageUploadRateLimit
-
-    # A conservative subset of git's branch name rules
-    BRANCH_NAME = /\A(?![-.\/])(?!.*(?:\.\.|\/\/|\/\.))(?!.*(?:\.lock|[.\/])\z)[A-Za-z0-9._\/-]{1,255}\z/
+    include CoverageUploadParams
 
     protect_from_forgery with: :null_session
     before_action :find_coverage_check
@@ -108,20 +106,18 @@ module V1
         repo_full_name, sha, pull_request_number,
         base_ref: uploaded_branch(:pull_request_base_ref), head_ref: uploaded_branch(:pull_request_head_ref)
       )
-      raise ActiveRecord::RecordNotFound unless @coverage_check
+      return if @coverage_check
+
+      render json: not_found_error(repo_full_name, sha), status: :not_found
     end
 
-    # Only an upload may start or update a check, never a cancellation
-    def uploaded_pull_request_number
-      return unless action_name == "create"
-
-      number = params[:pull_request_number].to_s
-      number.to_i if number.match?(/\A[1-9]\d{0,8}\z/)
-    end
-
-    def uploaded_branch(param)
-      branch = params[param]
-      branch if branch.is_a?(String) && branch.match?(BRANCH_NAME)
+    # The uploader skips quietly on not_installed, e.g. for a fork's own builds
+    def not_found_error(repo_full_name, sha)
+      if Installation.where("repos @> ?", [{full_name: repo_full_name}].to_json).exists?
+        {error: "No coverage check for #{sha} in #{repo_full_name}"}
+      else
+        {error: "UndercoverCI is not installed on #{repo_full_name}", code: "not_installed"}
+      end
     end
 
     def check_subscription
