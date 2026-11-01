@@ -234,7 +234,6 @@ class UndercoverCiCoverageUpload # rubocop:disable Metrics/ClassLength
     error_code(body) == "already_uploaded"
   end
 
-  # an error body can be any JSON, or none at all
   def error_code(body)
     parsed = JSON.parse(body.to_s)
     parsed["code"] if parsed.is_a?(Hash)
