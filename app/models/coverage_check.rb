@@ -102,7 +102,7 @@ class CoverageCheck < ApplicationRecord
   def pull_requests
     return [] unless check_suite
 
-    check_suite["pull_requests"]
+    DataObjects::CheckRunInfo.same_repo_pull_requests(check_suite, repo)
   end
 
   def base_ref_or_branch

@@ -11,9 +11,13 @@ describe ApplicationHelper do
     CoverageCheck.create!(
       installation:,
       head_sha: "b4c0n1b4c0n1",
-      repo: {"full_name" => "author/repo", "default_branch" => "main"},
+      repo: {"id" => 1, "full_name" => "author/repo", "default_branch" => "main"},
       state: :awaiting_coverage
     )
+  end
+
+  def pull_request(number, base_ref, repo_id: 1)
+    {"number" => number, "base" => {"ref" => base_ref, "repo" => {"id" => repo_id}}}
   end
 
   describe "#pull_request_label" do
@@ -24,9 +28,16 @@ describe ApplicationHelper do
     end
 
     it "uses the number from a check_suite payload" do
-      coverage_check.update!(check_suite: {"pull_requests" => [{"number" => 7, "base" => {"ref" => "main"}}]})
+      coverage_check.update!(check_suite: {"pull_requests" => [pull_request(7, "main")]})
 
       expect(helper.pull_request_label(coverage_check)).to eq("#7")
+    end
+
+    it "ignores an upstream pull request listed on a fork's check" do
+      coverage_check.update!(check_suite: {"pull_requests" => [pull_request(62, "main", repo_id: 2)]})
+
+      expect(helper.pull_request_label(coverage_check)).to be_nil
+      expect(helper.github_link(coverage_check)).to include("/commit/b4c0n1b4c0n1")
     end
 
     it "is empty without a pull request" do
@@ -52,7 +63,7 @@ describe ApplicationHelper do
 
   describe "#compare_base" do
     it "uses the pull request target branch from a check_suite payload" do
-      coverage_check.update!(check_suite: {"pull_requests" => [{"number" => 7, "base" => {"ref" => "develop"}}]})
+      coverage_check.update!(check_suite: {"pull_requests" => [pull_request(7, "develop")]})
 
       expect(helper.compare_base(coverage_check)).to eq("develop")
     end

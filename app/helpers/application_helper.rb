@@ -3,7 +3,7 @@
 module ApplicationHelper
   # a check started by a fork's coverage upload has no check_suite, only the number
   def check_pull_request_number(coverage_check)
-    coverage_check.pull_requests&.dig(0, "number") || coverage_check.pull_request_number
+    coverage_check.pull_requests.dig(0, "number") || coverage_check.pull_request_number
   end
 
   def pull_request_label(coverage_check)
@@ -19,7 +19,7 @@ module ApplicationHelper
   end
 
   def compare_base(coverage_check)
-    coverage_check.pull_requests&.dig(0, "base", "ref") || coverage_check.base_ref_or_branch
+    coverage_check.pull_requests.dig(0, "base", "ref") || coverage_check.base_ref_or_branch
   end
 
   def coverage_result_badge(check)
