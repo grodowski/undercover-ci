@@ -429,7 +429,7 @@ claude --plugin-dir ./undercover-claude</code></pre>
       </p>
 
       <p>
-        To configure critical paths, go to your Settings page, expand the configuration section for a repository, select "Neutral" and enter one glob per line in the "Critical paths" field. Blank lines and lines starting with <code>#</code> are ignored, up to <%= Installation::MAX_CRITICAL_PATHS %> patterns are allowed.
+        To configure critical paths, go to your Settings page, expand the configuration section for a repository, select "Neutral" and enter one glob per line in the "Critical paths" field. Blank lines and comments starting with <code>#</code> are ignored, on their own line or after a pattern, and up to <%= Installation::MAX_CRITICAL_PATHS %> patterns are allowed.
       </p>
 
       <p>

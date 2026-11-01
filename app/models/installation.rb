@@ -101,7 +101,7 @@ class Installation < ApplicationRecord
   end
 
   def set_repo_critical_paths(repo_full_name, text)
-    globs = text.to_s.lines.map(&:strip).reject { it.empty? || it.start_with?("#") }.uniq
+    globs = text.to_s.lines.map { it.sub(/(\A|\s)#.*/, "").strip }.reject(&:empty?).uniq
     paths = repo_critical_paths.dup
     if globs.any?
       paths[repo_full_name] = globs

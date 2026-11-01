@@ -47,11 +47,11 @@
                 <div class="border-top py-3">
                   <label class="form-label">
                     Branch Filter
-                    <a href="/docs#branch-filtering" target="_blank" class="text-decoration-none ms-1 text-muted" title="Learn more about branch filtering">
-                      (docs)
-                    </a>
                   </label>
-                  <p class="text-muted mb-2 small">Enter a regular expression to only run coverage checks on matching branches. Leave blank to run on all branches.</p>
+                  <p class="text-muted mb-2 small">
+                    Enter a regular expression to only run coverage checks on matching branches. Leave blank to run on all branches.
+                    <a href="/docs#branch-filtering" target="_blank" class="text-muted">Examples in the docs</a>
+                  </p>
 
                     <%= form.hidden_field :installation_id, value: inst.installation_id %>
                     <%= form.hidden_field :repo_full_name, value: repo["full_name"] %>
@@ -87,7 +87,7 @@
                                      id: "critical_paths_#{inst.installation_id}_#{index}",
                                      value: inst.repo_critical_paths[repo["full_name"]]&.join("\n"),
                                      rows: 6,
-                                     placeholder: "# billing code\napp/models/billing/**/*\n# one app in a monorepo\napps/payments/**/*\n# all Ruby, views stay neutral\n**/*.rb",
+                                     placeholder: "app/models/billing/**/*  # billing code\n**/*.rb  # all Ruby, views stay neutral",
                                      class: "form-control form-control-sm font-monospace" %>
                 </div>
                 <div class="text-end">
