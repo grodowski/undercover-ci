@@ -179,6 +179,17 @@ describe "uploader.rb" do
     end
   end
 
+  it "uploads to a custom --url with a port" do
+    WebMock.stub_request(:post, "http://localhost:3000/v1/coverage").to_return(status: 201)
+
+    expect do
+      build_uploader(
+        "--simplecov spec/fixtures/coverage.json --repo alice/bob --commit 1fffbb " \
+        "--url http://localhost:3000/v1/coverage"
+      ).upload
+    end.to output(a_string_including("Done! 201")).to_stdout
+  end
+
   it "prints 201 on success" do
     stub_post_coverage({}, status: 201)
     expect do

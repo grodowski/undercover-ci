@@ -177,7 +177,7 @@ class UndercoverCiCoverageUpload # rubocop:disable Metrics/ClassLength
   end
 
   def request(method, url, body)
-    http = Net::HTTP.start(url.hostname, use_ssl: url.instance_of?(URI::HTTPS))
+    http = Net::HTTP.start(url.hostname, url.port, use_ssl: url.instance_of?(URI::HTTPS))
     req = method.new(url.path, "Content-Type" => "application/json")
     req.body = body
     resp = http.request(req)
