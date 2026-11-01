@@ -110,6 +110,7 @@ describe "Coverage Upload" do
       "a b",
       "a~b",
       "@{-1}",
+      "a\u0000b",
       "x" * 256,
       {"nested" => "main"},
       ["main"]

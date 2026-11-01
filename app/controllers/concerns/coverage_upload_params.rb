@@ -20,9 +20,9 @@ module CoverageUploadParams
   end
 
   # git's own rules. Checking refs/heads/<name> avoids the @{-N} expansion of --branch, which
-  # also rejects a leading "-".
+  # also rejects a leading "-". system raises on a NUL byte, so that's rejected first.
   def git_branch_name?(name)
-    name.length <= 255 && !name.start_with?("-") &&
+    name.length <= 255 && !name.start_with?("-") && !name.include?("\0") &&
       system("git", "check-ref-format", "refs/heads/#{name}", out: File::NULL, err: File::NULL)
   end
 end
