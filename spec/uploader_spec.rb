@@ -17,7 +17,11 @@ describe "uploader.rb" do
     previous.each { |name, value| ENV[name] = value }
   end
 
-  around { |example| with_env("GITHUB_REF" => nil, "GITHUB_BASE_REF" => nil) { example.run } }
+  around do |example|
+    with_env("GITHUB_REF" => nil, "GITHUB_BASE_REF" => nil, "GITHUB_HEAD_REF" => nil) do
+      example.run
+    end
+  end
 
   def stub_post_coverage(payload, status: 201)
     WebMock
@@ -203,6 +207,28 @@ describe "uploader.rb" do
     expect(uploaded_body).to include("pull_request_number" => "42", "pull_request_base_ref" => "develop")
   end
 
+  it "sends --pull-request-head-ref with the pull request number" do
+    stub_post_coverage({}, status: 201)
+    with_env("GITHUB_HEAD_REF" => "fix/typo") do
+      build_uploader(
+        "--simplecov spec/fixtures/coverage.json --repo alice/bob --commit 1fffbb " \
+        "--pull-request 42 --pull-request-head-ref feature"
+      ).upload
+    end
+
+    expect(uploaded_body).to include("pull_request_number" => "42", "pull_request_head_ref" => "feature")
+  end
+
+  it "defaults the pull request head ref to GITHUB_HEAD_REF" do
+    stub_post_coverage({}, status: 201)
+    with_env("GITHUB_HEAD_REF" => "fix/typo") do
+      build_uploader("--simplecov spec/fixtures/coverage.json --repo alice/bob --commit 1fffbb --pull-request 42")
+        .upload
+    end
+
+    expect(uploaded_body).to include("pull_request_number" => "42", "pull_request_head_ref" => "fix/typo")
+  end
+
   it "omits the pull request base ref without a pull request number" do
     stub_post_coverage({}, status: 201)
     with_env("GITHUB_BASE_REF" => "develop") do
@@ -211,7 +237,7 @@ describe "uploader.rb" do
       ).upload
     end
 
-    expect(uploaded_body.keys).not_to include("pull_request_number", "pull_request_base_ref")
+    expect(uploaded_body.keys).not_to include("pull_request_number", "pull_request_base_ref", "pull_request_head_ref")
   end
 
   it "omits the pull request base ref when there is none" do

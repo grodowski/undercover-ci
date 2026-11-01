@@ -7,11 +7,11 @@ module Logic
   module ResolveCoverageCheck
     module_function
 
-    def call(repo_full_name, sha, pull_request_number, pull_request_base_ref = nil)
+    def call(repo_full_name, sha, pull_request_number, base_ref: nil, head_ref: nil)
       existing = CoverageCheck.for_repo_sha(repo_full_name, sha)
       return existing if existing || pull_request_number.nil?
 
-      Logic::StartCheckRunFromUpload.call(repo_full_name, sha, pull_request_number, pull_request_base_ref)
+      Logic::StartCheckRunFromUpload.call(repo_full_name, sha, pull_request_number, base_ref:, head_ref:)
     end
   end
 end

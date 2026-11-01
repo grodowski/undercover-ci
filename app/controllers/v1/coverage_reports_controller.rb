@@ -105,7 +105,8 @@ module V1
       repo_full_name, sha = params.require(%i[repo sha])
       pull_request_number = uploaded_pull_request_number
       @coverage_check = Logic::ResolveCoverageCheck.call(
-        repo_full_name, sha, pull_request_number, (uploaded_pull_request_base_ref if pull_request_number)
+        repo_full_name, sha, pull_request_number,
+        base_ref: uploaded_branch(:pull_request_base_ref), head_ref: uploaded_branch(:pull_request_head_ref)
       )
       raise ActiveRecord::RecordNotFound unless @coverage_check
     end
@@ -118,9 +119,9 @@ module V1
       number.to_i if number.match?(/\A[1-9]\d{0,8}\z/)
     end
 
-    def uploaded_pull_request_base_ref
-      base_ref = params[:pull_request_base_ref]
-      base_ref if base_ref.is_a?(String) && base_ref.match?(BRANCH_NAME)
+    def uploaded_branch(param)
+      branch = params[param]
+      branch if branch.is_a?(String) && branch.match?(BRANCH_NAME)
     end
 
     def check_subscription

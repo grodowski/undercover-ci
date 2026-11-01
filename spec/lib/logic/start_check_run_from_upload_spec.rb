@@ -66,6 +66,7 @@ describe Logic::StartCheckRunFromUpload do
     expect(coverage_check.head_sha).to eq(sha)
     expect(coverage_check.base_sha).to be_nil
     expect(coverage_check.pull_request_number).to eq(42)
+    expect(coverage_check.head_branch).to be_nil
     expect(coverage_check.installation).to eq(installation)
     expect(coverage_check.repo).to eq(
       "id" => 1, "full_name" => "author/repo", "default_branch" => "main",
@@ -107,6 +108,15 @@ describe Logic::StartCheckRunFromUpload do
     end
   end
 
+  it "stores the pull request branch name" do
+    installation.itself
+    stub_installation_token
+    stub_pull_request_ref
+    stub_repository
+
+    expect(described_class.call("author/repo", sha, 42, head_ref: "fix/typo").head_branch).to eq("fix/typo")
+  end
+
   it "creates a check for a same-repo pull request whose check_suite webhook never arrived" do
     installation.itself
     stub_installation_token
@@ -118,7 +128,7 @@ describe Logic::StartCheckRunFromUpload do
   end
 
   context "with a pull request base ref" do
-    subject { described_class.call("author/repo", sha, 42, "develop") }
+    subject { described_class.call("author/repo", sha, 42, base_ref: "develop") }
 
     before do
       installation.itself
@@ -157,7 +167,7 @@ describe Logic::StartCheckRunFromUpload do
     end
 
     it "does not look up the default branch" do
-      expect(described_class.call("author/repo", sha, 42, "main").base_sha).to eq("main")
+      expect(described_class.call("author/repo", sha, 42, base_ref: "main").base_sha).to eq("main")
     end
   end
 

@@ -23,7 +23,9 @@ LCOV_DEPRECATION_NOTICE = "⚠️ The LCOV coverage format is being deprecated a
                           "SimpleCov::Formatter::Undercover: " \
                           "https://undercover-ci.com/docs#reporting"
 
-Options = Struct.new(:commit, :lcov, :simplecov, :repo, :url, :cancel, :pull_request, :pull_request_base_ref) do
+Options = Struct.new(
+  :commit, :lcov, :simplecov, :repo, :url, :cancel, :pull_request, :pull_request_base_ref, :pull_request_head_ref
+) do
   def valid?
     commit && !commit.empty? &&
       repo && !repo.empty? &&
@@ -43,6 +45,10 @@ Options = Struct.new(:commit, :lcov, :simplecov, :repo, :url, :cancel, :pull_req
   # Only meaningful with a pull request number. GitHub Actions sets GITHUB_BASE_REF on pull request builds.
   def base_ref_param
     pull_request_param && (pull_request_base_ref || Options.presence(ENV.fetch("GITHUB_BASE_REF", nil)))
+  end
+
+  def head_ref_param
+    pull_request_param && (pull_request_head_ref || Options.presence(ENV.fetch("GITHUB_HEAD_REF", nil)))
   end
 
   def pull_request_valid?
@@ -65,13 +71,7 @@ class UndercoverCiCoverageUpload # rubocop:disable Metrics/ClassLength
       opts.on("--commit COMMIT", "Commit SHA") do |v|
         @options.commit = v
       end
-      # optional argument, so a CI template that expands to nothing (a push build) is not an error
-      opts.on("--pull-request [NUMBER]", "Pull request number, defaults to $GITHUB_REF on GitHub Actions") do |v|
-        @options.pull_request = Options.presence(v)
-      end
-      opts.on("--pull-request-base-ref [BRANCH]", "Pull request target branch, defaults to $GITHUB_BASE_REF") do |v|
-        @options.pull_request_base_ref = Options.presence(v)
-      end
+      pull_request_options(opts)
       opts.on("--cancel", "Cancel coverage check") do |v|
         @options.cancel = v
       end
@@ -127,7 +127,8 @@ class UndercoverCiCoverageUpload # rubocop:disable Metrics/ClassLength
         file_base64: coverage_data_base64,
         file_type: @options.lcov ? :lcov : :json,
         pull_request_number: @options.pull_request_param,
-        pull_request_base_ref: @options.base_ref_param
+        pull_request_base_ref: @options.base_ref_param,
+        pull_request_head_ref: @options.head_ref_param
       }.compact.to_json
     )
   end
@@ -144,6 +145,19 @@ class UndercoverCiCoverageUpload # rubocop:disable Metrics/ClassLength
   end
 
   private
+
+  # optional arguments, so a CI template that expands to nothing (a push build) is not an error
+  def pull_request_options(opts)
+    opts.on("--pull-request [NUMBER]", "Pull request number, defaults to $GITHUB_REF on GitHub Actions") do |v|
+      @options.pull_request = Options.presence(v)
+    end
+    opts.on("--pull-request-base-ref [BRANCH]", "Pull request target branch, defaults to $GITHUB_BASE_REF") do |v|
+      @options.pull_request_base_ref = Options.presence(v)
+    end
+    opts.on("--pull-request-head-ref [BRANCH]", "Pull request branch, defaults to $GITHUB_HEAD_REF") do |v|
+      @options.pull_request_head_ref = Options.presence(v)
+    end
+  end
 
   def request(method, url, body)
     http = Net::HTTP.start(url.hostname, use_ssl: url.instance_of?(URI::HTTPS))

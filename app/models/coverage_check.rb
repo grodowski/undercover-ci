@@ -94,8 +94,9 @@ class CoverageCheck < ApplicationRecord
     default_branch if pull_request_number && base_sha.blank?
   end
 
+  # an upload-created check has no check_suite, only the branch name the uploader sent
   def head_branch
-    check_suite && check_suite["head_branch"]
+    check_suite&.dig("head_branch") || pull_request_head_ref
   end
 
   def pull_requests

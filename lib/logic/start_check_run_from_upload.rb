@@ -10,17 +10,18 @@ module Logic
 
     REPO_KEYS = %w[id full_name default_branch visibility private html_url].freeze
 
-    def self.call(repo_full_name, sha, pull_request_number, pull_request_base_ref = nil)
-      new(repo_full_name, sha, pull_request_number, pull_request_base_ref).create_coverage_check
+    def self.call(repo_full_name, sha, pull_request_number, base_ref: nil, head_ref: nil)
+      new(repo_full_name, sha, pull_request_number, base_ref:, head_ref:).create_coverage_check
     end
 
-    attr_reader :repo_full_name, :sha, :pull_request_number, :pull_request_base_ref
+    attr_reader :repo_full_name, :sha, :pull_request_number, :base_ref, :head_ref
 
-    def initialize(repo_full_name, sha, pull_request_number, pull_request_base_ref = nil)
+    def initialize(repo_full_name, sha, pull_request_number, base_ref: nil, head_ref: nil)
       @repo_full_name = repo_full_name
       @sha = sha
       @pull_request_number = pull_request_number.to_i
-      @pull_request_base_ref = pull_request_base_ref
+      @base_ref = base_ref
+      @head_ref = head_ref
     end
 
     def create_coverage_check
@@ -48,7 +49,7 @@ module Logic
 
     def build_coverage_check(installation, repository, base_sha)
       coverage_check = installation.coverage_checks.create!(
-        head_sha: sha, repo: repository, pull_request_number:, base_sha:
+        head_sha: sha, repo: repository, pull_request_number:, pull_request_head_ref: head_ref, base_sha:
       )
       Logic::UpdateCoverageCheckState.new(coverage_check).await_coverage
       ExpireCheckJob.set(wait: coverage_check.expire_check_wait).perform_later(coverage_check.id)
@@ -61,14 +62,14 @@ module Logic
     # have would fail every compare call, so the check falls back to the default branch instead.
     # Other GitHub errors fail the upload, so a retry compares against the right branch.
     def compare_base(installation, repository)
-      return if pull_request_base_ref.blank?
-      return pull_request_base_ref if pull_request_base_ref == repository["default_branch"]
+      return if base_ref.blank?
+      return base_ref if base_ref == repository["default_branch"]
 
-      client(installation).get("/repos/#{repo_full_name}/branches/#{pull_request_base_ref}")
-      pull_request_base_ref
+      client(installation).get("/repos/#{repo_full_name}/branches/#{base_ref}")
+      base_ref
     rescue Octokit::NotFound => e
       log "comparing #{repo_full_name} pull/#{pull_request_number} against the default branch, " \
-          "base ref #{pull_request_base_ref} not found: #{e.class}"
+          "base ref #{base_ref} not found: #{e.class}"
       nil
     end
 

@@ -284,6 +284,10 @@ claude --plugin-dir ./undercover-claude</code></pre>
         against the right branch. Defaults to <code>$GITHUB_BASE_REF</code> on GitHub Actions; elsewhere the default
         branch is used when it's not set.
 
+        <h6 class="mb-2 mt-3"><code>--pull-request-head-ref</code></h6>
+        The pull request's branch, sent with <code>--pull-request</code> so the dashboard shows a fork's branch name.
+        Defaults to <code>$GITHUB_HEAD_REF</code> on GitHub Actions.
+
         <h6 class="mb-2 mt-3"><code>--cancel</code></h6>
         Cancel coverage check represented by the given <code>--commit</code>. The check will be passing and marked as completed + skipped on your GitHub commit or pull request.
 

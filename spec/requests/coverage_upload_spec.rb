@@ -64,10 +64,18 @@ describe "Coverage Upload" do
     end
 
     it "compares the check against the pull request's target branch" do
-      upload(pull_request_number: "42", pull_request_base_ref: "release/1.x")
+      upload(pull_request_number: "42", pull_request_base_ref: "release/1.x", pull_request_head_ref: "fix/typo")
 
       expect(response.status).to eq(201)
       expect(CoverageCheck.last.base_sha).to eq("release/1.x")
+      expect(CoverageCheck.last.head_branch).to eq("fix/typo")
+    end
+
+    it "ignores an invalid head ref" do
+      upload(pull_request_number: "42", pull_request_head_ref: "../main")
+
+      expect(response.status).to eq(201)
+      expect(CoverageCheck.last.head_branch).to be_nil
     end
 
     ["../main", "-main", "main.lock", "a b", "x" * 256, {"nested" => "main"}, ["main"]].each do |base_ref|
@@ -80,8 +88,6 @@ describe "Coverage Upload" do
     end
 
     it "ignores the base ref without a pull request number" do
-      expect(Logic::ResolveCoverageCheck).to receive(:call).with("user/repository", "b4c0n", nil, nil).and_call_original
-
       upload(pull_request_base_ref: "release/1.x")
 
       expect(response.status).to eq(404)
