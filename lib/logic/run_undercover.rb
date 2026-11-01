@@ -84,13 +84,19 @@ module Logic
     end
 
     def update_compare_to_merge_base(run)
-      compare_response = installation_api_client(run.installation_id).compare(run.full_name, run.compare, run.sha)
+      compare_response = installation_api_client(run.installation_id)
+                         .compare(run.full_name, url_encode_ref(run.compare), run.sha)
       merge_base_sha = compare_response.merge_base_commit.sha
       run.compare = merge_base_sha
       log("updated merge base for #{run.external_id} via GitHub compare")
     rescue Octokit::Error => e
       log("update_compare_to_merge_base failed with #{e}, retrying...")
       raise # retry
+    end
+
+    # A target branch from an upload can hold any character git allows, Octokit's compare doesn't escape it
+    def url_encode_ref(ref)
+      ref.split("/").map { ERB::Util.url_encode(it) }.join("/")
     end
 
     # Fetches only the two commits and their trees. File contents are downloaded on demand,

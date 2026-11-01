@@ -64,8 +64,10 @@ describe "Coverage Upload" do
       stub_installation_token
       stub_pull_request_ref
       stub_repository
-      WebMock.stub_request(:get, "https://api.github.com/repos/user/repository/branches/release/1.x")
-             .to_return(status: 200, body: "{}", headers: {"Content-Type" => "application/json"})
+      %w[release%2F1.x release%2Bhotfix r%C3%A9lease].each do |branch|
+        WebMock.stub_request(:get, "https://api.github.com/repos/user/repository/branches/#{branch}")
+               .to_return(status: 200, body: "{}", headers: {"Content-Type" => "application/json"})
+      end
     end
 
     def upload(params)
@@ -92,7 +94,26 @@ describe "Coverage Upload" do
       expect(CoverageCheck.last.head_branch).to be_nil
     end
 
-    ["../main", "-main", "main.lock", "a b", "x" * 256, {"nested" => "main"}, ["main"]].each do |base_ref|
+    ["release+hotfix", "rélease"].each do |base_ref|
+      it "accepts the git branch name #{base_ref}" do
+        upload(pull_request_number: "42", pull_request_base_ref: base_ref)
+
+        expect(response.status).to eq(201)
+        expect(CoverageCheck.last.base_sha).to eq(base_ref)
+      end
+    end
+
+    [
+      "../main",
+      "-main",
+      "main.lock",
+      "a b",
+      "a~b",
+      "@{-1}",
+      "x" * 256,
+      {"nested" => "main"},
+      ["main"]
+    ].each do |base_ref|
       it "ignores the invalid base ref #{base_ref.inspect[0, 20]}" do
         upload(pull_request_number: "42", pull_request_base_ref: base_ref)
 

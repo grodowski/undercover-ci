@@ -65,7 +65,7 @@ module Logic
       return if base_ref.blank?
       return base_ref if base_ref == repository["default_branch"]
 
-      client(installation).get("/repos/#{repo_full_name}/branches/#{base_ref}")
+      client(installation).branch(repo_full_name, base_ref)
       base_ref
     rescue Octokit::NotFound => e
       log "comparing #{repo_full_name} pull/#{pull_request_number} against the default branch, " \

@@ -168,6 +168,22 @@ describe Logic::RunUndercover do
       expect(coverage_check.reload.state).to eq(:complete)
     end
 
+    it "escapes a target branch with characters outside a URL path" do
+      coverage_check.update!(base_sha: "rélease/1+x")
+      compare_stub = WebMock
+                     .stub_request(:get, "https://api.github.com/repos/author/repo/compare/r%C3%A9lease/1%2Bx...#{coverage_check.head_sha}")
+                     .to_return(
+                       status: 200,
+                       body: {merge_base_commit: {sha: "953a8049abaaa57f8db4ff97a55114283355d17e"}}.to_json,
+                       headers: {"Content-Type" => "application/json"}
+                     )
+      use_fake_remote(fork_pull_request: 42)
+
+      subject
+
+      expect(compare_stub).to have_been_requested
+    end
+
     it "fetches the head sha directly when the pull request ref has moved on" do
       remote = use_fake_remote(fork_pull_request: 42)
       system(
