@@ -16,52 +16,61 @@ describe ApplicationHelper do
     )
   end
 
-  describe "#pull_request_or_commit_link" do
-    it "links to the pull request of a check created from a fork upload" do
+  describe "#pull_request_label" do
+    it "uses the number of a check created from a fork upload" do
       coverage_check.update!(pull_request_number: 42)
 
-      link = helper.pull_request_or_commit_link(coverage_check)
+      expect(helper.pull_request_label(coverage_check)).to eq("#42")
+    end
 
-      expect(link).to include("https://github.com/author/repo/pull/42/checks")
-      expect(link).to include("#42 @ b4c0n1b4")
+    it "uses the number from a check_suite payload" do
+      coverage_check.update!(check_suite: {"pull_requests" => [{"number" => 7, "base" => {"ref" => "main"}}]})
+
+      expect(helper.pull_request_label(coverage_check)).to eq("#7")
+    end
+
+    it "is empty without a pull request" do
+      coverage_check.update!(check_suite: {"pull_requests" => []})
+
+      expect(helper.pull_request_label(coverage_check)).to be_nil
+    end
+  end
+
+  describe "#github_link" do
+    it "links to the pull request checks" do
+      coverage_check.update!(pull_request_number: 42)
+
+      expect(helper.github_link(coverage_check))
+        .to eq("<a href=\"https://github.com/author/repo/pull/42/checks\">View on GitHub</a>")
+    end
+
+    it "links to the commit without a pull request" do
+      expect(helper.github_link(coverage_check))
+        .to eq("<a href=\"https://github.com/author/repo/commit/b4c0n1b4c0n1\">View on GitHub</a>")
+    end
+  end
+
+  describe "#compare_base" do
+    it "uses the pull request target branch from a check_suite payload" do
+      coverage_check.update!(check_suite: {"pull_requests" => [{"number" => 7, "base" => {"ref" => "develop"}}]})
+
+      expect(helper.compare_base(coverage_check)).to eq("develop")
     end
 
     it "shows the full target branch of a check created from a fork upload" do
       coverage_check.update!(pull_request_number: 42, base_sha: "release/2.0")
 
-      expect(helper.pull_request_or_commit_link(coverage_check)).to include("<code>release/2.0</code>")
+      expect(helper.compare_base(coverage_check)).to eq("release/2.0")
     end
 
     it "shortens a base commit sha" do
       coverage_check.update!(base_sha: "953a8049abaaa57f8db4ff97a55114283355d17e")
 
-      expect(helper.pull_request_or_commit_link(coverage_check)).to include("<code>953a8049</code>")
+      expect(helper.compare_base(coverage_check)).to eq("953a8049")
     end
 
     it "falls back to the default branch without a base" do
-      expect(helper.pull_request_or_commit_link(coverage_check)).to include("<code>main</code>")
-    end
-
-    it "links to the commit when there is no pull request" do
-      expect(helper.pull_request_or_commit_link(coverage_check))
-        .to include("https://github.com/author/repo/commit/b4c0n1b4c0n1")
-    end
-
-    it "links to the pull request from a check_suite payload" do
-      coverage_check.update!(
-        check_suite: {
-          "pull_requests" => [
-            {"number" => 7, "head" => {"ref" => "feature"}, "base" => {"ref" => "main"}}
-          ]
-        }
-      )
-
-      link = helper.pull_request_or_commit_link(coverage_check)
-
-      expect(link).to include("https://github.com/author/repo/pull/7/checks")
-      expect(link).to include("#7 @ b4c0n1b4")
-      expect(link).to include("main")
-      expect(link).not_to include("feature")
+      expect(helper.compare_base(coverage_check)).to eq("main")
     end
   end
 end

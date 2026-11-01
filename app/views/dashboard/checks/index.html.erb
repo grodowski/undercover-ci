@@ -68,6 +68,8 @@
       <thead>
         <tr>
           <th>Repo</th>
+          <th>Branch</th>
+          <th>Pull request</th>
           <th>Commit</th>
           <th>Coverage</th>
           <th>State</th>
@@ -77,12 +79,9 @@
         <% @checks.each do |check| %>
           <tr class="row-href" data-href="<%= check_path(check.id) %>">
             <td><%= check.repo_full_name %></td>
-            <td>
-              <code><%= pull_request_or_commit_link(check) %></code>
-              <% if check.head_branch.present? %>
-                <span class="d-block small text-muted"><%= check.head_branch %></span>
-              <% end %>
-            </td>
+            <td><%= check.head_branch %></td>
+            <td><%= pull_request_label(check) %></td>
+            <td><code><%= check.head_sha[0..7] %></code></td>
             <td>
               <%= coverage_result_badge(check) %>
             </td>
@@ -96,7 +95,7 @@
           </tr>
         <% end %>
         <% if @checks.none? %>
-          <tr><td colspan=3><span>No data yet</span></td></tr>
+          <tr><td colspan=6><span>No data yet</span></td></tr>
         <% end %>
       </tbody>
     </table>

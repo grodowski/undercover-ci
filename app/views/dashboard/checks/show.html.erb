@@ -1,15 +1,27 @@
 <div class="mb-5">
-  <p class="lead">Commit report</p>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <p class="lead mb-0">Commit report</p>
+    <%= github_link(@check, class: "btn btn-primary") %>
+  </div>
   <table class="table">
+    <thead>
+      <tr>
+        <th>Repo</th>
+        <th>Branch</th>
+        <th>Pull request</th>
+        <th>Commit</th>
+        <th>Compared to</th>
+        <th>Coverage</th>
+        <th>State</th>
+      </tr>
+    </thead>
     <tbody>
       <tr>
         <td><%= @check.repo_full_name %></td>
-        <td>
-          <code><%= pull_request_or_commit_link(@check) %></code>
-          <% if @check.head_branch.present? %>
-            <span class="d-block small text-muted"><%= @check.head_branch %></span>
-          <% end %>
-        </td>
+        <td><%= @check.head_branch %></td>
+        <td><%= pull_request_label(@check) %></td>
+        <td><code><%= @check.head_sha[0..7] %></code></td>
+        <td><code><%= compare_base(@check) %></code></td>
         <td>
           <%= coverage_result_badge(@check) %>
         </td>

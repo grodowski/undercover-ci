@@ -84,7 +84,7 @@ describe "Dashboard spec" do
       get("/auth/github/callback")
       get("/app")
       expect(response.body).to include(
-        "<a href=\"https://github.com//commit/1337SHA\"><code>1337SHA</code> 👉 <code></code></a>"
+        "<td><code>1337SHA</code></td>"
       )
       expect(response.body).to include("<span class=\"badge rounded-pill text-bg-warning\">1 warning</span>")
       expect(response.body).to include("<span class=\"badge rounded-pill text-bg-success\">0 warnings</span>")
@@ -115,11 +115,17 @@ describe "Dashboard spec" do
         expect(response.body).not_to include("OLD_SHA")
       end
 
-      it "renders the head branch next to the check" do
+      it "renders the head branch of each check" do
         get("/app", params: {date_range: "last_90d"})
 
-        expect(response.body).to include("<span class=\"d-block small text-muted\">main</span>")
-        expect(response.body).to include("<span class=\"d-block small text-muted\">feature</span>")
+        expect(response.body).to include("<td>main</td>")
+        expect(response.body).to include("<td>feature</td>")
+      end
+
+      it "renders an empty state when no checks match" do
+        get("/app", params: {repository_name: "owner/repo1", date_range: "last_7d"})
+
+        expect(response.body).to include("<td colspan=6><span>No data yet</span></td>")
       end
 
       it "filters by repository name" do
@@ -203,6 +209,9 @@ describe "Dashboard spec" do
 
       get("/auth/github/callback")
       get("/checks/#{check.id}")
+      expect(response.body).to include(
+        "<a class=\"btn btn-primary\" href=\"https://github.com//commit/1337SHA\">View on GitHub</a>"
+      )
       expect(response.body).to include("<span class=\"badge rounded-pill text-bg-warning\">warning</span>")
       expect(response.body).to include(
         "Instance method <code>hello</code>. " \
