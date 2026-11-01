@@ -2253,6 +2253,14 @@ h1 *, h2 *, h3 *, h4 *, h5 *, h6 * {
   margin-bottom: 1rem;
 }
 
+.critical-paths {
+  display: none;
+}
+
+form:has(input[name="failure_mode"][value="neutral"]:checked) .critical-paths {
+  display: block;
+}
+
 .blog-post-body .post-caption {
   margin-top: -1.25rem;
   text-align: center;
