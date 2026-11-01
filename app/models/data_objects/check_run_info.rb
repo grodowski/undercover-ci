@@ -17,6 +17,7 @@ module DataObjects
     state_log
     failure_mode
     pull_request_number
+    critical_paths
   ].freeze
 
   # TODO: consider refactoring into OpenStruct/Class with named attrs
@@ -44,7 +45,8 @@ module DataObjects
         db_check.nodes, # TODO: wrap AR models with a dedicated read model
         db_check.state_log,
         db_check.failure_mode,
-        db_check.pull_request_number
+        db_check.pull_request_number,
+        db_check.critical_paths
       )
     end
 
@@ -73,6 +75,17 @@ module DataObjects
 
     def num_warnings
       @num_warnings ||= nodes.flagged.size
+    end
+
+    # With the failure mode every warning already fails the check, so critical paths only apply to neutral checks
+    def critical?(path)
+      return false unless failure_mode == "neutral"
+
+      (critical_paths || []).any? { File.fnmatch?(it, path, File::FNM_PATHNAME | File::FNM_EXTGLOB) }
+    end
+
+    def critical_warnings
+      @critical_warnings ||= nodes.flagged.select { critical?(it.path) }
     end
 
     def error_message
