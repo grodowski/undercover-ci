@@ -127,14 +127,13 @@ Learn how to install UndercoverCI for your repos, report coverage data and use t
       <p>Starting with <code>undercover</code> 0.9.0, UndercoverCI can also check ERB templates changed in a pull request. Your test suite needs Ruby 3.2+ and SimpleCov 1.0+. On older versions, pin <code>undercover ~> 0.8.0</code> and keep checking Ruby code only.</p>
 
       <p>
-        1. Enable eval coverage in <code>SimpleCov.start</code>. Templates are only measured when this is on. Keep <code>enable_coverage(:branch)</code> if you use branch coverage.
+        1. Enable eval coverage in <code>SimpleCov.start</code>, next to branch coverage. Templates are only measured when this is on.
         <pre><code>
           SimpleCov.start do
-            enable_coverage(:branch)
-            enable_coverage(:eval)
+            enable_coverage :branch, :eval
           end
         </code></pre>
-        If you merge reports from <a href="#parallel-tests">parallel tests</a>, add <code>enable_coverage(:eval)</code> to the <code>SimpleCov.collate</code> block too.
+        If you merge reports from <a href="#parallel-tests">parallel tests</a>, use the same <code>enable_coverage :branch, :eval</code> in the <code>SimpleCov.collate</code> block.
       </p>
 
       <p>
@@ -313,7 +312,7 @@ claude --plugin-dir ./undercover-claude</code></pre>
           puts('Merging coverage results from parallel CircleCI tests containers into a single JSON report...')
 
           SimpleCov.collate(Dir['/home/circleci/rspec/*.resultset.json']) do
-            enable_coverage(:branch)
+            enable_coverage :branch, :eval
           end
 
           report_path = ARGV[0] || 'coverage/coverage.json'

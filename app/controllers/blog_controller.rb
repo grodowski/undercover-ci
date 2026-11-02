@@ -5,6 +5,10 @@ class BlogController < ApplicationController
 
   POSTS_DIR = Rails.root.join("app/content/blog")
 
+  def index
+    @posts = load_posts.sort_by { |p| [p[:date], p[:slug]] }.reverse
+  end
+
   def show
     @post = load_posts.find { |p| p[:slug] == params[:slug] }
     render file: Rails.public_path.join("404.html"), status: :not_found, layout: false unless @post
@@ -27,6 +31,7 @@ class BlogController < ApplicationController
       title: meta["title"],
       date: meta["date"],
       description: meta["description"],
+      image: meta["image"],
       body: render_markdown(body.strip)
     }
   end
@@ -55,6 +60,9 @@ class BlogController < ApplicationController
                   else
                     @view_context.image_path("blog/#{link}")
                   end
+      # A number as the title sets the image width, e.g. ![tree](tree.png "314")
+      return "<img src=\"#{image_url}\" alt=\"#{alt}\" style=\"width: #{title}px\" />" if title.to_s.match?(/\A\d+\z/)
+
       "<img src=\"#{image_url}\" alt=\"#{alt}\" title=\"#{title}\" />"
     end
   end

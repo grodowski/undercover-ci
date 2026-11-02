@@ -1,5 +1,6 @@
 <% content_for(:title) { @post[:title] } %>
 <% content_for(:meta_description) { @post[:description] } %>
+<% content_for(:og_image) { image_url(@post[:image] ? "blog/#{@post[:image]}" : "check_screenshot.png") } %>
 
 <div class="container py-5">
   <div class="row justify-content-center">

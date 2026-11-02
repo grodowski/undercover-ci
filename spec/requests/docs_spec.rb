@@ -9,7 +9,7 @@ describe "/docs" do
     expect(response.status).to eq(200)
     expect(response.body).to include('id="view-coverage"')
     expect(response.body).to include('href="#view-coverage"')
-    expect(response.body).to include("enable_coverage(:eval)")
+    expect(response.body).to include("enable_coverage :branch, :eval")
     expect(response.body).to include("-f *.rb,*.rake,*.ru,Rakefile,*.erb")
   end
 

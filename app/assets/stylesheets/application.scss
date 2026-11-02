@@ -436,14 +436,39 @@ a.lead { line-height: 1.2; }
 }
 
 // maintenance banner
-.maintenance-banner__icon {
+.top-banner__icon {
   width: 18px;
   height: 18px;
   color: currentColor;
 }
 
+.top-banner {
+  border: 0;
+
+  &[hidden] { display: none; }
+
+  @mixin dark-top-banner {
+    background-color: #2a2a5c;
+    color: var(--text-color);
+
+    .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
+  }
+
+  :root[data-theme="dark"] & { @include dark-top-banner; }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) & { @include dark-top-banner; }
+  }
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}
+
 @media (max-width: 640px) {
-  .maintenance-banner__icon {
+  .top-banner__icon {
     width: 16px;
     height: 16px;
   }
@@ -1460,6 +1485,23 @@ blockquote {
 }
 
 // ----- Pricing + reading bands -----
+.why-section {
+  padding: 5rem 0;
+  background-color: var(--bg-color);
+  border-top: 1px solid var(--border-color);
+
+  h2 {
+    font-weight: 600;
+    font-size: 2.4rem;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+}
+
 .pricing-band {
   padding: 5.5rem 0;
   background-color: var(--band-tint);
@@ -1653,7 +1695,7 @@ blockquote {
 
   tbody tr:last-child td { border-bottom: none; }
 
-  tbody td:nth-child(4) {
+  tbody td:nth-child(5) {
     background: color-mix(in oklch, var(--band-tint) 60%, transparent);
   }
 
@@ -2000,11 +2042,11 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: inset 0 4px 0 var(--undercover-blue);
 }
 
-.pricing-table tbody td:nth-child(4) {
+.pricing-table tbody td:nth-child(5) {
   background: rgba(78, 78, 242, 0.045);
 }
 
-.pricing-table tbody tr:last-child td:nth-child(4) {
+.pricing-table tbody tr:last-child td:nth-child(5) {
   border-bottom-right-radius: 14px;
 }
 
@@ -2013,8 +2055,8 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(120, 140, 255, 0.14);
 }
 
-:root[data-theme="dark"] .pricing-table tbody td:nth-child(4),
-:root:not([data-theme="light"]) .pricing-table tbody td:nth-child(4) {
+:root[data-theme="dark"] .pricing-table tbody td:nth-child(5),
+:root:not([data-theme="light"]) .pricing-table tbody td:nth-child(5) {
   background: rgba(120, 140, 255, 0.09);
 }
 

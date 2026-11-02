@@ -20,10 +20,12 @@ Rails.application.routes.draw do
   get "/pricing", to: "home#pricing", as: :pricing_page
   get "/privacy", to: "home#privacy", as: :privacy_page
   get "/terms", to: "home#terms", as: :terms_page
+  get "/cookies", to: "home#cookie_policy", as: :cookies_page
   get "/faq", to: "home#faq", as: :faq_page
   get "/docs", to: "home#docs", as: :docs_page
   get "/subscription_confirmation", to: "home#subscription_confirmation"
 
+  get "/blog", to: "blog#index", as: :blog
   get "/blog/:slug", to: "blog#show", as: :blog_post
 
   scope module: "dashboard" do
