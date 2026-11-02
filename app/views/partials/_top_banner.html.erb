@@ -1,0 +1,44 @@
+<% maintenance = ENV["MAINTENANCE_REASON"].presence %>
+<% message = maintenance || ENV["ANNOUNCEMENT"].presence %>
+<% if message %>
+  <div class="alert alert-info top-banner mb-0 rounded-0 py-2" id="top-banner" role="alert"
+       aria-label="<%= maintenance ? "Maintenance notification" : "Announcement" %>"
+       <% unless maintenance %>data-key="announcement_<%= Digest::SHA256.hexdigest(message)[0, 12] %>" hidden<% end %>>
+    <div class="d-flex align-items-center gap-3 container">
+      <svg class="top-banner__icon flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <% if maintenance %>
+          <path d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        <% else %>
+          <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
+          <path d="M20 3v4M22 5h-4M4 17v2M5 18H3"></path>
+        <% end %>
+      </svg>
+      <div class="flex-grow-1">
+        <%= raw message %>
+      </div>
+      <% unless maintenance %>
+        <button type="button" class="btn-close" id="top-banner-close" aria-label="Dismiss"></button>
+      <% end %>
+    </div>
+  </div>
+  <% unless maintenance %>
+    <script>
+    (function() {
+      function initTopBanner() {
+        var banner = document.getElementById('top-banner');
+        if (!banner) return;
+        var key = banner.dataset.key;
+        try { if (localStorage.getItem(key) === 'dismissed') return; } catch (e) {}
+        banner.hidden = false;
+        document.getElementById('top-banner-close').onclick = function() {
+          try { localStorage.setItem(key, 'dismissed'); } catch (e) {}
+          banner.hidden = true;
+        };
+      }
+      document.addEventListener('turbo:load', initTopBanner);
+      document.addEventListener('DOMContentLoaded', initTopBanner);
+      initTopBanner();
+    })();
+    </script>
+  <% end %>
+<% end %>

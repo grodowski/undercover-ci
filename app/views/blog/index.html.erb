@@ -1,0 +1,18 @@
+<% content_for(:title) { "Blog" } %>
+<% content_for(:meta_description) { "Posts about undercover, UndercoverCI and testing Ruby code." } %>
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <h1 class="mb-4">Blog</h1>
+
+      <% @posts.each do |post| %>
+        <article class="mb-4">
+          <p class="small text-muted mb-1"><%= post[:date]&.strftime("%B %-d, %Y") %></p>
+          <h2 class="h4 mb-1"><%= link_to post[:title], blog_post_path(post[:slug]) %></h2>
+          <p class="mb-0"><%= post[:description] %></p>
+        </article>
+      <% end %>
+    </div>
+  </div>
+</div>

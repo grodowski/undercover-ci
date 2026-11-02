@@ -2,6 +2,7 @@
 title: 4 ways to steer your agents towards better tests with Undercover CI
 date: 2026-06-11
 description: AI agents write code fast but skip tests. Here are 4 ways to catch untested code, from CLI checks to CI enforcement with Undercover CI.
+image: coverage_agent_fail.png
 ---
 
 As agents write more and more of the code, our job has shifted towards ownership: less time spent writing, more reviewing diffs, catching architectural gaps, ensuring quality doesn't slip.

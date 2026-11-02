@@ -3,12 +3,18 @@
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://undercover-ci.com/">
+<meta property="og:url" content="<%= request.base_url + request.path %>">
 <meta property="og:title" content="UndercoverCI<%= t = yield :title; " | #{t}" if t %>">
 <meta property="og:description" content="<%= yield :meta_description %>">
+<% if content_for?(:og_image) %>
+<meta property="og:image" content="<%= yield :og_image %>">
+<% end %>
 
 <!-- Twitter -->
-<meta property="twitter:card" content="summary">
-<meta property="twitter:url" content="https://undercover-ci.com/">
+<meta property="twitter:card" content="<%= content_for?(:og_image) ? "summary_large_image" : "summary" %>">
+<meta property="twitter:url" content="<%= request.base_url + request.path %>">
 <meta property="twitter:title" content="UndercoverCI<%= t = yield :title; " | #{t}" if t %>">
 <meta property="twitter:description" content="<%= yield :meta_description %>">
+<% if content_for?(:og_image) %>
+<meta property="twitter:image" content="<%= yield :og_image %>">
+<% end %>
