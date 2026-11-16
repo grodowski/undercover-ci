@@ -5,6 +5,7 @@ module Dashboard
     include Chartable
 
     DEFAULT_PER_PAGE = 25
+    BRANCH_SUGGESTIONS_FROM_CHECKS = 1000
 
     before_action :check_current_user
     before_action :validate_installations
@@ -35,10 +36,12 @@ module Dashboard
       checks = current_user.coverage_checks
       checks = checks.where("repo->>'full_name' = ?", chart_params[:repository_name]) if chart_params[:repository_name]
 
-      checks.last_90d
-            .order(created_at: :desc)
-            .pluck(Arel.sql(CoverageCheck::HEAD_BRANCH_SQL))
-            .compact.uniq.unshift(["All branches", "all"])
+      # selects ids first, so that only the limited rows read the large check_suite
+      recent_ids = checks.last_90d.order(created_at: :desc).limit(BRANCH_SUGGESTIONS_FROM_CHECKS).select(:id)
+      CoverageCheck.where(id: recent_ids)
+                   .order(created_at: :desc)
+                   .pluck(Arel.sql(CoverageCheck::HEAD_BRANCH_SQL))
+                   .compact.uniq.unshift(["All branches", "all"])
     end
 
     def chart_params_for_async_chart
