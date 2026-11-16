@@ -148,6 +148,15 @@ describe "Dashboard spec" do
         expect(response.body).not_to include("RECENT_S")
       end
 
+      it "suggests branches of the most recent checks only" do
+        stub_const("Dashboard::ChecksController::BRANCH_SUGGESTIONS_FROM_CHECKS", 1)
+
+        get("/app", params: {date_range: "last_90d"})
+
+        expect(response.body).to include('<option value="feature">')
+        expect(response.body).not_to include('<option value="main">')
+      end
+
       it "filters by branch name" do
         get("/app", params: {branch_name: "feature"})
         expect(response.body).to include("RECENT_S")
