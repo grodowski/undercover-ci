@@ -88,6 +88,8 @@ describe "Dashboard spec" do
       )
       expect(response.body).to include("<span class=\"badge rounded-pill text-bg-warning\">1 warning</span>")
       expect(response.body).to include("<span class=\"badge rounded-pill text-bg-success\">0 warnings</span>")
+      expect(response.body).to include("© #{Time.current.year} UndercoverCI")
+      expect(response.body).to include("href=\"mailto:help@undercover-ci.com\"")
     end
 
     context "filter_checks_from_params functionality" do

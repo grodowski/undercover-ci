@@ -17,4 +17,8 @@ describe "/docs" do
     expect(response.body).to include("# simplecov:disable")
     expect(response.body).to include("relative to the directory SimpleCov covered")
   end
+
+  it "renders the current year in the footer" do
+    expect(response.body).to include("© #{Time.current.year} UndercoverCI")
+  end
 end
