@@ -10,10 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_11_01_125118) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_16_120000) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_stat_statements"
-  enable_extension "plpgsql"
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -59,6 +59,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_11_01_125118) do
     t.integer "pull_request_number"
     t.string "pull_request_head_ref"
     t.index ["head_sha"], name: "index_coverage_checks_on_head_sha"
+    t.index ["installation_id", "created_at"], name: "index_coverage_checks_on_installation_id_and_created_at"
     t.index ["installation_id"], name: "index_coverage_checks_on_installation_id"
     t.index ["repo"], name: "index_coverage_checks_on_repo", opclass: :jsonb_path_ops, using: :gin
     t.index ["result"], name: "index_coverage_checks_on_result"
