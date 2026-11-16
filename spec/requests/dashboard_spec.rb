@@ -88,6 +88,8 @@ describe "Dashboard spec" do
       )
       expect(response.body).to include("<span class=\"badge rounded-pill text-bg-warning\">1 warning</span>")
       expect(response.body).to include("<span class=\"badge rounded-pill text-bg-success\">0 warnings</span>")
+      expect(response.body).to include("© #{Time.current.year} UndercoverCI")
+      expect(response.body).to include("href=\"mailto:help@undercover-ci.com\"")
     end
 
     context "filter_checks_from_params functionality" do
@@ -144,6 +146,15 @@ describe "Dashboard spec" do
 
         expect(response.body).to include("FORK_SHA", '<option value="fork-branch">')
         expect(response.body).not_to include("RECENT_S")
+      end
+
+      it "suggests branches of the most recent checks only" do
+        stub_const("Dashboard::ChecksController::BRANCH_SUGGESTIONS_FROM_CHECKS", 1)
+
+        get("/app", params: {date_range: "last_90d"})
+
+        expect(response.body).to include('<option value="feature">')
+        expect(response.body).not_to include('<option value="main">')
       end
 
       it "filters by branch name" do
