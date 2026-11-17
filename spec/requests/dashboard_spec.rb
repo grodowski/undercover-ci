@@ -157,6 +157,17 @@ describe "Dashboard spec" do
         expect(response.body).not_to include('<option value="main">')
       end
 
+      it "suggests branches of the selected repository" do
+        get("/app", params: {repository_name: "owner/repo1"})
+
+        expect(response.body).to include('<option value="main">')
+        expect(response.body).not_to include('<option value="feature">')
+
+        get("/app", params: {repository_name: "all"})
+
+        expect(response.body).to include('<option value="main">', '<option value="feature">')
+      end
+
       it "filters by branch name" do
         get("/app", params: {branch_name: "feature"})
         expect(response.body).to include("RECENT_S")

@@ -1,1 +1,2 @@
 -f *.rb,*.rake,*.ru,Rakefile,*.erb
+-x test/*,spec/*,db/*,config/*,*_test.rb,*_spec.rb,vendor/*,script/*
