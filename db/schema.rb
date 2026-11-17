@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_16_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_17_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_stat_statements"
@@ -58,6 +58,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_16_120000) do
     t.string "result"
     t.integer "pull_request_number"
     t.string "pull_request_head_ref"
+    t.index "installation_id, ((repo ->> 'full_name'::text)), created_at", name: "index_coverage_checks_on_installation_repo_created_at"
     t.index ["head_sha"], name: "index_coverage_checks_on_head_sha"
     t.index ["installation_id", "created_at"], name: "index_coverage_checks_on_installation_id_and_created_at"
     t.index ["installation_id"], name: "index_coverage_checks_on_installation_id"
