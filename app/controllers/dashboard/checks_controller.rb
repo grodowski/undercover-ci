@@ -33,9 +33,7 @@ module Dashboard
     end
 
     def branch_names_options_for_select
-      checks = current_user.coverage_checks
-      checks = checks.where("repo->>'full_name' = ?", chart_params[:repository_name]) if chart_params[:repository_name]
-
+      checks = filter_by_repository(current_user.coverage_checks)
       # selects ids first, so that only the limited rows read the large check_suite
       recent_ids = checks.last_90d.order(created_at: :desc).limit(BRANCH_SUGGESTIONS_FROM_CHECKS).select(:id)
       CoverageCheck.where(id: recent_ids)

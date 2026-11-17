@@ -17,7 +17,14 @@ ApplicationController.prepend(
   end
 )
 
-paths = ["/app", "/app?date_range=last_90d", "/app?branch_name=branch-42", "/charts/total_checks"]
+paths = [
+  "/app",
+  "/app?date_range=last_90d",
+  "/app?branch_name=branch-42",
+  "/app?repository_name=bench-org%2Fmonorepo",
+  "/app?repository_name=all",
+  "/charts/total_checks?repository_name=bench-org%2Fmonorepo"
+]
 runs = Integer(ENV.fetch("RUNS", "5"))
 session = ActionDispatch::Integration::Session.new(Rails.application)
 session.host = "localhost"

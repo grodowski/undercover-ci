@@ -31,7 +31,7 @@ conn.execute(<<~SQL)
 SQL
 noise_ids = conn.select_values("SELECT id FROM installations WHERE id <> #{target.id} ORDER BY id")
 
-# ~2.4KB check_suite like production: the GitHub payload, with a hard to compress commit message
+# check_suite and repo hold GitHub payloads of a few KB, so Postgres stores them out of line
 check_suite_sql = <<~SQL
   jsonb_build_object(
     'id', 100000000000 + r.n,
@@ -69,7 +69,10 @@ end
     INSERT INTO coverage_checks (installation_id, head_sha, base_sha, repo, check_suite, state, result,
                                  state_log, event_log, created_at, updated_at)
     SELECT r.installation_id, r.sha, 'master',
-           jsonb_build_object('full_name', r.full_name, 'visibility', 'private', 'default_branch', 'master'),
+           jsonb_build_object(
+             'full_name', r.full_name, 'visibility', 'private', 'default_branch', 'master',
+             'description', concat(#{(1..56).map { "md5(r.n::text || 'repo#{it}')" }.join(', ')})
+           ),
            #{check_suite_sql},
            'complete', CASE WHEN random() < 0.8 THEN 'passed' ELSE 'failed' END,
            jsonb_build_array(jsonb_build_object('to', 'complete', 'ts', r.ts, 'via', 'benchmark')),
